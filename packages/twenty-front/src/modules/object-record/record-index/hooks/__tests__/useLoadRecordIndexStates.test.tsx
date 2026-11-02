@@ -5,7 +5,9 @@ import { anyFieldFilterValueComponentState } from '@/object-record/record-filter
 import { recordIndexGroupLoadLimitComponentState } from '@/object-record/record-index/states/recordIndexGroupLoadLimitComponentState';
 import { jotaiStore } from '@/ui/utilities/state/jotai/jotaiStore';
 import { DEFAULT_VIEW_GROUP_LOAD_LIMIT } from 'twenty-shared/constants';
+import { loadedViewFiltersComponentFamilyState } from '@/views/states/loadedViewFiltersComponentFamilyState';
 import { type View } from '@/views/types/View';
+import { ViewFilterOperand } from 'twenty-shared/types';
 import { act } from 'react';
 import { ViewType, ViewVisibility } from '~/generated-metadata/graphql';
 import { getJestMetadataAndApolloMocksWrapper } from '~/testing/jest/getJestMetadataAndApolloMocksWrapper';
@@ -49,6 +51,38 @@ const renderUseLoadRecordIndexStates = () =>
   });
 
 describe('useLoadRecordIndexStates', () => {
+  it('records the saved filters the record filters were loaded from', () => {
+    const { result } = renderUseLoadRecordIndexStates();
+    const viewFilters = [
+      {
+        id: 'filter-id',
+        fieldMetadataId: objectMetadataItem.fields[0].id,
+        operand: ViewFilterOperand.CONTAINS,
+        value: 'saved',
+      },
+    ];
+
+    act(() => {
+      result.current.loadRecordIndexStates(
+        { ...makeView(null), viewFilters },
+        objectMetadataItem,
+        {
+          skipGlobalIndexStates: true,
+          recordIndexId,
+        },
+      );
+    });
+
+    expect(
+      jotaiStore.get(
+        loadedViewFiltersComponentFamilyState.atomFamily({
+          instanceId: recordIndexId,
+          familyKey: { viewId: 'view-id' },
+        }),
+      ),
+    ).toEqual(viewFilters);
+  });
+
   it('hydrates the scoped any-field filter from the loaded view', () => {
     const { result } = renderUseLoadRecordIndexStates();
 

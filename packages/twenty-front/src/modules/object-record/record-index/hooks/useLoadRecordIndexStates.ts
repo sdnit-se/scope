@@ -36,6 +36,7 @@ import { ViewComponentInstanceContext } from '@/views/states/contexts/ViewCompon
 import { useAtomComponentStateCallbackState } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateCallbackState';
 import { hasInitializedCurrentRecordFieldsComponentFamilyState } from '@/views/states/hasInitializedCurrentRecordFieldsComponentFamilyState';
 import { hasInitializedCurrentRecordFiltersComponentFamilyState } from '@/views/states/hasInitializedCurrentRecordFiltersComponentFamilyState';
+import { loadedViewFiltersComponentFamilyState } from '@/views/states/loadedViewFiltersComponentFamilyState';
 import { hasInitializedCurrentRecordSortsComponentFamilyState } from '@/views/states/hasInitializedCurrentRecordSortsComponentFamilyState';
 import { type View } from '@/views/types/View';
 import { mapViewFieldToRecordField } from '@/views/utils/mapViewFieldToRecordField';
@@ -306,6 +307,11 @@ export const useLoadRecordIndexStates = () => {
           instanceId: recordIndexId,
           familyKey: { viewId: view.id },
         });
+      const loadedViewFiltersAtom =
+        loadedViewFiltersComponentFamilyState.atomFamily({
+          instanceId: recordIndexId,
+          familyKey: { viewId: view.id },
+        });
       const hasInitializedSortsAtom =
         hasInitializedCurrentRecordSortsComponentFamilyState.atomFamily({
           instanceId: recordIndexId,
@@ -322,6 +328,7 @@ export const useLoadRecordIndexStates = () => {
           batchSet(currentRecordFilterGroupsAtom, recordFilterGroups);
           batchSet(anyFieldFilterValueAtom, view.anyFieldFilterValue ?? '');
           batchSet(hasInitializedFiltersAtom, true);
+          batchSet(loadedViewFiltersAtom, view.viewFilters);
 
           batchSet(currentRecordSortsAtom, view.viewSorts);
           batchSet(hasInitializedSortsAtom, true);

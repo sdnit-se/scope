@@ -1,9 +1,7 @@
 import { currentRecordFiltersComponentState } from '@/object-record/record-filter/states/currentRecordFiltersComponentState';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { useGetCurrentViewOnly } from '@/views/hooks/useGetCurrentViewOnly';
-import { getViewFiltersToCreate } from '@/views/utils/getViewFiltersToCreate';
-import { getViewFiltersToDelete } from '@/views/utils/getViewFiltersToDelete';
-import { getViewFiltersToUpdate } from '@/views/utils/getViewFiltersToUpdate';
+import { areViewFilterListsDifferent } from '@/views/utils/areViewFilterListsDifferent';
 import { mapRecordFilterToViewFilter } from '@/views/utils/mapRecordFilterToViewFilter';
 import { useMemo } from 'react';
 
@@ -19,27 +17,10 @@ export const useAreViewFiltersDifferentFromRecordFilters = () => {
       mapRecordFilterToViewFilter,
     );
 
-    const viewFiltersToCreate = getViewFiltersToCreate(
+    return areViewFilterListsDifferent(
       currentViewFilters,
       viewFiltersFromCurrentRecordFilters,
     );
-
-    const viewFiltersToDelete = getViewFiltersToDelete(
-      currentViewFilters,
-      viewFiltersFromCurrentRecordFilters,
-    );
-
-    const viewFiltersToUpdate = getViewFiltersToUpdate(
-      currentViewFilters,
-      viewFiltersFromCurrentRecordFilters,
-    );
-
-    const filtersHaveChanged =
-      viewFiltersToCreate.length > 0 ||
-      viewFiltersToDelete.length > 0 ||
-      viewFiltersToUpdate.length > 0;
-
-    return filtersHaveChanged;
   }, [currentRecordFilters, currentView]);
 
   return { viewFiltersAreDifferentFromRecordFilters };
