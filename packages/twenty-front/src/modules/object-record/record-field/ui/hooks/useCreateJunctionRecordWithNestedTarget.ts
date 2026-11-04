@@ -7,7 +7,6 @@ import { getToastOptionsFromError } from '@/error-handler/utils/getToastOptionsF
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { getObjectTypename } from '@/object-record/cache/utils/getObjectTypename';
-import { useBuildRecordInputFromRLSPredicates } from '@/object-record/hooks/useBuildRecordInputFromRLSPredicates';
 import { useCreateOneRecord } from '@/object-record/hooks/useCreateOneRecord';
 import { findTargetFieldInfo } from '@/object-record/record-field/ui/utils/junction/findTargetFieldInfo';
 import { getSourceJoinColumnName } from '@/object-record/record-field/ui/utils/junction/getSourceJoinColumnName';
@@ -39,8 +38,6 @@ export const useCreateJunctionRecordWithNestedTarget = ({
   const { objectMetadataItems } = useObjectMetadataItems();
   const { enqueueToast } = useToast();
   const { createRecordWithOptionalForm } = useRecordCreationForm();
-  const { buildRecordInputFromRLSPredicates } =
-    useBuildRecordInputFromRLSPredicates();
   const { createOneRecord: createJunctionRecord } = useCreateOneRecord({
     objectNameSingular:
       junctionConfig?.junctionObjectMetadata.nameSingular ??
@@ -124,9 +121,6 @@ export const useCreateJunctionRecordWithNestedTarget = ({
         const targetRecord = await createRecordWithOptionalForm({
           objectMetadataItem: targetObjectMetadataItem,
           initialDraftRecord: {
-            ...buildRecordInputFromRLSPredicates({
-              objectMetadataItem: targetObjectMetadataItem,
-            }),
             ...buildRecordLabelPayload({
               searchInput,
               objectMetadataItem: targetObjectMetadataItem,
@@ -153,7 +147,6 @@ export const useCreateJunctionRecordWithNestedTarget = ({
       }
     },
     [
-      buildRecordInputFromRLSPredicates,
       createJunctionRecord,
       createRecordWithOptionalForm,
       enqueueToast,

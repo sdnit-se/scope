@@ -3,7 +3,6 @@ import { createStore, Provider } from 'jotai';
 import { type ReactNode } from 'react';
 
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
-import { useBuildRecordInputFromRLSPredicates } from '@/object-record/hooks/useBuildRecordInputFromRLSPredicates';
 import { useCreateOneRecord } from '@/object-record/hooks/useCreateOneRecord';
 import { useCreateJunctionRecordWithNestedTarget } from '@/object-record/record-field/ui/hooks/useCreateJunctionRecordWithNestedTarget';
 import { isUsableJunctionConfig } from '@/object-record/record-field/ui/utils/junction/isUsableJunctionConfig';
@@ -25,7 +24,6 @@ import { getMockObjectMetadataItemOrThrow } from '~/testing/utils/getMockObjectM
 import { getTestEnrichedObjectMetadataItemsMock } from '~/testing/utils/getTestEnrichedObjectMetadataItemsMock';
 
 jest.mock('@/object-metadata/hooks/useObjectMetadataItems');
-jest.mock('@/object-record/hooks/useBuildRecordInputFromRLSPredicates');
 jest.mock('@/object-record/hooks/useCreateOneRecord', () => ({
   useCreateOneRecord: jest.fn(),
 }));
@@ -126,9 +124,6 @@ beforeEach(() => {
   jest.clearAllMocks();
   jest.mocked(useObjectMetadataItems).mockReturnValue({ objectMetadataItems });
   jest.mocked(useIsFeatureEnabled).mockReturnValue(true);
-  jest.mocked(useBuildRecordInputFromRLSPredicates).mockReturnValue({
-    buildRecordInputFromRLSPredicates: () => ({}),
-  });
   jest.mocked(useCreateOneRecord).mockReturnValue({
     createOneRecord: mockCreateJunctionRecord,
     loading: false,

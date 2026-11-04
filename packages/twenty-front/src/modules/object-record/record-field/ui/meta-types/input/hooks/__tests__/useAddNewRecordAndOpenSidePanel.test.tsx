@@ -31,11 +31,6 @@ jest.mock('@/object-record/hooks/useCreateOneRecord', () => ({
 jest.mock('@/object-record/hooks/useUpdateOneRecord', () => ({
   useUpdateOneRecord: () => ({ updateOneRecord: mockUpdateOneRecord }),
 }));
-jest.mock('@/object-record/hooks/useBuildRecordInputFromRLSPredicates', () => ({
-  useBuildRecordInputFromRLSPredicates: () => ({
-    buildRecordInputFromRLSPredicates: () => ({}),
-  }),
-}));
 jest.mock('@/object-record/hooks/useObjectPermissionsForObject', () => ({
   useObjectPermissionsForObject: () => ({ canUpdateObjectRecords: true }),
 }));
