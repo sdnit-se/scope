@@ -24,73 +24,41 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-      - run: scripts/check-no-enterprise-code.sh --max "$ENTERPRISE_FILES_MAX"
+      - uses: jdx/mise-action@fc42bcc7ddbf51124c30f95a877a0c5168a3bfde # v5.2.1
+        with:
+          version: 2026.10.23
+          install: false
+      - run: mise run enterprise:check --max "$ENTERPRISE_FILES_MAX"
 
-  shared:
-    if: github.repository == 'sdnit-se/scope'
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    env:
-      NODE_OPTIONS: '--max-old-space-size=4096'
-    steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-      - uses: ./.github/actions/yarn-install
-      - run: npx nx build twenty-shared
-      - run: npx nx run-many -t lint typecheck test -p twenty-shared
-
-  front:
-    if: github.repository == 'sdnit-se/scope'
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-    env:
-      NODE_OPTIONS: '--max-old-space-size=10240'
-    steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-      - uses: ./.github/actions/yarn-install
-      - run: npx nx build twenty-shared
-      - run: npx nx reset:env twenty-front
-      - run: npx nx run-many -t lint typecheck -p twenty-front
-      - run: npx nx build twenty-front
-
-  front-test:
-    if: github.repository == 'sdnit-se/scope'
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-    env:
-      NODE_OPTIONS: '--max-old-space-size=6144'
-    strategy:
-      fail-fast: false
-      matrix:
-        shard: [1, 2, 3]
-    steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-      - uses: ./.github/actions/yarn-install
-      - run: npx nx build twenty-shared
-      - run: npx nx reset:env twenty-front
-      - run: npx nx test twenty-front --shard=${{ matrix.shard }}/3
-
-  server:
-    if: github.repository == 'sdnit-se/scope'
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-    steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-      - uses: ./.github/actions/yarn-install
-      - run: npx nx build twenty-shared
-      - run: npx nx reset:env twenty-server
-      - run: npx nx run-many -t lint typecheck -p twenty-server
-      - run: npx nx build twenty-server
-
-  server-test:
+  check:
     if: github.repository == 'sdnit-se/scope'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4]
+        package: [shared, front, server]
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-      - uses: ./.github/actions/yarn-install
-      - run: npx nx build twenty-shared
-      - run: npx nx run twenty-server:test:ci --shard=${{ matrix.shard }}/4
+      - uses: ./.github/actions/scope-setup
+      - run: mise run check:${{ matrix.package }}
+
+  test:
+    if: github.repository == 'sdnit-se/scope'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { package: front, shard: 1/3 }
+          - { package: front, shard: 2/3 }
+          - { package: front, shard: 3/3 }
+          - { package: server, shard: 1/4 }
+          - { package: server, shard: 2/4 }
+          - { package: server, shard: 3/4 }
+          - { package: server, shard: 4/4 }
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: ./.github/actions/scope-setup
+      - run: mise run test:${{ matrix.package }} ${{ matrix.shard }}
