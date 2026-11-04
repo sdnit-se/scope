@@ -15,7 +15,7 @@ concurrency:
 
 env:
   # Lower this as each area is removed; it reaches 0 when the work is done.
-  ENTERPRISE_FILES_MAX: 597
+  ENTERPRISE_FILES_MAX: 541
 
 jobs:
   enterprise-code:
