@@ -28,9 +28,12 @@ const currencies: { value: CurrencyCode; label: string }[] = Object.entries(
 export const turnAnyFieldFilterIntoRecordGqlFilter = ({
   filterValue,
   fields,
+  relatedRecordFilters = [],
 }: {
   filterValue: string;
   fields: PartialFieldMetadataItem[];
+  // Matches through a relation, such as people whose company name contains the value.
+  relatedRecordFilters?: RecordGqlOperationFilter[];
 }) => {
   const anyFieldRecordFilters: RecordFilter[] = [];
 
@@ -223,15 +226,18 @@ export const turnAnyFieldFilterIntoRecordGqlFilter = ({
     fields.map((field) => [field.id, field]),
   );
 
-  const baseRecordGqlOperationFilters = anyFieldRecordFilters
-    .map((recordFilter) =>
-      turnRecordFilterIntoRecordGqlOperationFilter({
-        filterValueDependencies: {},
-        fieldMetadataItemById,
-        recordFilter,
-      }),
-    )
-    .filter(isDefined);
+  const baseRecordGqlOperationFilters = [
+    ...anyFieldRecordFilters
+      .map((recordFilter) =>
+        turnRecordFilterIntoRecordGqlOperationFilter({
+          filterValueDependencies: {},
+          fieldMetadataItemById,
+          recordFilter,
+        }),
+      )
+      .filter(isDefined),
+    ...(isNonEmptyString(filterValue) ? relatedRecordFilters : []),
+  ];
 
   const recordGqlOperationFilter: RecordGqlOperationFilter = {
     or: baseRecordGqlOperationFilters,

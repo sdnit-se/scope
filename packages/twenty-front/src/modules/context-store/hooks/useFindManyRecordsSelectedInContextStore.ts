@@ -1,3 +1,4 @@
+import { contextStoreAnyFieldFilterRelatedRecordFiltersComponentState } from '@/context-store/states/contextStoreAnyFieldFilterRelatedRecordFiltersComponentState';
 import { contextStoreAnyFieldFilterValueComponentState } from '@/context-store/states/contextStoreAnyFieldFilterValueComponentState';
 import { contextStoreCurrentObjectMetadataItemIdComponentState } from '@/context-store/states/contextStoreCurrentObjectMetadataItemIdComponentState';
 import { contextStoreFilterGroupsComponentState } from '@/context-store/states/contextStoreFilterGroupsComponentState';
@@ -49,6 +50,12 @@ export const useFindManyRecordsSelectedInContextStore = ({
     instanceId,
   );
 
+  const contextStoreAnyFieldFilterRelatedRecordFilters =
+    useAtomComponentStateValue(
+      contextStoreAnyFieldFilterRelatedRecordFiltersComponentState,
+      instanceId,
+    );
+
   const { filterValueDependencies } = useFilterValueDependencies();
 
   const fieldMetadataItemByIdMap = useAtomStateValue(
@@ -73,6 +80,7 @@ export const useFindManyRecordsSelectedInContextStore = ({
     fieldMetadataItems: flattenedFieldMetadataItems,
     filterValueDependencies,
     contextStoreAnyFieldFilterValue,
+    contextStoreAnyFieldFilterRelatedRecordFilters,
   });
 
   const { records, loading, totalCount } = useFindManyRecords({

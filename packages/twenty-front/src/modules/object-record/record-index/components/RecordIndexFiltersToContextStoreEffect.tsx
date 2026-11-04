@@ -9,6 +9,8 @@ import { contextStoreTargetedRecordsRuleComponentState } from '@/context-store/s
 import { orderRecordIdsBySelection } from '@/context-store/utils/orderRecordIdsBySelection';
 import { currentRecordFilterGroupsComponentState } from '@/object-record/record-filter-group/states/currentRecordFilterGroupsComponentState';
 import { anyFieldFilterValueComponentState } from '@/object-record/record-filter/states/anyFieldFilterValueComponentState';
+import { useAnyFieldFilterRelatedRecordFilters } from '@/object-record/record-filter/hooks/useAnyFieldFilterRelatedRecordFilters';
+import { contextStoreAnyFieldFilterRelatedRecordFiltersComponentState } from '@/context-store/states/contextStoreAnyFieldFilterRelatedRecordFiltersComponentState';
 import { currentRecordFiltersComponentState } from '@/object-record/record-filter/states/currentRecordFiltersComponentState';
 import { useRecordIndexContextOrThrow } from '@/object-record/record-index/contexts/RecordIndexContext';
 import { recordIndexAllRecordIdsComponentSelector } from '@/object-record/record-index/states/selectors/recordIndexAllRecordIdsComponentSelector';
@@ -77,6 +79,14 @@ export const RecordIndexFiltersToContextStoreEffect = () => {
       contextStoreAnyFieldFilterValueComponentState,
     );
 
+  const anyFieldFilterRelatedRecordFilters =
+    useAnyFieldFilterRelatedRecordFilters();
+
+  const contextStoreAnyFieldFilterRelatedRecordFiltersAtom =
+    useAtomComponentStateCallbackState(
+      contextStoreAnyFieldFilterRelatedRecordFiltersComponentState,
+    );
+
   useEffect(() => {
     const setIfChanged = <TValue,>(
       atom: PrimitiveAtom<TValue>,
@@ -114,6 +124,10 @@ export const RecordIndexFiltersToContextStoreEffect = () => {
     setIfChanged(contextStoreFiltersAtom, currentRecordFilters);
     setIfChanged(contextStoreFilterGroupsAtom, currentRecordFilterGroups);
     setIfChanged(contextStoreAnyFieldFilterValueAtom, anyFieldFilterValue);
+    setIfChanged(
+      contextStoreAnyFieldFilterRelatedRecordFiltersAtom,
+      anyFieldFilterRelatedRecordFilters,
+    );
 
     return () => {
       setIfChanged(contextStoreTargetedRecordsRuleAtom, {
@@ -122,10 +136,13 @@ export const RecordIndexFiltersToContextStoreEffect = () => {
       });
       setIfChanged(contextStoreFiltersAtom, []);
       setIfChanged(contextStoreAnyFieldFilterValueAtom, '');
+      setIfChanged(contextStoreAnyFieldFilterRelatedRecordFiltersAtom, []);
     };
   }, [
     anyFieldFilterValue,
+    anyFieldFilterRelatedRecordFilters,
     contextStoreAnyFieldFilterValueAtom,
+    contextStoreAnyFieldFilterRelatedRecordFiltersAtom,
     contextStoreFilterGroupsAtom,
     contextStoreFiltersAtom,
     contextStoreRecordIdsInSelectionOrderAtom,

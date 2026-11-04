@@ -2,6 +2,7 @@ import { type FieldMetadata } from '@/object-record/record-field/ui/types/FieldM
 import { type ColumnDefinition } from '@/object-record/record-table/types/ColumnDefinition';
 import { type ObjectRecord } from '@/object-record/types/ObjectRecord';
 
+import { contextStoreAnyFieldFilterRelatedRecordFiltersComponentState } from '@/context-store/states/contextStoreAnyFieldFilterRelatedRecordFiltersComponentState';
 import { contextStoreAnyFieldFilterValueComponentState } from '@/context-store/states/contextStoreAnyFieldFilterValueComponentState';
 import { contextStoreFilterGroupsComponentState } from '@/context-store/states/contextStoreFilterGroupsComponentState';
 import { contextStoreFiltersComponentState } from '@/context-store/states/contextStoreFiltersComponentState';
@@ -84,6 +85,11 @@ export const useRecordIndexLazyFetchRecords = ({
     contextStoreAnyFieldFilterValueComponentState,
   );
 
+  const contextStoreAnyFieldFilterRelatedRecordFilters =
+    useAtomComponentStateValue(
+      contextStoreAnyFieldFilterRelatedRecordFiltersComponentState,
+    );
+
   const { filterValueDependencies } = useFilterValueDependencies();
 
   const flattenedFieldMetadataItems = useAtomStateValue(
@@ -107,6 +113,7 @@ export const useRecordIndexLazyFetchRecords = ({
     fieldMetadataItems: flattenedFieldMetadataItems,
     filterValueDependencies,
     contextStoreAnyFieldFilterValue,
+    contextStoreAnyFieldFilterRelatedRecordFilters,
   });
 
   const queryFilter = isEmptySelection

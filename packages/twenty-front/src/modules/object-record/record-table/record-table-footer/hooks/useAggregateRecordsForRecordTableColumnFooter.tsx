@@ -1,3 +1,4 @@
+import { useAnyFieldFilterRelatedRecordFilters } from '@/object-record/record-filter/hooks/useAnyFieldFilterRelatedRecordFilters';
 import { useNumberFormat } from '@/localization/hooks/useNumberFormat';
 import { flattenedFieldMetadataItemsSelector } from '@/object-metadata/states/flattenedFieldMetadataItemsSelector';
 import { useAggregateRecords } from '@/object-record/hooks/useAggregateRecords';
@@ -109,10 +110,14 @@ export const useAggregateRecordsForRecordTableColumnFooter = (
     anyFieldFilterValueComponentState,
   );
 
+  const anyFieldFilterRelatedRecordFilters =
+    useAnyFieldFilterRelatedRecordFilters();
+
   const { recordGqlOperationFilter: anyFieldFilter } =
     turnAnyFieldFilterIntoRecordGqlFilter({
       fields: objectMetadataItem.readableFields,
       filterValue: anyFieldFilterValue,
+      relatedRecordFilters: anyFieldFilterRelatedRecordFilters,
     });
 
   const { data, loading, refetch } = useAggregateRecords({

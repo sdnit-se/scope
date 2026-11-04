@@ -1,6 +1,7 @@
 import { type FieldMetadata } from '@/object-record/record-field/ui/types/FieldMetadata';
 import { type ColumnDefinition } from '@/object-record/record-table/types/ColumnDefinition';
 
+import { contextStoreAnyFieldFilterRelatedRecordFiltersComponentState } from '@/context-store/states/contextStoreAnyFieldFilterRelatedRecordFiltersComponentState';
 import { contextStoreAnyFieldFilterValueComponentState } from '@/context-store/states/contextStoreAnyFieldFilterValueComponentState';
 import { contextStoreFilterGroupsComponentState } from '@/context-store/states/contextStoreFilterGroupsComponentState';
 import { contextStoreFiltersComponentState } from '@/context-store/states/contextStoreFiltersComponentState';
@@ -61,6 +62,11 @@ export const useRecordIndexExportParameters = ({
     contextStoreAnyFieldFilterValueComponentState,
   );
 
+  const contextStoreAnyFieldFilterRelatedRecordFilters =
+    useAtomComponentStateValue(
+      contextStoreAnyFieldFilterRelatedRecordFiltersComponentState,
+    );
+
   const { filterValueDependencies } = useFilterValueDependencies();
 
   const flattenedFieldMetadataItems = useAtomStateValue(
@@ -84,6 +90,7 @@ export const useRecordIndexExportParameters = ({
     fieldMetadataItems: flattenedFieldMetadataItems,
     filterValueDependencies,
     contextStoreAnyFieldFilterValue,
+    contextStoreAnyFieldFilterRelatedRecordFilters,
   });
 
   const queryFilter = isEmptySelection
