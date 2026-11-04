@@ -1,0 +1,56 @@
+[tools]
+node = "26.12.1"
+yarn = "4.18.1"
+
+[tasks.install]
+description = "Install workspace dependencies"
+run = "yarn install --immutable"
+
+[tasks."enterprise:check"]
+description = "List files under Twenty's Enterprise licence; pass --max <count> to allow some"
+run = "scripts/check-no-enterprise-code.sh"
+
+[tasks."shared:build"]
+description = "Build twenty-shared, which other packages import from dist"
+run = "npx nx build twenty-shared"
+
+[tasks."check:shared"]
+description = "Lint, typecheck and test twenty-shared"
+depends = ["shared:build"]
+env = { NODE_OPTIONS = "--max-old-space-size=4096" }
+run = "npx nx run-many -t lint typecheck test -p twenty-shared"
+
+[tasks."check:front"]
+description = "Lint, typecheck and build twenty-front"
+depends = ["shared:build"]
+env = { NODE_OPTIONS = "--max-old-space-size=10240" }
+run = [
+  "test -f packages/twenty-front/.env || npx nx reset:env twenty-front",
+  "npx nx run-many -t lint typecheck -p twenty-front",
+  "npx nx build twenty-front",
+]
+
+[tasks."test:front"]
+description = "Run twenty-front unit tests, optionally one shard such as 1/3"
+depends = ["shared:build"]
+env = { NODE_OPTIONS = "--max-old-space-size=6144" }
+usage = 'arg "[shard]" default="1/1"'
+run = [
+  "test -f packages/twenty-front/.env || npx nx reset:env twenty-front",
+  "npx nx test twenty-front --shard=${usage_shard}",
+]
+
+[tasks."check:server"]
+description = "Lint, typecheck and build twenty-server"
+depends = ["shared:build"]
+run = [
+  "test -f packages/twenty-server/.env || npx nx reset:env twenty-server",
+  "npx nx run-many -t lint typecheck -p twenty-server",
+  "npx nx build twenty-server",
+]
+
+[tasks."test:server"]
+description = "Run twenty-server unit tests, optionally one shard such as 1/4"
+depends = ["shared:build"]
+usage = 'arg "[shard]" default="1/1"'
+run = "npx nx run twenty-server:test:ci --shard=${usage_shard}"

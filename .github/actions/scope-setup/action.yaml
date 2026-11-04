@@ -1,0 +1,17 @@
+name: Scope setup
+description: Install mise.toml's tools and the workspace dependencies
+
+runs:
+  using: composite
+  steps:
+    - uses: jdx/mise-action@fc42bcc7ddbf51124c30f95a877a0c5168a3bfde # v5.2.1
+      with:
+        version: 2026.10.23
+    - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+      with:
+        path: |
+          node_modules
+          packages/*/node_modules
+        key: node-modules-${{ runner.os }}-${{ hashFiles('yarn.lock', '.yarnrc.yml', 'mise.toml') }}
+    - shell: bash
+      run: mise run install
