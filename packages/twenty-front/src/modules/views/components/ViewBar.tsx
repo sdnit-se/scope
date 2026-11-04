@@ -18,6 +18,7 @@ import { ViewBarRecordFieldEffect } from '@/views/components/ViewBarRecordFieldE
 import { ViewBarRecordFilterEffect } from '@/views/components/ViewBarRecordFilterEffect';
 import { ViewBarRecordFilterGroupEffect } from '@/views/components/ViewBarRecordFilterGroupEffect';
 import { ViewBarRecordSortEffect } from '@/views/components/ViewBarRecordSortEffect';
+import { ViewBarSearchInput } from '@/views/components/ViewBarSearchInput';
 import { getViewBarFilterDropdownId } from '@/views/utils/getViewBarFilterDropdownId';
 import { UpdateViewButtonGroup } from './UpdateViewButtonGroup';
 import { ViewBarDetails } from './ViewBarDetails';
@@ -65,6 +66,7 @@ export const ViewBar = ({
         leftComponent={<ViewPickerDropdown />}
         rightComponent={
           <>
+            <ViewBarSearchInput />
             <ObjectFilterDropdownComponentInstanceContext.Provider
               value={{ instanceId: getViewBarFilterDropdownId(recordIndexId) }}
             >
