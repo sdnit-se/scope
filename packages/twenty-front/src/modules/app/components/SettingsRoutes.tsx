@@ -262,14 +262,6 @@ const SettingsSubdomainPage = lazy(() =>
   })),
 );
 
-const SettingsCustomDomainPage = lazy(() =>
-  import('~/pages/settings/domains/SettingsCustomDomainPage').then(
-    (module) => ({
-      default: module.SettingsCustomDomainPage,
-    }),
-  ),
-);
-
 const SettingsDevelopers = lazy(() =>
   import('~/pages/settings/developers/SettingsDevelopers').then((module) => ({
     default: module.SettingsDevelopers,
@@ -946,10 +938,6 @@ const createSettingsRouteElements = ({
       <Route
         path={SettingsPath.Subdomain}
         element={<SettingsSubdomainPage />}
-      />
-      <Route
-        path={SettingsPath.CustomDomain}
-        element={<SettingsCustomDomainPage />}
       />
       <Route
         path={SettingsPath.ApplicationPublicDomainNew}
