@@ -1,5 +1,3 @@
-import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
-import { isCloudflareIntegrationEnabledState } from '@/client-config/states/isCloudflareIntegrationEnabledState';
 import { isMultiWorkspaceEnabledState } from '@/client-config/states/isMultiWorkspaceEnabledState';
 import { SettingsCard } from '@/settings/components/SettingsCard';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
@@ -7,8 +5,7 @@ import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { SettingsPath } from 'twenty-shared/types';
 import { getSettingsPath } from 'twenty-shared/utils';
-import { IconWorld, IconWorldWww } from 'twenty-ui/icon';
-import { Status } from 'twenty-ui/primitives/data-display';
+import { IconWorldWww } from 'twenty-ui/icon';
 import { MOBILE_VIEWPORT, themeCssVariables } from 'twenty-ui/theme';
 
 const StyledContainer = styled.div`
@@ -26,10 +23,6 @@ export const SettingsWorkspaceDomainCard = () => {
   const isMultiWorkspaceEnabled = useAtomStateValue(
     isMultiWorkspaceEnabledState,
   );
-  const isCloudflareIntegrationEnabled = useAtomStateValue(
-    isCloudflareIntegrationEnabledState,
-  );
-  const currentWorkspace = useAtomStateValue(currentWorkspaceState);
 
   if (!isMultiWorkspaceEnabled) {
     return null;
@@ -42,21 +35,6 @@ export const SettingsWorkspaceDomainCard = () => {
         Icon={<IconWorldWww />}
         to={getSettingsPath(SettingsPath.Subdomain)}
       />
-      {isCloudflareIntegrationEnabled && (
-        <SettingsCard
-          to={getSettingsPath(SettingsPath.CustomDomain)}
-          title={t`Custom Domain`}
-          Icon={<IconWorld />}
-          Status={
-            currentWorkspace?.customDomain &&
-            currentWorkspace?.isCustomDomainEnabled ? (
-              <Status color="turquoise">{t`Active`}</Status>
-            ) : currentWorkspace?.customDomain ? (
-              <Status color="orange">{t`Inactive`}</Status>
-            ) : undefined
-          }
-        />
-      )}
     </StyledContainer>
   );
 };
