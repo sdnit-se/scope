@@ -1,3 +1,4 @@
+import { useAnyFieldFilterRelatedRecordFilters } from '@/object-record/record-filter/hooks/useAnyFieldFilterRelatedRecordFilters';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import { flattenedFieldMetadataItemsSelector } from '@/object-metadata/states/flattenedFieldMetadataItemsSelector';
 import { turnSortsIntoOrderBy } from '@/object-record/object-sort-dropdown/utils/turnSortsIntoOrderBy';
@@ -53,10 +54,14 @@ export const useRecordIndexGroupCommonQueryVariables = () => {
     anyFieldFilterValueComponentState,
   );
 
+  const anyFieldFilterRelatedRecordFilters =
+    useAnyFieldFilterRelatedRecordFilters();
+
   const { recordGqlOperationFilter: anyFieldFilter } =
     turnAnyFieldFilterIntoRecordGqlFilter({
       fields: objectMetadataItem.readableFields,
       filterValue: anyFieldFilterValue,
+      relatedRecordFilters: anyFieldFilterRelatedRecordFilters,
     });
 
   const orderBy = turnSortsIntoOrderBy(

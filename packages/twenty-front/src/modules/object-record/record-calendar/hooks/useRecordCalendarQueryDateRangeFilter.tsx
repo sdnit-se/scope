@@ -1,3 +1,4 @@
+import { useAnyFieldFilterRelatedRecordFilters } from '@/object-record/record-filter/hooks/useAnyFieldFilterRelatedRecordFilters';
 import { flattenedFieldMetadataItemsSelector } from '@/object-metadata/states/flattenedFieldMetadataItemsSelector';
 import { useRecordCalendarContextOrThrow } from '@/object-record/record-calendar/contexts/RecordCalendarContext';
 import { useRecordCalendarDaysRange } from '@/object-record/record-calendar/hooks/useRecordCalendarDaysRange';
@@ -57,6 +58,9 @@ export const useRecordCalendarQueryDateRangeFilter = (
     (field) => field.id === recordIndexCalendarFieldMetadataId,
   );
 
+  const anyFieldFilterRelatedRecordFilters =
+    useAnyFieldFilterRelatedRecordFilters(viewBarInstanceId);
+
   if (!isDefined(calendarFieldMetadataItem)) {
     return { dateRangeFilter: {} };
   }
@@ -88,6 +92,7 @@ export const useRecordCalendarQueryDateRangeFilter = (
     turnAnyFieldFilterIntoRecordGqlFilter({
       fields: objectMetadataItem.readableFields,
       filterValue: anyFieldFilterValue,
+      relatedRecordFilters: anyFieldFilterRelatedRecordFilters,
     });
 
   return {

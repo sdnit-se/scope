@@ -1,3 +1,4 @@
+import { useAnyFieldFilterRelatedRecordFilters } from '@/object-record/record-filter/hooks/useAnyFieldFilterRelatedRecordFilters';
 import { useContextStoreObjectMetadataItemOrThrow } from '@/context-store/hooks/useContextStoreObjectMetadataItemOrThrow';
 import { flattenedFieldMetadataItemsSelector } from '@/object-metadata/states/flattenedFieldMetadataItemsSelector';
 import { useAggregateRecords } from '@/object-record/hooks/useAggregateRecords';
@@ -50,10 +51,14 @@ export const useGetRecordIndexTotalCount = () => {
     anyFieldFilterValueComponentState,
   );
 
+  const anyFieldFilterRelatedRecordFilters =
+    useAnyFieldFilterRelatedRecordFilters();
+
   const { recordGqlOperationFilter: anyFieldFilter } =
     turnAnyFieldFilterIntoRecordGqlFilter({
       fields: objectMetadataItem.readableFields,
       filterValue: anyFieldFilterValue,
+      relatedRecordFilters: anyFieldFilterRelatedRecordFilters,
     });
 
   const { data, loading } = useAggregateRecords<{

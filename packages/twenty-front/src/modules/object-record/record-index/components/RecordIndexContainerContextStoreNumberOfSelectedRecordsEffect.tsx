@@ -1,3 +1,4 @@
+import { contextStoreAnyFieldFilterRelatedRecordFiltersComponentState } from '@/context-store/states/contextStoreAnyFieldFilterRelatedRecordFiltersComponentState';
 import { contextStoreAnyFieldFilterValueComponentState } from '@/context-store/states/contextStoreAnyFieldFilterValueComponentState';
 import { contextStoreFilterGroupsComponentState } from '@/context-store/states/contextStoreFilterGroupsComponentState';
 import { contextStoreFiltersComponentState } from '@/context-store/states/contextStoreFiltersComponentState';
@@ -52,6 +53,11 @@ export const RecordIndexContainerContextStoreNumberOfSelectedRecordsEffect =
       contextStoreAnyFieldFilterValueComponentState,
     );
 
+    const contextStoreAnyFieldFilterRelatedRecordFilters =
+      useAtomComponentStateValue(
+        contextStoreAnyFieldFilterRelatedRecordFiltersComponentState,
+      );
+
     const { filterValueDependencies } = useFilterValueDependencies();
 
     const flattenedFieldMetadataItems = useAtomStateValue(
@@ -66,6 +72,7 @@ export const RecordIndexContainerContextStoreNumberOfSelectedRecordsEffect =
       fieldMetadataItems: flattenedFieldMetadataItems,
       filterValueDependencies,
       contextStoreAnyFieldFilterValue,
+      contextStoreAnyFieldFilterRelatedRecordFilters,
     });
 
     const { totalCount } = useFindManyRecords({

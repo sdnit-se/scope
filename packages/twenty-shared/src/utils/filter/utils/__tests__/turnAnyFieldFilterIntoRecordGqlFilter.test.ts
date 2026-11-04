@@ -611,3 +611,48 @@ describe('turnAnyFieldFilterIntoRecordGqlFilter', () => {
     });
   });
 });
+
+describe('turnAnyFieldFilterIntoRecordGqlFilter related record filters', () => {
+  const relatedRecordFilters = [{ companyId: { in: ['company-1'] } }];
+
+  it('matches through a relation alongside the record own fields', () => {
+    const { recordGqlOperationFilter } = turnAnyFieldFilterIntoRecordGqlFilter({
+      fields: [textFieldMetadataItem],
+      filterValue: 'Saab',
+      relatedRecordFilters,
+    });
+
+    expect(recordGqlOperationFilter).toEqual({
+      or: [
+        { textField: { ilike: '%Saab%' } },
+        { companyId: { in: ['company-1'] } },
+      ],
+    });
+  });
+
+  it('matches through a relation even when no own field can', () => {
+    const { recordGqlOperationFilter } = turnAnyFieldFilterIntoRecordGqlFilter({
+      fields: [],
+      filterValue: 'Saab',
+      relatedRecordFilters,
+    });
+
+    expect(recordGqlOperationFilter).toEqual({
+      or: [{ companyId: { in: ['company-1'] } }],
+    });
+  });
+
+  it('ignores related record filters when nothing is searched', () => {
+    const { recordGqlOperationFilter } = turnAnyFieldFilterIntoRecordGqlFilter({
+      fields: [textFieldMetadataItem],
+      filterValue: '',
+      relatedRecordFilters,
+    });
+
+    expect(recordGqlOperationFilter).not.toEqual(
+      expect.objectContaining({
+        or: expect.arrayContaining(relatedRecordFilters),
+      }),
+    );
+  });
+});

@@ -1,6 +1,7 @@
 import type { Store } from 'jotai/vanilla/store';
 
 import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
+import { contextStoreAnyFieldFilterRelatedRecordFiltersComponentState } from '@/context-store/states/contextStoreAnyFieldFilterRelatedRecordFiltersComponentState';
 import { contextStoreAnyFieldFilterValueComponentState } from '@/context-store/states/contextStoreAnyFieldFilterValueComponentState';
 import { contextStoreCurrentObjectMetadataItemIdComponentState } from '@/context-store/states/contextStoreCurrentObjectMetadataItemIdComponentState';
 import { contextStoreFilterGroupsComponentState } from '@/context-store/states/contextStoreFilterGroupsComponentState';
@@ -67,6 +68,11 @@ export const computeContextStoreGraphqlFilterFromStore = ({
     },
     contextStoreAnyFieldFilterValue: store.get(
       contextStoreAnyFieldFilterValueComponentState.atomFamily({
+        instanceId: contextStoreInstanceId,
+      }),
+    ),
+    contextStoreAnyFieldFilterRelatedRecordFilters: store.get(
+      contextStoreAnyFieldFilterRelatedRecordFiltersComponentState.atomFamily({
         instanceId: contextStoreInstanceId,
       }),
     ),

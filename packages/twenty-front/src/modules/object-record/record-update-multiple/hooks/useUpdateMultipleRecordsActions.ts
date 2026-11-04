@@ -1,4 +1,5 @@
 import { useContextStoreObjectMetadataItemOrThrow } from '@/context-store/hooks/useContextStoreObjectMetadataItemOrThrow';
+import { contextStoreAnyFieldFilterRelatedRecordFiltersComponentState } from '@/context-store/states/contextStoreAnyFieldFilterRelatedRecordFiltersComponentState';
 import { contextStoreAnyFieldFilterValueComponentState } from '@/context-store/states/contextStoreAnyFieldFilterValueComponentState';
 import { contextStoreFilterGroupsComponentState } from '@/context-store/states/contextStoreFilterGroupsComponentState';
 import { contextStoreFiltersComponentState } from '@/context-store/states/contextStoreFiltersComponentState';
@@ -43,6 +44,12 @@ export const useUpdateMultipleRecordsActions = ({
     contextStoreInstanceId,
   );
 
+  const contextStoreAnyFieldFilterRelatedRecordFilters =
+    useAtomComponentStateValue(
+      contextStoreAnyFieldFilterRelatedRecordFiltersComponentState,
+      contextStoreInstanceId,
+    );
+
   const { filterValueDependencies } = useFilterValueDependencies();
 
   const flattenedFieldMetadataItems = useAtomStateValue(
@@ -57,6 +64,7 @@ export const useUpdateMultipleRecordsActions = ({
     fieldMetadataItems: flattenedFieldMetadataItems,
     filterValueDependencies,
     contextStoreAnyFieldFilterValue,
+    contextStoreAnyFieldFilterRelatedRecordFilters,
   });
 
   const {
