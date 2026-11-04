@@ -25,7 +25,7 @@ description = "Lint, typecheck and build twenty-front"
 depends = ["shared:build"]
 env = { NODE_OPTIONS = "--max-old-space-size=10240" }
 run = [
-  "npx nx reset:env twenty-front",
+  "test -f packages/twenty-front/.env || npx nx reset:env twenty-front",
   "npx nx run-many -t lint typecheck -p twenty-front",
   "npx nx build twenty-front",
 ]
@@ -36,7 +36,7 @@ depends = ["shared:build"]
 env = { NODE_OPTIONS = "--max-old-space-size=6144" }
 usage = 'arg "[shard]" default="1/1"'
 run = [
-  "npx nx reset:env twenty-front",
+  "test -f packages/twenty-front/.env || npx nx reset:env twenty-front",
   "npx nx test twenty-front --shard=${usage_shard}",
 ]
 
@@ -44,7 +44,7 @@ run = [
 description = "Lint, typecheck and build twenty-server"
 depends = ["shared:build"]
 run = [
-  "npx nx reset:env twenty-server",
+  "test -f packages/twenty-server/.env || npx nx reset:env twenty-server",
   "npx nx run-many -t lint typecheck -p twenty-server",
   "npx nx build twenty-server",
 ]
