@@ -2,7 +2,6 @@ import { FieldInputEventContext } from '@/object-record/record-field/ui/contexts
 import { useClearField } from '@/object-record/record-field/ui/hooks/useClearField';
 import { useAddSelectOption } from '@/object-record/record-field/ui/meta-types/hooks/useAddSelectOption';
 import { useCanAddSelectOption } from '@/object-record/record-field/ui/meta-types/hooks/useCanAddSelectOption';
-import { useFilteredSelectOptionsFromRLSPredicates } from '@/object-record/record-field/ui/meta-types/hooks/useFilteredSelectOptionsFromRLSPredicates';
 import { useSelectField } from '@/object-record/record-field/ui/meta-types/hooks/useSelectField';
 import { FieldInputDropdown } from '@/object-record/record-field/ui/meta-types/input/components/FieldInputDropdown';
 import { SelectInput } from '@/ui/input/components/SelectInput';
@@ -19,14 +18,6 @@ export const SelectFieldInput = () => {
   );
 
   const { onCancel, onSubmit } = useContext(FieldInputEventContext);
-
-  const { filteredOptions: selectOptions, canSelectEmpty } =
-    useFilteredSelectOptionsFromRLSPredicates({
-      fieldMetadataId: fieldDefinition.fieldMetadataId,
-      objectMetadataNameSingular:
-        fieldDefinition.metadata.objectMetadataNameSingular,
-      options: fieldDefinition.metadata.options,
-    });
 
   const clearField = useClearField();
 
@@ -47,12 +38,10 @@ export const SelectFieldInput = () => {
     <FieldInputDropdown value={fieldValue} onDismiss={handleCancel}>
       <SelectInput
         onOptionSelected={handleSubmit}
-        options={selectOptions}
+        options={fieldDefinition.metadata.options}
         value={fieldValue}
         onClear={
-          fieldDefinition.metadata.isNullable && canSelectEmpty
-            ? handleClearField
-            : undefined
+          fieldDefinition.metadata.isNullable ? handleClearField : undefined
         }
         clearLabel={fieldDefinition.label}
         onAddSelectOption={canAddSelectOption ? addSelectOption : undefined}

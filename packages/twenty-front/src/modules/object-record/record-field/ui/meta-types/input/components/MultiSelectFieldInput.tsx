@@ -1,7 +1,6 @@
 import { FieldInputEventContext } from '@/object-record/record-field/ui/contexts/FieldInputEventContext';
 import { useAddSelectOption } from '@/object-record/record-field/ui/meta-types/hooks/useAddSelectOption';
 import { useCanAddSelectOption } from '@/object-record/record-field/ui/meta-types/hooks/useCanAddSelectOption';
-import { useFilteredSelectOptionsFromRLSPredicates } from '@/object-record/record-field/ui/meta-types/hooks/useFilteredSelectOptionsFromRLSPredicates';
 import { useMultiSelectField } from '@/object-record/record-field/ui/meta-types/hooks/useMultiSelectField';
 import { FieldInputDropdown } from '@/object-record/record-field/ui/meta-types/input/components/FieldInputDropdown';
 import { type FieldMultiSelectValue } from '@/object-record/record-field/ui/types/FieldMetadata';
@@ -19,14 +18,6 @@ export const MultiSelectFieldInput = () => {
   );
 
   const { onSubmit, onEnter } = useContext(FieldInputEventContext);
-
-  const { filteredOptions: selectOptions } =
-    useFilteredSelectOptionsFromRLSPredicates({
-      fieldMetadataId: fieldDefinition.fieldMetadataId,
-      objectMetadataNameSingular:
-        fieldDefinition.metadata.objectMetadataNameSingular,
-      options: fieldDefinition.metadata.options,
-    });
 
   const handleOptionSelected = (newDraftValue: FieldMultiSelectValue) => {
     setDraftValue(newDraftValue);
@@ -49,7 +40,7 @@ export const MultiSelectFieldInput = () => {
     <FieldInputDropdown value={draftValue} onDismiss={handleCancel} multiple>
       <MultiSelectInput
         onEnter={handleEnter}
-        options={selectOptions}
+        options={fieldDefinition.metadata.options}
         onOptionSelected={handleOptionSelected}
         values={draftValue}
         onAddSelectOption={canAddSelectOption ? addSelectOption : undefined}

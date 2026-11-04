@@ -450,7 +450,7 @@ const computeValueFromSubFieldType = ({
   });
 };
 
-export const buildCompositeValueFromSubField = ({
+const buildCompositeValueFromSubField = ({
   compositeFieldType,
   subFieldName,
   value,

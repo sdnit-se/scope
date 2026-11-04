@@ -5,12 +5,6 @@ import {
 } from 'twenty-shared/types';
 import { type FILTER_OPERANDS_MAP } from 'twenty-shared/utils';
 
-// RLS-specific: references a workspace member field for dynamic "Me" comparisons
-export type RLSDynamicValue = {
-  workspaceMemberFieldMetadataId: string;
-  workspaceMemberSubFieldName?: string | null;
-};
-
 export type RecordFilter = {
   id: string;
   fieldMetadataId: string;
@@ -25,7 +19,6 @@ export type RecordFilter = {
   label: string;
   subFieldName?: CompositeFieldSubFieldName | null | undefined;
   relationTargetFieldMetadataId?: string | null;
-  rlsDynamicValue?: RLSDynamicValue | null;
 };
 
 export type RecordFilterToRecordInputOperand<
