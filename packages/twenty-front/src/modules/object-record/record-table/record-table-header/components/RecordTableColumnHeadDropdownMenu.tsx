@@ -4,28 +4,36 @@ import { isFieldMetadataItemFilterableAndSortableSelector } from '@/object-metad
 import { isFieldMetadataItemLabelIdentifierSelector } from '@/object-metadata/states/isFieldMetadataItemLabelIdentifierSelector';
 import { useChangeRecordFieldVisibility } from '@/object-record/record-field/hooks/useChangeRecordFieldVisibility';
 import { type RecordField } from '@/object-record/record-field/types/RecordField';
-import { useHandleToggleColumnSort } from '@/object-record/record-index/hooks/useHandleToggleColumnSort';
+import { ObjectFilterDropdownFilterInput } from '@/object-record/object-filter-dropdown/components/ObjectFilterDropdownFilterInput';
+import { ObjectFilterDropdownComponentInstanceContext } from '@/object-record/object-filter-dropdown/states/contexts/ObjectFilterDropdownComponentInstanceContext';
+import { useUpsertRecordSort } from '@/object-record/record-sort/hooks/useUpsertRecordSort';
+import { currentRecordSortsComponentState } from '@/object-record/record-sort/states/currentRecordSortsComponentState';
+import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
+import { getColumnHeadFilterInstanceId } from '@/object-record/record-table/record-table-header/hooks/useColumnHeadFilter';
+import { v4 } from 'uuid';
+import { ViewSortDirection } from '~/generated-metadata/graphql';
 import { useRecordTableContextOrThrow } from '@/object-record/record-table/contexts/RecordTableContext';
 import { useMoveTableColumn } from '@/object-record/record-table/hooks/useMoveTableColumn';
-import { useOpenRecordFilterChipFromTableHeader } from '@/object-record/record-table/record-table-header/hooks/useOpenRecordFilterChipFromTableHeader';
 import { useLingui } from '@lingui/react/macro';
 import { useAtomFamilySelectorValue } from '@/ui/utilities/state/jotai/hooks/useAtomFamilySelectorValue';
 import {
   IconArrowLeft,
   IconArrowRight,
-  IconArrowsSort,
+  IconCheck,
   IconEyeOff,
-  IconFilter,
+  IconSortAscending,
+  IconSortDescending,
 } from 'twenty-ui/icon';
 
 type RecordTableColumnHeadDropdownMenuProps = {
   recordField: RecordField;
   objectMetadataId: string;
+  dropdownId: string;
 };
 
 export const RecordTableColumnHeadDropdownMenu = ({
   recordField,
-  objectMetadataId,
+  dropdownId,
 }: RecordTableColumnHeadDropdownMenuProps) => {
   const { t } = useLingui();
 
@@ -77,19 +85,26 @@ export const RecordTableColumnHeadDropdownMenu = ({
     });
   };
 
-  const handleToggleColumnSort = useHandleToggleColumnSort({
-    objectMetadataItemId: objectMetadataId,
-  });
+  const currentRecordSorts = useAtomComponentStateValue(
+    currentRecordSortsComponentState,
+  );
 
-  const handleSortClick = () => {
-    handleToggleColumnSort(recordField.fieldMetadataItemId);
-  };
+  const { upsertRecordSort } = useUpsertRecordSort();
 
-  const { openRecordFilterChipFromTableHeader } =
-    useOpenRecordFilterChipFromTableHeader();
+  const currentSortDirection = currentRecordSorts.find(
+    (sort) => sort.fieldMetadataId === recordField.fieldMetadataItemId,
+  )?.direction;
 
-  const handleFilterClick = () => {
-    openRecordFilterChipFromTableHeader(recordField.fieldMetadataItemId);
+  const handleSort = (direction: ViewSortDirection) => {
+    const existingSort = currentRecordSorts.find(
+      (sort) => sort.fieldMetadataId === recordField.fieldMetadataItemId,
+    );
+
+    upsertRecordSort({
+      id: existingSort?.id ?? v4(),
+      fieldMetadataId: recordField.fieldMetadataItemId,
+      direction,
+    });
   };
 
   const { isFilterable, isSortable } = useAtomFamilySelectorValue(
@@ -104,16 +119,38 @@ export const RecordTableColumnHeadDropdownMenu = ({
   return (
     <Dropdown.Section>
       {isFilterable && (
+        <ObjectFilterDropdownComponentInstanceContext.Provider
+          value={{
+            instanceId: getColumnHeadFilterInstanceId(
+              recordField.fieldMetadataItemId,
+            ),
+          }}
+        >
+          <ObjectFilterDropdownFilterInput filterDropdownId={dropdownId} />
+        </ObjectFilterDropdownComponentInstanceContext.Provider>
+      )}
+      {isFilterable && isSortable && <Dropdown.Separator />}
+      {isSortable && (
         <Dropdown.ActionItem
-          startIcon={<IconFilter />}
-          onClick={handleFilterClick}
-        >{t`Filter`}</Dropdown.ActionItem>
+          startIcon={<IconSortAscending />}
+          onClick={() => handleSort(ViewSortDirection.ASC)}
+          endIcon={
+            currentSortDirection === ViewSortDirection.ASC ? (
+              <IconCheck />
+            ) : undefined
+          }
+        >{t`Sort ascending`}</Dropdown.ActionItem>
       )}
       {isSortable && (
         <Dropdown.ActionItem
-          startIcon={<IconArrowsSort />}
-          onClick={handleSortClick}
-        >{t`Sort`}</Dropdown.ActionItem>
+          startIcon={<IconSortDescending />}
+          onClick={() => handleSort(ViewSortDirection.DESC)}
+          endIcon={
+            currentSortDirection === ViewSortDirection.DESC ? (
+              <IconCheck />
+            ) : undefined
+          }
+        >{t`Sort descending`}</Dropdown.ActionItem>
       )}
       {showSeparator && <Dropdown.Separator />}
       {canMoveLeft && (
