@@ -128,7 +128,9 @@ export const KeyboardMoveAndDismiss: Story = {
     expect(scroll).toHaveClass('scroll-wrapper-y-enabled');
 
     await userEvent.click(trigger);
-    await userEvent.click(await body.findByRole('menuitem', { name: 'Sort' }));
+    await userEvent.click(
+      await body.findByRole('menuitem', { name: 'Sort ascending' }),
+    );
     await waitFor(() =>
       expect(body.queryByRole('menu')).not.toBeInTheDocument(),
     );
@@ -170,36 +172,34 @@ export const KeyboardMoveAndDismiss: Story = {
   },
 };
 
-export const FilterHandoff: Story = {
+export const FilterFromHeader: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const body = within(canvasElement.ownerDocument.body);
     const trigger = await canvas.findByRole('button', { name: 'Name' });
-    const scroll = canvasElement.querySelector(
-      `#scroll-wrapper-record-table-scroll-${RECORD_INDEX_ID}`,
-    );
 
+    // The header opens straight onto the column's filter, its input focused.
     await userEvent.click(trigger);
-    await userEvent.click(
-      await body.findByRole('menuitem', { name: 'Filter' }),
-    );
     const input = await body.findByPlaceholderText('Name');
     await waitFor(() => expect(input).toHaveFocus());
-    expect(body.queryByRole('menu')).not.toBeInTheDocument();
-    expect(scroll).toHaveClass('scroll-wrapper-x-enabled');
-    expect(scroll).toHaveClass('scroll-wrapper-y-enabled');
+    expect(
+      body.getByRole('menuitem', { name: 'Sort ascending' }),
+    ).toBeVisible();
+    expect(
+      body.getByRole('menuitem', { name: 'Sort descending' }),
+    ).toBeVisible();
     await userEvent.type(input, 'Acme');
-    await userEvent.keyboard('{Enter}');
+    await userEvent.keyboard('{Escape}');
     await waitFor(() => expect(input).not.toBeInTheDocument());
 
     await userEvent.click(trigger);
-    await userEvent.click(
-      await body.findByRole('menuitem', { name: 'Filter' }),
-    );
     const existingInput = await body.findByPlaceholderText('Name');
     expect(existingInput).toHaveValue('Acme');
-    await waitFor(() => expect(existingInput).toHaveFocus());
+    expect(canvas.getByText('Reset')).toBeVisible();
+
+    await userEvent.clear(existingInput);
     await userEvent.keyboard('{Escape}');
     await waitFor(() => expect(existingInput).not.toBeInTheDocument());
+    await waitFor(() => expect(canvas.queryByText('Reset')).toBeNull());
   },
 };
