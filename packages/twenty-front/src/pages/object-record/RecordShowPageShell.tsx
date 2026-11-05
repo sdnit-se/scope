@@ -1,5 +1,5 @@
 import { type ErrorLike } from '@apollo/client';
-import { type ReactNode } from 'react';
+import { type ReactNode, useState } from 'react';
 import { isDefined } from 'twenty-shared/utils';
 
 import { TimelineActivityContext } from '@/activities/timeline-activities/contexts/TimelineActivityContext';
@@ -21,6 +21,9 @@ import { PageCardLayout } from '@/ui/layout/page/components/PageCardLayout';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { RecordShowPageHeader } from '~/pages/object-record/RecordShowPageHeader';
 import { RecordShowPageTitle } from '~/pages/object-record/RecordShowPageTitle';
+import { SimpleModeRecordPage } from '@/simple-mode/components/SimpleModeRecordPage';
+import { SIMPLE_MODE_RECORD_PAGE_OBJECTS } from '@/simple-mode/constants/SimpleModeRecordPageObjects';
+import { useIsSimpleModeEnabled } from '@/simple-mode/hooks/useIsSimpleModeEnabled';
 
 type RecordShowPageShellProps = {
   objectNameSingular: string;
@@ -56,6 +59,23 @@ export const RecordShowPageShell = ({
     useWorkspaceSurfaceScopedComponentInstanceId(
       computeRecordShowComponentInstanceId(objectRecordId),
     );
+
+  const isSimpleModeEnabled = useIsSimpleModeEnabled();
+  const [isStandardPageShown, setIsStandardPageShown] = useState(false);
+  const isSimpleRecordPage =
+    isSimpleModeEnabled &&
+    !isInSidePanel &&
+    SIMPLE_MODE_RECORD_PAGE_OBJECTS.includes(objectNameSingular);
+
+  const standardPage = (
+    <PageLayoutRecordPageRenderer
+      targetRecordIdentifier={{
+        id: objectRecordId,
+        targetObjectNameSingular: objectNameSingular,
+      }}
+      isRecordIdentifierBarHidden={isRecordIdentifierBarHidden}
+    />
+  );
 
   const resourceEffect = (
     <RecordShowPageResourceEffect
@@ -112,13 +132,20 @@ export const RecordShowPageShell = ({
               recordId: objectRecordId,
             }}
           >
-            <PageLayoutRecordPageRenderer
-              targetRecordIdentifier={{
-                id: objectRecordId,
-                targetObjectNameSingular: objectNameSingular,
-              }}
-              isRecordIdentifierBarHidden={isRecordIdentifierBarHidden}
-            />
+            {isSimpleRecordPage ? (
+              <SimpleModeRecordPage
+                key={`${objectNameSingular}:${objectRecordId}`}
+                objectNameSingular={objectNameSingular}
+                recordId={objectRecordId}
+                isStandardPageShown={isStandardPageShown}
+                onToggleStandardPage={() =>
+                  setIsStandardPageShown(!isStandardPageShown)
+                }
+                standardPage={standardPage}
+              />
+            ) : (
+              standardPage
+            )}
             <RecordShowPageSSESubscribeEffect
               objectNameSingular={objectNameSingular}
               recordId={objectRecordId}

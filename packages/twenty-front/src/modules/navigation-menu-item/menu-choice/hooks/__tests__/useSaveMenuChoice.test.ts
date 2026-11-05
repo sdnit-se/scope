@@ -37,6 +37,7 @@ describe('useSaveMenuChoice', () => {
       workspaceMemberId: MEMBER_ID,
       hiddenNavigationMenuItemIds: [],
       savedHiddenNavigationMenuItemIds: [],
+      isSimpleModeEnabled: false,
     });
     store.set(menuChoiceSaveQueueState.atom, Promise.resolve());
   });
@@ -66,6 +67,7 @@ describe('useSaveMenuChoice', () => {
       id: 'choice-1',
       hiddenNavigationMenuItemIds: ['kunder', 'sales'],
       savedHiddenNavigationMenuItemIds: ['kunder', 'sales'],
+      isSimpleModeEnabled: false,
     });
   });
 
@@ -75,6 +77,7 @@ describe('useSaveMenuChoice', () => {
       id: 'choice-1',
       hiddenNavigationMenuItemIds: [],
       savedHiddenNavigationMenuItemIds: [],
+      isSimpleModeEnabled: false,
     });
     mockUpdateOneRecord
       .mockRejectedValueOnce(new Error('offline'))
@@ -99,6 +102,7 @@ describe('useSaveMenuChoice', () => {
       id: 'choice-1',
       hiddenNavigationMenuItemIds: ['kunder'],
       savedHiddenNavigationMenuItemIds: ['kunder'],
+      isSimpleModeEnabled: false,
     });
     mockUpdateOneRecord.mockRejectedValueOnce(new Error('offline'));
     const { result } = renderHook(() => useSaveMenuChoice());
@@ -119,6 +123,7 @@ describe('useSaveMenuChoice', () => {
       id: 'choice-1',
       hiddenNavigationMenuItemIds: [],
       savedHiddenNavigationMenuItemIds: [],
+      isSimpleModeEnabled: false,
     });
     mockUpdateOneRecord.mockRejectedValue(new Error('offline'));
     const { result } = renderHook(() => useSaveMenuChoice());

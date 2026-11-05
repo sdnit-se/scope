@@ -1,6 +1,11 @@
 import { FieldInputEventContext } from '@/object-record/record-field/ui/contexts/FieldInputEventContext';
 import { RecordFieldComponentInstanceContext } from '@/object-record/record-field/ui/states/contexts/RecordFieldComponentInstanceContext';
+import { SimpleModeQuickDates } from '@/simple-mode/components/SimpleModeQuickDates';
+import { useIsSimpleModeEnabled } from '@/simple-mode/hooks/useIsSimpleModeEnabled';
+import { getMiddayInstant } from '@/simple-mode/utils/getMiddayInstant';
+import { DateInput } from '@/ui/field/input/components/DateInput';
 import { DateTimeInput } from '@/ui/field/input/components/DateTimeInput';
+import { useUserTimezone } from '@/ui/input/components/internal/date/hooks/useUserTimezone';
 import { useAvailableComponentInstanceIdOrThrow } from '@/ui/utilities/state/component-state/hooks/useAvailableComponentInstanceIdOrThrow';
 import { isNonEmptyString } from '@sniptt/guards';
 import { useContext } from 'react';
@@ -10,6 +15,8 @@ import { type Nullable } from 'twenty-shared/types';
 
 export const DateTimeFieldInput = () => {
   const { fieldValue, setDraftValue } = useDateTimeField();
+  const isSimpleModeEnabled = useIsSimpleModeEnabled();
+  const { userTimezone } = useUserTimezone();
 
   const { onEnter, onEscape, onClickOutside, onSubmit } = useContext(
     FieldInputEventContext,
@@ -59,6 +66,40 @@ export const DateTimeFieldInput = () => {
   const dateValue = isNonEmptyString(fieldValue)
     ? Temporal.Instant.from(fieldValue)
     : null;
+
+  if (isSimpleModeEnabled) {
+    const originalPlainDate = dateValue
+      ?.toZonedDateTimeISO(userTimezone)
+      .toPlainDate()
+      .toString();
+
+    // Closing the picker without choosing another day keeps the stored time.
+    const toInstant = (plainDate: Nullable<string>) =>
+      !isNonEmptyString(plainDate)
+        ? null
+        : plainDate === originalPlainDate
+          ? dateValue
+          : Temporal.Instant.from(getMiddayInstant(plainDate, userTimezone));
+
+    return (
+      <DateInput
+        instanceId={instanceId}
+        value={originalPlainDate}
+        onEnter={(plainDate) => handleEnter(toInstant(plainDate))}
+        onEscape={(plainDate) => handleEscape(toInstant(plainDate))}
+        onClickOutside={(event, plainDate) =>
+          handleClickOutside(event, toInstant(plainDate))
+        }
+        onChange={(plainDate) => handleChange(toInstant(plainDate))}
+        onSubmit={(plainDate) => handleSubmit(toInstant(plainDate))}
+        onClear={handleClear}
+        clearable
+        renderFooter={(submit) => (
+          <SimpleModeQuickDates timeZone={userTimezone} onPick={submit} />
+        )}
+      />
+    );
+  }
 
   return (
     <DateTimeInput
