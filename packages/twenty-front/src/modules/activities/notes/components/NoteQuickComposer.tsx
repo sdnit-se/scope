@@ -203,15 +203,17 @@ export const NoteQuickComposer = ({
     const stored = readNoteDraft(draftKey);
     const isSameNote = isDefined(stored) && stored.noteId === draft.noteId;
     const text = isSameNote ? stored.text : draft.text;
+    const noteType = isSameNote ? stored.noteType : draft.noteType;
 
     writeNoteDraft(draftKey, {
       text,
-      noteType: isSameNote ? stored.noteType : draft.noteType,
+      noteType,
       noteId: draft.noteId,
       linkId: draft.linkId,
       isCreated: draft.isCreated,
       isLinked: draft.isLinked,
-      isSynced: draft.isSynced && text === draft.text,
+      isSynced:
+        draft.isSynced && text === draft.text && noteType === draft.noteType,
     });
   };
 
@@ -260,12 +262,6 @@ export const NoteQuickComposer = ({
     // A recovered draft's ids may already have been written by an interrupted save or another tab, so they are
     // checked by updating before anything is created; a refused create would also drop the existing record from view.
     const isRecovering = draft.isRestored;
-    const linkFields = {
-      noteId: draft.noteId,
-      [getActivityTargetObjectFieldIdName({
-        nameSingular: targetRecord.targetObjectNameSingular,
-      })]: targetRecord.id,
-    };
 
     if (draft.isCreated || isRecovering) {
       let updateError: unknown;
@@ -312,6 +308,8 @@ export const NoteQuickComposer = ({
           draft.isLinked = recreateFrom.isLinked;
           throw recreateFrom.error;
         }
+        // The note may exist even though the create failed, so the next save checks by updating first.
+        draft.isRestored = true;
         throw error;
       } finally {
         draft.isCreating = false;
@@ -321,6 +319,12 @@ export const NoteQuickComposer = ({
     }
 
     if (!draft.isLinked) {
+      const linkFields = {
+        noteId: draft.noteId,
+        [getActivityTargetObjectFieldIdName({
+          nameSingular: targetRecord.targetObjectNameSingular,
+        })]: targetRecord.id,
+      };
       const confirmExistingLink = () =>
         updateOneRecord({
           objectNameSingular: CoreObjectNameSingular.NoteTarget,
