@@ -1,5 +1,4 @@
 import { FormFieldInput } from '@/object-record/record-field/ui/components/FormFieldInput';
-import { FormDateFieldInput } from '@/object-record/record-field/ui/form-types/components/FormDateFieldInput';
 import { FormEmailsFieldInput } from '@/object-record/record-field/ui/form-types/components/FormEmailsFieldInput';
 import { recordFieldInputIsFieldInErrorComponentState } from '@/object-record/record-field/ui/states/recordFieldInputIsFieldInErrorComponentState';
 import { type FormFieldInputSubFieldPlaceholders } from '@/object-record/record-field/ui/form-types/types/FormFieldInputSubFieldPlaceholders';
@@ -11,7 +10,6 @@ import { isFieldArray } from '@/object-record/record-field/ui/types/guards/isFie
 import { isFieldArrayValue } from '@/object-record/record-field/ui/types/guards/isFieldArrayValue';
 import { isFieldBoolean } from '@/object-record/record-field/ui/types/guards/isFieldBoolean';
 import { isFieldBooleanValue } from '@/object-record/record-field/ui/types/guards/isFieldBooleanValue';
-import { isFieldDateTime } from '@/object-record/record-field/ui/types/guards/isFieldDateTime';
 import { isFieldCurrency } from '@/object-record/record-field/ui/types/guards/isFieldCurrency';
 import { isFieldCurrencyValue } from '@/object-record/record-field/ui/types/guards/isFieldCurrencyValue';
 import { isFieldEmails } from '@/object-record/record-field/ui/types/guards/isFieldEmails';
@@ -41,12 +39,8 @@ import { RecordFormPhonesFieldInput } from '@/object-record/record-form/componen
 import { RecordFormTextAreaFieldInput } from '@/object-record/record-form/components/RecordFormTextAreaFieldInput';
 import { getRecordFormCurrencyFieldDefaultValue } from '@/object-record/record-form/utils/getRecordFormCurrencyFieldDefaultValue';
 import { getLinksVariant } from '@/object-record/spreadsheet-import/utils/getLinksVariant';
-import { useIsSimpleModeEnabled } from '@/simple-mode/hooks/useIsSimpleModeEnabled';
-import { getMiddayInstant } from '@/simple-mode/utils/getMiddayInstant';
-import { useUserTimezone } from '@/ui/input/components/internal/date/hooks/useUserTimezone';
 import { useSetAtomComponentState } from '@/ui/utilities/state/jotai/hooks/useSetAtomComponentState';
 import { isNonEmptyString } from '@sniptt/guards';
-import { Temporal } from 'temporal-polyfill';
 import { isDefined, isValidCountryCode } from 'twenty-shared/utils';
 import { type JsonValue } from 'type-fest';
 import { FieldMetadataType } from '~/generated-metadata/graphql';
@@ -77,33 +71,6 @@ export const RecordFormFieldInput = ({
   const setRecordFieldInputIsFieldInError = useSetAtomComponentState(
     recordFieldInputIsFieldInErrorComponentState,
   );
-  const isSimpleModeEnabled = useIsSimpleModeEnabled();
-  const { userTimezone } = useUserTimezone();
-
-  if (isSimpleModeEnabled && isFieldDateTime(field) && !readonly) {
-    const originalPlainDate = isNonEmptyString(defaultValue)
-      ? Temporal.Instant.from(defaultValue)
-          .toZonedDateTimeISO(userTimezone)
-          .toPlainDate()
-          .toString()
-      : undefined;
-
-    return (
-      <FormDateFieldInput
-        label={field.label}
-        defaultValue={originalPlainDate}
-        onChange={(plainDate) =>
-          onChange(
-            !isNonEmptyString(plainDate)
-              ? null
-              : plainDate === originalPlainDate
-                ? defaultValue
-                : getMiddayInstant(plainDate, userTimezone),
-          )
-        }
-      />
-    );
-  }
 
   if (isFieldLinks(field) && !readonly) {
     return (

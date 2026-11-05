@@ -8,7 +8,6 @@ import { SpreadsheetImportProvider } from '@/spreadsheet-import/provider/compone
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { ViewBar } from '@/views/components/ViewBar';
 import { ViewType } from '@/views/types/ViewType';
-import { useIsSimpleModeEnabled } from '@/simple-mode/hooks/useIsSimpleModeEnabled';
 
 export const RecordIndexViewBar = () => {
   const recordIndexViewType = useAtomComponentStateValue(
@@ -17,7 +16,6 @@ export const RecordIndexViewBar = () => {
 
   const { objectNamePlural, recordIndexId, objectMetadataItem } =
     useRecordIndexContextOrThrow();
-  const isSimpleModeEnabled = useIsSimpleModeEnabled();
 
   const { hasCurrentViewNonReadableFields } =
     useHasCurrentViewNonReadableFields(objectMetadataItem);
@@ -32,13 +30,11 @@ export const RecordIndexViewBar = () => {
             {(recordIndexViewType ?? ViewType.TABLE) === ViewType.TABLE && (
               <RecordIndexSelectButton />
             )}
-            {!isSimpleModeEnabled && (
-              <ObjectOptionsDropdown
-                recordIndexId={recordIndexId}
-                objectMetadataItem={objectMetadataItem}
-                viewType={recordIndexViewType ?? ViewType.TABLE}
-              />
-            )}
+            <ObjectOptionsDropdown
+              recordIndexId={recordIndexId}
+              objectMetadataItem={objectMetadataItem}
+              viewType={recordIndexViewType ?? ViewType.TABLE}
+            />
           </>
         }
       />

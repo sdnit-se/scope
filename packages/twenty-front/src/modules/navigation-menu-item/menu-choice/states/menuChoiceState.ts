@@ -5,7 +5,6 @@ export type MenuChoice = {
   id?: string;
   hiddenNavigationMenuItemIds: string[];
   savedHiddenNavigationMenuItemIds: string[];
-  isSimpleModeEnabled: boolean;
 };
 
 export const menuChoiceState = createAtomState<MenuChoice | null>({

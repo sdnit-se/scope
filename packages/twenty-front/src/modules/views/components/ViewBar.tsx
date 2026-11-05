@@ -23,13 +23,6 @@ import { ViewBarSearchInput } from '@/views/components/ViewBarSearchInput';
 import { getViewBarFilterDropdownId } from '@/views/utils/getViewBarFilterDropdownId';
 import { UpdateViewButtonGroup } from './UpdateViewButtonGroup';
 import { ViewBarDetails } from './ViewBarDetails';
-import { navigationMenuItemsSelector } from '@/navigation-menu-item/common/states/navigationMenuItemsSelector';
-import { SimpleModeViewSwitch } from '@/simple-mode/components/SimpleModeViewSwitch';
-import { useIsSimpleModeEnabled } from '@/simple-mode/hooks/useIsSimpleModeEnabled';
-import { getSimpleModeViewChoices } from '@/simple-mode/utils/getSimpleModeViewChoices';
-import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
-import { viewsSelector } from '@/views/states/selectors/viewsSelector';
-import { isDefined } from 'twenty-shared/utils';
 
 type ViewBarProps = {
   viewBarId: string;
@@ -44,32 +37,16 @@ export const ViewBar = ({
   optionsDropdownButton,
   isReadOnly = false,
 }: ViewBarProps) => {
-  const { objectNamePlural, recordIndexId, objectMetadataItem } =
-    useRecordIndexContextOrThrow();
-  const isSimpleModeEnabled = useIsSimpleModeEnabled();
-  const views = useAtomStateValue(viewsSelector);
-  const navigationMenuItems = useAtomStateValue(navigationMenuItemsSelector);
-
-  const simpleModeViewChoices = isSimpleModeEnabled
-    ? getSimpleModeViewChoices({
-        objectMetadataId: objectMetadataItem.id,
-        views,
-        navigationMenuItems,
-      })
-    : null;
-
-  const viewPicker = isDefined(simpleModeViewChoices) ? (
-    <SimpleModeViewSwitch choices={simpleModeViewChoices} />
-  ) : (
-    <ViewPickerDropdown />
-  );
+  const { objectNamePlural, recordIndexId } = useRecordIndexContextOrThrow();
 
   if (!objectNamePlural) {
     return;
   }
 
   if (isReadOnly) {
-    return <TopBar className={className} leftComponent={viewPicker} />;
+    return (
+      <TopBar className={className} leftComponent={<ViewPickerDropdown />} />
+    );
   }
 
   return (
@@ -88,7 +65,7 @@ export const ViewBar = ({
       <ViewBarPageTitle />
       <TopBar
         className={className}
-        leftComponent={viewPicker}
+        leftComponent={<ViewPickerDropdown />}
         rightComponent={
           <>
             <ViewBarSearchInput />

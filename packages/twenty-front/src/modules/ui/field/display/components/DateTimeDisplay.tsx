@@ -9,8 +9,6 @@ import { useContext } from 'react';
 import { themeCssVariables } from 'twenty-ui/theme';
 import { dateLocaleState } from '@/localization/states/dateLocaleState';
 import { formatDateTimeString } from '@/object-record/record-field/ui/utils/formatDateTimeString';
-import { useIsSimpleModeEnabled } from '@/simple-mode/hooks/useIsSimpleModeEnabled';
-import { getSimpleModeDateFieldSettings } from '@/simple-mode/utils/getSimpleModeDateFieldSettings';
 
 const StyledTimeZoneSpacer = styled.span`
   min-width: ${themeCssVariables.spacing[1]};
@@ -27,16 +25,13 @@ export const DateTimeDisplay = ({
 }: DateTimeDisplayProps) => {
   const { dateFormat, timeFormat, timeZone } = useContext(UserContext);
   const dateLocale = useAtomStateValue(dateLocaleState);
-  const isSimpleModeEnabled = useIsSimpleModeEnabled();
 
   const formattedDate = formatDateTimeString({
     value,
     timeZone,
     dateFormat,
     timeFormat,
-    dateFieldSettings: isSimpleModeEnabled
-      ? getSimpleModeDateFieldSettings(dateFieldSettings)
-      : dateFieldSettings,
+    dateFieldSettings,
     localeCatalog: dateLocale.localeCatalog,
   });
 
@@ -44,7 +39,7 @@ export const DateTimeDisplay = ({
     <EllipsisDisplay>
       {formattedDate}
       <span></span>
-      {isNonEmptyString(value) && !isSimpleModeEnabled && (
+      {isNonEmptyString(value) && (
         <>
           <StyledTimeZoneSpacer />
           <TimeZoneAbbreviation instant={value} />
