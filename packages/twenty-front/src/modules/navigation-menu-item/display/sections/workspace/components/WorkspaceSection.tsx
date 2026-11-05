@@ -24,6 +24,9 @@ import { useReadableNavigationMenuItems } from '@/navigation-menu-item/display/h
 import { getNavigationMenuItemComputedLink } from '@/navigation-menu-item/display/utils/getNavigationMenuItemComputedLink';
 import { CustomiseMenuDropdown } from '@/navigation-menu-item/menu-choice/components/CustomiseMenuDropdown';
 import { MenuChoiceLoadEffect } from '@/navigation-menu-item/menu-choice/components/MenuChoiceLoadEffect';
+import { useIsSimpleModeFieldAvailable } from '@/navigation-menu-item/menu-choice/hooks/useIsSimpleModeFieldAvailable';
+import { SimpleModeToggle } from '@/simple-mode/components/SimpleModeToggle';
+import { useIsSimpleModeEnabled } from '@/simple-mode/hooks/useIsSimpleModeEnabled';
 import { useIsMenuChoiceAvailable } from '@/navigation-menu-item/menu-choice/hooks/useIsMenuChoiceAvailable';
 import { menuChoiceState } from '@/navigation-menu-item/menu-choice/states/menuChoiceState';
 import { filterHiddenNavigationMenuItems } from '@/navigation-menu-item/menu-choice/utils/filterHiddenNavigationMenuItems';
@@ -70,6 +73,8 @@ export const WorkspaceSection = () => {
     doNotTranslate('Workspace'),
   );
   const isMenuChoiceAvailable = useIsMenuChoiceAvailable();
+  const isSimpleModeFieldAvailable = useIsSimpleModeFieldAvailable();
+  const isSimpleModeEnabled = useIsSimpleModeEnabled();
   const menuChoice = useAtomStateValue(menuChoiceState);
   const currentWorkspaceMember = useAtomStateValue(currentWorkspaceMemberState);
   const currentMemberMenuChoice =
@@ -165,7 +170,7 @@ export const WorkspaceSection = () => {
                         topLevelItems={filteredTopLevelItems}
                       />
                     )}
-                  {hasLayoutsPermission && (
+                  {hasLayoutsPermission && !isSimpleModeEnabled && (
                     <div onMouseEnter={preloadNavigationMenuItemDndKit}>
                       <LightIconButton
                         emphasis="subtle"
@@ -190,6 +195,9 @@ export const WorkspaceSection = () => {
         }
         onActiveObjectMetadataItemClick={handleActiveObjectMetadataItemClick}
       />
+      {isSimpleModeFieldAvailable && isDefined(currentMemberMenuChoice) && (
+        <SimpleModeToggle />
+      )}
     </>
   );
 };

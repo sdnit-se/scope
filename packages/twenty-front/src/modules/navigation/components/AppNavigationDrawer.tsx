@@ -8,6 +8,7 @@ import { SettingsNavigationDrawerContent } from '@/navigation/components/Setting
 import { NavigationDrawer } from '@/ui/navigation/navigation-drawer/components/NavigationDrawer';
 import { NavigationDrawerFixedContent } from '@/ui/navigation/navigation-drawer/components/NavigationDrawerFixedContent';
 import { useIsMobile } from 'twenty-ui/utilities';
+import { useIsSimpleModeEnabled } from '@/simple-mode/hooks/useIsSimpleModeEnabled';
 
 export type AppNavigationDrawerProps = {
   className?: string;
@@ -18,6 +19,8 @@ export const AppNavigationDrawer = ({
 }: AppNavigationDrawerProps) => {
   const isMobile = useIsMobile();
   const isSettingsDrawer = useIsSettingsDrawer();
+  // Simple mode keeps one way to each thing: the menu. AI and Settings come back with simple mode off.
+  const isSimpleModeEnabled = useIsSimpleModeEnabled();
 
   // The main navigation is the home page on mobile, not a drawer.
   if (isMobile && !isSettingsDrawer) {
@@ -27,7 +30,7 @@ export const AppNavigationDrawer = ({
   return (
     <NavigationDrawer className={className} header={<NavigationDrawerHeader />}>
       {/* Mobile switches modes from the bottom navigation bar instead. */}
-      {!isMobile && (
+      {!isMobile && !isSimpleModeEnabled && (
         <NavigationDrawerFixedContent>
           <MainNavigationDrawerModeSwitcher />
         </NavigationDrawerFixedContent>

@@ -38,6 +38,7 @@ import { DialogComponentInstanceContext } from '@/ui/feedback/dialog-manager/con
 import { AppToaster } from '@/ui/feedback/toast/components/AppToaster';
 import { GlobalFilePreviewModal } from '@/ui/field/display/components/GlobalFilePreviewModal';
 import { UserThemeProviderEffect } from '@/workspace-member/effect-components/UserThemeProviderEffect';
+import { SimpleModeThemeEffect } from '@/simple-mode/components/SimpleModeThemeEffect';
 import { UserUiScaleProviderEffect } from '@/workspace-member/effect-components/UserUiScaleProviderEffect';
 import { PageFavicon } from '@/app/components/PageFavicon';
 import { UserContextProvider } from '@/users/components/UserContextProvider';
@@ -60,6 +61,7 @@ export const WorkspaceAppProviders = () => {
                   <MyConnectedAccountsLoadEffect />
                   <UserThemeProviderEffect />
                   <UserUiScaleProviderEffect />
+                  <SimpleModeThemeEffect />
                   <ContextStoreComponentInstanceContext.Provider
                     value={{ instanceId: MAIN_CONTEXT_STORE_INSTANCE_ID }}
                   >
