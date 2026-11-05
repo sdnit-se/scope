@@ -1532,9 +1532,14 @@ export const OneToManyRelationFieldWidgetWithSeeAllButton: Story = {
     const headerCanvas = within(header);
 
     expect(headerCanvas.getByText('People')).toBeVisible();
+    const addButton = headerCanvas.getByRole('button', {
+      name: 'Add relation',
+    });
+    expect(addButton).toBeVisible();
+    expect(addButton).toHaveTextContent('Add');
     expect(
-      headerCanvas.getByRole('button', { name: 'Edit relation' }),
-    ).toBeVisible();
+      headerCanvas.queryByRole('button', { name: 'Edit relation' }),
+    ).toBeNull();
 
     const seeAllLink = await canvas.findByRole('link', {
       name: /See all .* linked to this record/,

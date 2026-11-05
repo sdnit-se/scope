@@ -24,6 +24,7 @@ import { CustomError, isDefined } from 'twenty-shared/utils';
 import { doNotTranslate } from 'twenty-shared/i18n';
 import { IconPencil, IconPlus } from 'twenty-ui/icon';
 import { IconButton } from 'twenty-ui/components/input';
+import { Button } from 'twenty-ui/primitives/input';
 import { RelationType } from '~/generated-metadata/graphql';
 
 type FieldWidgetRelationEditActionProps = {
@@ -85,17 +86,29 @@ export const FieldWidgetRelationEditAction = ({
     ? relationValue.length > 0
     : isDefined(relationValue);
 
-  const isEditAction =
-    fieldDefinition.metadata.relationType === RelationType.MANY_TO_ONE ||
-    hasAtLeastOneRelationRecord;
+  // A list such as People or Opportunities grows by adding to it, so it shows a worded plus; a pencil is kept for
+  // changing a single related record.
+  const isManyToOne =
+    fieldDefinition.metadata.relationType === RelationType.MANY_TO_ONE;
 
-  const TriggerIcon = isEditAction ? IconPencil : IconPlus;
-  const triggerLabel = isEditAction ? t`Edit relation` : t`Add relation`;
+  // A morph relation's records sit under per-target field names, so its emptiness is not known here.
+  const isEditAction = isMorphRelation
+    ? isManyToOne || hasAtLeastOneRelationRecord
+    : isManyToOne && hasAtLeastOneRelationRecord;
 
-  const dropdownTriggerClickableComponent = (
-    <IconButton variant="ghost" size="sm" aria-label={triggerLabel}>
-      <TriggerIcon />
+  const dropdownTriggerClickableComponent = isEditAction ? (
+    <IconButton variant="ghost" size="sm" aria-label={t`Edit relation`}>
+      <IconPencil />
     </IconButton>
+  ) : (
+    <Button
+      variant="ghost"
+      size="sm"
+      startIcon={<IconPlus />}
+      aria-label={t`Add relation`}
+    >
+      {t`Add`}
+    </Button>
   );
 
   return (
