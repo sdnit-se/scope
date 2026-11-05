@@ -166,6 +166,7 @@ export const NoteQuickComposer = ({
     recreateFrom?: { isLinked: boolean; error: unknown };
     isRestoreHandled: boolean;
     isCreating: boolean;
+    queuedSaves: number;
     queue: Promise<unknown>;
   }>(() => ({
     text: restoredDraft?.text ?? '',
@@ -178,6 +179,7 @@ export const NoteQuickComposer = ({
     isRestored: isDefined(restoredDraft?.noteId),
     isRestoreHandled: false,
     isCreating: false,
+    queuedSaves: 0,
     queue: Promise.resolve(),
   }));
 
@@ -382,13 +384,20 @@ export const NoteQuickComposer = ({
 
   const queueSave = (noteText: string, type: NoteType): Promise<boolean> => {
     setStatus('saving');
+    draft.queuedSaves += 1;
 
     const save = draft.queue
       .then(() => writeNote(noteText, type))
       .then(() => {
+        draft.queuedSaves -= 1;
         setStatus('saved');
 
-        if (noteText === draft.text && type === draft.noteType) {
+        // A save still queued behind this one writes other text over it, so only the last one can be in sync.
+        if (
+          draft.queuedSaves === 0 &&
+          noteText === draft.text &&
+          type === draft.noteType
+        ) {
           draft.isSynced = true;
           keepIdentity();
         }
@@ -396,6 +405,7 @@ export const NoteQuickComposer = ({
         return true;
       })
       .catch((error: unknown) => {
+        draft.queuedSaves -= 1;
         setStatus('idle');
         enqueueToast(getToastOptionsFromError({ error }));
 
