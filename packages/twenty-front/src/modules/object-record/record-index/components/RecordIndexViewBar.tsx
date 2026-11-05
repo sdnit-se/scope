@@ -1,4 +1,5 @@
 import { ObjectOptionsDropdown } from '@/object-record/object-options-dropdown/components/ObjectOptionsDropdown';
+import { RecordIndexSelectButton } from '@/object-record/record-index/components/RecordIndexSelectButton';
 import { RecordIndexViewBarEffect } from '@/object-record/record-index/components/RecordIndexViewBarEffect';
 import { useRecordIndexContextOrThrow } from '@/object-record/record-index/contexts/RecordIndexContext';
 import { useHasCurrentViewNonReadableFields } from '@/object-record/record-index/hooks/useHasCurrentViewNonReadableFields';
@@ -25,11 +26,16 @@ export const RecordIndexViewBar = () => {
         isReadOnly={hasCurrentViewNonReadableFields}
         viewBarId={recordIndexId}
         optionsDropdownButton={
-          <ObjectOptionsDropdown
-            recordIndexId={recordIndexId}
-            objectMetadataItem={objectMetadataItem}
-            viewType={recordIndexViewType ?? ViewType.TABLE}
-          />
+          <>
+            {(recordIndexViewType ?? ViewType.TABLE) === ViewType.TABLE && (
+              <RecordIndexSelectButton />
+            )}
+            <ObjectOptionsDropdown
+              recordIndexId={recordIndexId}
+              objectMetadataItem={objectMetadataItem}
+              viewType={recordIndexViewType ?? ViewType.TABLE}
+            />
+          </>
         }
       />
       <RecordIndexViewBarEffect

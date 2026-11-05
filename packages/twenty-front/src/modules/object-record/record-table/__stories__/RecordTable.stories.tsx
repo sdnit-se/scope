@@ -1,6 +1,11 @@
 import { type Meta, type StoryObj } from '@storybook/react-vite';
 import { graphql, HttpResponse } from 'msw';
 
+import { RecordIndexSelectButton } from '@/object-record/record-index/components/RecordIndexSelectButton';
+import {
+  RecordIndexContextProvider,
+  useRecordIndexContextOrThrow,
+} from '@/object-record/record-index/contexts/RecordIndexContext';
 import { RecordTableWithWrappers } from '@/object-record/record-table/components/RecordTableWithWrappers';
 import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test';
 import { Button } from 'twenty-ui/primitives/input';
@@ -91,6 +96,56 @@ export const HeaderSearchOpen: Story = {
     await userEvent.click(await canvas.findByText('Domain Name'));
 
     expect(await body.findByPlaceholderText('Domain Name')).toHaveFocus();
+  },
+};
+
+// The decorator's index context names its own instance; the app's index and table share one id.
+const SelectButtonForTable = ({ recordTableId }: { recordTableId: string }) => {
+  const recordIndexContext = useRecordIndexContextOrThrow();
+
+  return (
+    <RecordIndexContextProvider
+      value={{ ...recordIndexContext, recordIndexId: recordTableId }}
+    >
+      <RecordIndexSelectButton />
+    </RecordIndexContextProvider>
+  );
+};
+
+export const RowTickBoxesHiddenUntilSelect: Story = {
+  render: (args) => (
+    <>
+      <SelectButtonForTable recordTableId={args.recordTableId} />
+      <RecordTableWithWrappers {...args} />
+    </>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await canvas.findAllByText('Linkedin', {}, { timeout: 3000 });
+
+    expect(canvas.queryAllByRole('checkbox', { name: 'Select row' })).toEqual(
+      [],
+    );
+    expect(
+      canvas.queryByRole('checkbox', { name: 'Select all rows' }),
+    ).toBeNull();
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Select' }));
+    const rowCheckboxes = await canvas.findAllByRole('checkbox', {
+      name: 'Select row',
+    });
+    expect(rowCheckboxes.length).toBeGreaterThan(0);
+
+    await userEvent.click(rowCheckboxes[0]);
+    expect(rowCheckboxes[0]).toBeChecked();
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Done' }));
+    await waitFor(() =>
+      expect(canvas.queryAllByRole('checkbox', { name: 'Select row' })).toEqual(
+        [],
+      ),
+    );
+    expect(canvas.getByRole('button', { name: 'Select' })).toBeVisible();
   },
 };
 
