@@ -8,8 +8,18 @@ import { useToast } from 'twenty-ui/components/feedback';
 import { Button } from 'twenty-ui/primitives/input';
 import { themeCssVariables } from 'twenty-ui/theme';
 import { useDebouncedCallback } from 'use-debounce';
+import { v4 } from 'uuid';
 
 import { useNoteTypingFocus } from '@/activities/notes/hooks/useNoteTypingFocus';
+import {
+  getNoteDraftStorageKey,
+  readNoteDraft,
+  removeNoteDraft,
+  writeNoteDraft,
+} from '@/activities/notes/utils/noteDraftStorage';
+import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
+import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
+import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { type ActivityTargetableObject } from '@/activities/types/ActivityTargetableEntity';
 import { getActivityTargetObjectFieldIdName } from '@/activities/utils/getActivityTargetObjectFieldIdName';
 import { getNoteTitleFromText } from '@/activities/notes/utils/getNoteTitleFromText';
@@ -23,6 +33,9 @@ const AUTOSAVE_DELAY_MS = 1000;
 const NOTE_TYPES = ['NOTE', 'CALL', 'MEETING', 'EMAIL'] as const;
 
 type NoteType = (typeof NOTE_TYPES)[number];
+
+const isNoteType = (value: string): value is NoteType =>
+  (NOTE_TYPES as readonly string[]).includes(value);
 
 const StyledComposer = styled.div`
   border: 1px solid ${themeCssVariables.border.color.medium};
@@ -101,18 +114,117 @@ export const NoteQuickComposer = ({
   );
   const typingFocus = useNoteTypingFocus(`note-box-${targetRecord.id}`);
 
-  const [text, setText] = useState('');
-  const [noteType, setNoteType] = useState<NoteType>('NOTE');
+  const currentWorkspace = useAtomStateValue(currentWorkspaceState);
+  const currentWorkspaceMember = useAtomStateValue(currentWorkspaceMemberState);
+  const draftKey =
+    isDefined(currentWorkspace) && isDefined(currentWorkspaceMember)
+      ? getNoteDraftStorageKey({
+          workspaceId: currentWorkspace.id,
+          workspaceMemberId: currentWorkspaceMember.id,
+          objectNameSingular: targetRecord.targetObjectNameSingular,
+          recordId: targetRecord.id,
+        })
+      : undefined;
+
+  // Each keystroke is kept in the browser, so a reload or a closed tab before the autosave loses nothing.
+  const [restoredDraft] = useState(() => {
+    if (!isDefined(draftKey)) {
+      return undefined;
+    }
+    const stored = readNoteDraft(draftKey);
+
+    // Fully saved text is just a note in the list now; replaying it could overwrite edits made since.
+    if (stored?.isSynced === true) {
+      removeNoteDraft(draftKey);
+
+      return undefined;
+    }
+
+    return stored;
+  });
+  const restoredNoteType =
+    isDefined(restoredDraft) && isNoteType(restoredDraft.noteType)
+      ? restoredDraft.noteType
+      : 'NOTE';
+
+  const [text, setText] = useState(restoredDraft?.text ?? '');
+  const [noteType, setNoteType] = useState<NoteType>(restoredNoteType);
   const [status, setStatus] = useState<SaveStatus>('idle');
   const [isFinishing, setIsFinishing] = useState(false);
   // Saves run one after another: the first creates the note, later ones update it. The link to the record is
   // tracked separately so a failed link is retried by the next save.
   const [draft] = useState<{
+    text: string;
+    noteType: NoteType;
     noteId?: string;
-    isCreating: boolean;
+    linkId?: string;
+    isCreated: boolean;
     isLinked: boolean;
+    isSynced: boolean;
+    isRestored: boolean;
+    recreateFrom?: { isLinked: boolean; error: unknown };
+    isRestoreHandled: boolean;
+    isCreating: boolean;
     queue: Promise<unknown>;
-  }>(() => ({ isCreating: false, isLinked: false, queue: Promise.resolve() }));
+  }>(() => ({
+    text: restoredDraft?.text ?? '',
+    noteType: restoredNoteType,
+    noteId: restoredDraft?.noteId,
+    linkId: restoredDraft?.linkId,
+    isCreated: restoredDraft?.isCreated ?? false,
+    isLinked: restoredDraft?.isLinked ?? false,
+    isSynced: false,
+    isRestored: isDefined(restoredDraft?.noteId),
+    isRestoreHandled: false,
+    isCreating: false,
+    queue: Promise.resolve(),
+  }));
+
+  const keepDraft = () => {
+    if (isDefined(draftKey)) {
+      writeNoteDraft(draftKey, {
+        text: draft.text,
+        noteType: draft.noteType,
+        noteId: draft.noteId,
+        linkId: draft.linkId,
+        isCreated: draft.isCreated,
+        isLinked: draft.isLinked,
+        isSynced: draft.isSynced,
+      });
+    }
+  };
+
+  // A save finishing later records only what the server now has. Text another tab stored for the same note in the
+  // meantime is newer and stays, and is then not in sync.
+  const keepIdentity = () => {
+    if (!isDefined(draftKey)) {
+      return;
+    }
+    const stored = readNoteDraft(draftKey);
+    const isSameNote = isDefined(stored) && stored.noteId === draft.noteId;
+    const text = isSameNote ? stored.text : draft.text;
+
+    writeNoteDraft(draftKey, {
+      text,
+      noteType: isSameNote ? stored.noteType : draft.noteType,
+      noteId: draft.noteId,
+      linkId: draft.linkId,
+      isCreated: draft.isCreated,
+      isLinked: draft.isLinked,
+      isSynced: draft.isSynced && text === draft.text,
+    });
+  };
+
+  // The note and its link get their ids before anything is sent and are kept with the draft, so every save, tab and
+  // reopening writes the same note: the database refuses a second one with that id.
+  const startNewNote = () => {
+    draft.noteId = v4();
+    draft.linkId = v4();
+    draft.isCreated = false;
+    draft.isLinked = false;
+    keepDraft();
+    onDraftNoteChange(draft.noteId);
+  };
 
   const { createOneRecord: createNote } = useCreateOneRecord({
     objectNameSingular: CoreObjectNameSingular.Note,
@@ -138,34 +250,104 @@ export const NoteQuickComposer = ({
       ...(isActivityTypeAvailable ? { activityType: type } : {}),
     };
 
-    if (isDefined(draft.noteId)) {
-      await updateOneRecord({
+    if (!isDefined(draft.noteId)) {
+      if (noteText.trim().length === 0) {
+        return;
+      }
+      startNewNote();
+    }
+
+    // A recovered draft's ids may already have been written by an interrupted save or another tab, so they are
+    // checked by updating before anything is created; a refused create would also drop the existing record from view.
+    const isRecovering = draft.isRestored;
+    const linkFields = {
+      noteId: draft.noteId,
+      [getActivityTargetObjectFieldIdName({
+        nameSingular: targetRecord.targetObjectNameSingular,
+      })]: targetRecord.id,
+    };
+
+    if (draft.isCreated || isRecovering) {
+      let updateError: unknown;
+      const updated = await updateOneRecord({
         objectNameSingular: CoreObjectNameSingular.Note,
-        idToUpdate: draft.noteId,
+        idToUpdate: draft.noteId as string,
         updateOneRecordInput: fields,
+      }).catch((error: unknown) => {
+        updateError = error;
+
+        return null;
       });
-    } else if (noteText.trim().length === 0) {
-      return;
-    } else {
+
+      if (isDefined(updated?.deletedAt)) {
+        // In the trash, where updates still succeed: it stays there and the text becomes a new note.
+        startNewNote();
+      } else if (isDefined(updated)) {
+        draft.isCreated = true;
+      } else if (draft.isCreated && !isRecovering) {
+        // The create below with the same id tells a destroyed note (id free, made anew and linked again) from a
+        // passing failure (id taken, create refused, the original error reported and the next save updates again).
+        draft.recreateFrom = { isLinked: draft.isLinked, error: updateError };
+        draft.isCreated = false;
+        draft.isLinked = false;
+      } else {
+        // Not on the server: any link it had went with it.
+        draft.isCreated = false;
+        draft.isLinked = false;
+      }
+    }
+
+    if (!draft.isCreated) {
       draft.isCreating = true;
 
+      const recreateFrom = draft.recreateFrom;
+
+      draft.recreateFrom = undefined;
+
       try {
-        draft.noteId = (await createNote(fields)).id;
+        await createNote({ id: draft.noteId, ...fields });
+      } catch (error) {
+        if (isDefined(recreateFrom)) {
+          draft.isCreated = true;
+          draft.isLinked = recreateFrom.isLinked;
+          throw recreateFrom.error;
+        }
+        throw error;
       } finally {
         draft.isCreating = false;
       }
-      onDraftNoteChange(draft.noteId);
+      draft.isCreated = true;
+      keepIdentity();
     }
 
     if (!draft.isLinked) {
-      await createNoteTarget({
-        noteId: draft.noteId,
-        [getActivityTargetObjectFieldIdName({
-          nameSingular: targetRecord.targetObjectNameSingular,
-        })]: targetRecord.id,
-      });
+      const confirmExistingLink = () =>
+        updateOneRecord({
+          objectNameSingular: CoreObjectNameSingular.NoteTarget,
+          idToUpdate: draft.linkId as string,
+          updateOneRecordInput: linkFields,
+        }).then(
+          (link) => isDefined(link) && !isDefined(link.deletedAt),
+          () => false,
+        );
+
+      const isLinkedAlready = isRecovering && (await confirmExistingLink());
+
+      if (!isLinkedAlready) {
+        try {
+          await createNoteTarget({ id: draft.linkId, ...linkFields });
+        } catch (error) {
+          // Refused because another tab made this very link: accepted only once it is confirmed on the server.
+          if (!(await confirmExistingLink())) {
+            throw error;
+          }
+        }
+      }
       draft.isLinked = true;
+      keepIdentity();
     }
+
+    draft.isRestored = false;
   };
 
   const queueSave = (noteText: string, type: NoteType): Promise<boolean> => {
@@ -175,6 +357,11 @@ export const NoteQuickComposer = ({
       .then(() => writeNote(noteText, type))
       .then(() => {
         setStatus('saved');
+
+        if (noteText === draft.text && type === draft.noteType) {
+          draft.isSynced = true;
+          keepIdentity();
+        }
 
         return true;
       })
@@ -200,13 +387,42 @@ export const NoteQuickComposer = ({
     [debouncedSave],
   );
 
+  // A recovered draft is shown again, kept out of the list while it is in the box, and synced with its latest text.
+  useEffect(() => {
+    if (draft.isRestoreHandled || !isDefined(restoredDraft)) {
+      return;
+    }
+    draft.isRestoreHandled = true;
+    onDraftNoteChange(restoredDraft.noteId);
+
+    // An emptied draft of a saved note is synced too, so the note does not keep text the person erased.
+    if (
+      restoredDraft.text.trim().length > 0 ||
+      isDefined(restoredDraft.noteId)
+    ) {
+      debouncedSave(restoredDraft.text, restoredNoteType);
+    }
+  }, [
+    draft,
+    restoredDraft,
+    restoredNoteType,
+    onDraftNoteChange,
+    debouncedSave,
+  ]);
+
   const handleTextChange = (nextText: string) => {
     setText(nextText);
+    draft.text = nextText;
+    draft.isSynced = false;
+    keepDraft();
     debouncedSave(nextText, noteType);
   };
 
   const handleTypeClick = (type: NoteType) => {
     setNoteType(type);
+    draft.noteType = type;
+    draft.isSynced = false;
+    keepDraft();
 
     if (text.trim().length > 0) {
       debouncedSave(text, type);
@@ -226,14 +442,25 @@ export const NoteQuickComposer = ({
 
     debouncedSave.cancel();
 
+    const filedText = text;
+
     setIsFinishing(true);
-    const isSaved = await queueSave(text, noteType);
+    const isSaved = await queueSave(filedText, noteType);
     setIsFinishing(false);
 
     // A failed save keeps the text and the draft, so trying again updates the same note.
     if (isSaved) {
       draft.noteId = undefined;
+      draft.linkId = undefined;
+      draft.isCreated = false;
       draft.isLinked = false;
+      draft.text = '';
+      draft.noteType = 'NOTE';
+
+      // Another tab may have written newer text to the same draft since; that text stays recoverable.
+      if (isDefined(draftKey) && readNoteDraft(draftKey)?.text === filedText) {
+        removeNoteDraft(draftKey);
+      }
       onDraftNoteChange(undefined);
       setText('');
       setNoteType('NOTE');
