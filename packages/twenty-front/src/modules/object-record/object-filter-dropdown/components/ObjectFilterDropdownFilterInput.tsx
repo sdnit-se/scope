@@ -22,11 +22,13 @@ import { getFilterTypeFromFieldType, isDefined } from 'twenty-shared/utils';
 type ObjectFilterDropdownFilterInputProps = {
   filterDropdownId: string;
   recordFilterId?: string;
+  isOperandHidden?: boolean;
 };
 
 export const ObjectFilterDropdownFilterInput = ({
   filterDropdownId,
   recordFilterId,
+  isOperandHidden = false,
 }: ObjectFilterDropdownFilterInputProps) => {
   const fieldMetadataItemUsedInDropdown = useAtomComponentSelectorValue(
     fieldMetadataItemUsedInDropdownComponentSelector,
@@ -95,8 +97,12 @@ export const ObjectFilterDropdownFilterInput = ({
   } else {
     return (
       <>
-        <ObjectFilterDropdownInnerSelectOperandDropdown />
-        <DropdownMenuSeparator />
+        {!isOperandHidden && (
+          <>
+            <ObjectFilterDropdownInnerSelectOperandDropdown />
+            <DropdownMenuSeparator />
+          </>
+        )}
         {TEXT_FILTER_TYPES.includes(filterType) && (
           <ObjectFilterDropdownTextInput filterDropdownId={filterDropdownId} />
         )}

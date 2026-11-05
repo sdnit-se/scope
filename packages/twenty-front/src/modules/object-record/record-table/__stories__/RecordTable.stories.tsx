@@ -82,34 +82,15 @@ export const Default: Story = {
   },
 };
 
-export const HeaderMenuOpen: Story = {
+export const HeaderSearchOpen: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const body = within(canvasElement.ownerDocument.body);
     await canvas.findAllByText('Linkedin', {}, { timeout: 3000 });
 
-    const headerMenuButton = await canvas.findByText('Domain Name');
+    await userEvent.click(await canvas.findByText('Domain Name'));
 
-    await userEvent.click(headerMenuButton);
-
-    await body.findByText('Move right');
-  },
-};
-
-export const HeaderMenuStaysOpenAfterMoveRight: Story = {
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const body = within(canvasElement.ownerDocument.body);
-
-    await canvas.findAllByText('Linkedin', {}, { timeout: 3000 });
-
-    const headerMenuButton = await canvas.findByText('Domain Name');
-    await userEvent.click(headerMenuButton);
-
-    const moveRightButton = await body.findByText('Move right');
-    await userEvent.click(moveRightButton);
-
-    await body.findByText('Move right');
+    expect(await body.findByPlaceholderText('Domain Name')).toHaveFocus();
   },
 };
 

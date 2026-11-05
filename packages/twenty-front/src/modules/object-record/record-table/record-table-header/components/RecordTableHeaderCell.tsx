@@ -1,7 +1,6 @@
 import { type RecordField } from '@/object-record/record-field/types/RecordField';
 import { hasRecordGroupsComponentSelector } from '@/object-record/record-group/states/selectors/hasRecordGroupsComponentSelector';
 
-import { useRecordTableContextOrThrow } from '@/object-record/record-table/contexts/RecordTableContext';
 import { RecordTableColumnHead } from '@/object-record/record-table/record-table-header/components/RecordTableColumnHead';
 import { RecordTableColumnHeadWithDropdown } from '@/object-record/record-table/record-table-header/components/RecordTableColumnHeadWithDropdown';
 import { RecordTableHeaderCellContainer } from '@/object-record/record-table/record-table-header/components/RecordTableHeaderCellContainer';
@@ -31,8 +30,6 @@ export const RecordTableHeaderCell = ({
   recordField,
   recordFieldIndex,
 }: RecordTableHeaderCellProps) => {
-  const { objectMetadataItem } = useRecordTableContextOrThrow();
-
   const {
     onPointerCancel: handlePointerCancel,
     onPointerDown: handlePointerDown,
@@ -108,10 +105,7 @@ export const RecordTableHeaderCell = ({
         {isRecordTableColumnHeadersReadOnly ? (
           <RecordTableColumnHead recordField={recordField} />
         ) : (
-          <RecordTableColumnHeadWithDropdown
-            recordField={recordField}
-            objectMetadataId={objectMetadataItem.id}
-          />
+          <RecordTableColumnHeadWithDropdown recordField={recordField} />
         )}
       </DragDropItemSortableHandle>
       {isRecordTableColumnResizable && (
