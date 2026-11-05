@@ -18,9 +18,9 @@ import { themeCssVariables } from 'twenty-ui/theme';
 
 const StyledCustomDatePickerHeader = styled.div`
   align-items: center;
-  display: flex;
+  display: grid;
   gap: ${themeCssVariables.spacing[1]};
-  justify-content: flex-end;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr) auto auto;
   padding-left: ${themeCssVariables.spacing[2]};
   padding-right: ${themeCssVariables.spacing[2]};
 
