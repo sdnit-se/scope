@@ -4,7 +4,6 @@ import { DatePickerClearButton } from '@/ui/input/components/internal/date/compo
 import { DatePickerHeader } from '@/ui/input/components/internal/date/components/DatePickerHeader';
 import { RelativeDatePickerHeader } from '@/ui/input/components/internal/date/components/RelativeDatePickerHeader';
 import { StyledDatePickerContainer } from '@/ui/input/components/internal/date/components/StyledDatePickerContainer';
-import { type ReactNode } from 'react';
 import { Temporal } from 'temporal-polyfill';
 import { type Nullable } from 'twenty-shared/types';
 import { doNotTranslate } from 'twenty-shared/i18n';
@@ -34,7 +33,6 @@ type DatePickerProps = {
   keyboardEventsDisabled?: boolean;
   onClear?: () => void;
   hideCalendar?: boolean;
-  footer?: ReactNode;
 };
 
 export const DatePicker = ({
@@ -48,7 +46,6 @@ export const DatePicker = ({
   relativeDate,
   onRelativeDateChange,
   hideHeaderInput,
-  footer,
 }: DatePickerProps) => {
   const plainDate = isDefined(plainDateString)
     ? Temporal.PlainDate.from(plainDateString)
@@ -109,7 +106,6 @@ export const DatePicker = ({
           );
         }}
       />
-      {footer}
       {clearable && <DatePickerClearButton onClear={onClear} />}
     </StyledDatePickerContainer>
   );

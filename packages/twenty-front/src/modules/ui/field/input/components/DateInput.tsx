@@ -1,4 +1,4 @@
-import { type ReactNode, useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import { useRegisterInputEvents } from '@/ui/input/hooks/useRegisterInputEvents';
 import { DatePicker } from '@/ui/input/components/internal/date/components/DatePicker';
@@ -20,7 +20,6 @@ export type DateInputProps = {
   onClear?: () => void;
   onSubmit?: (newDate: Nullable<string>) => void;
   hideHeaderInput?: boolean;
-  renderFooter?: (submit: (newDate: string) => void) => ReactNode;
 };
 
 export const DateInput = ({
@@ -34,7 +33,6 @@ export const DateInput = ({
   onClear,
   onSubmit,
   hideHeaderInput,
-  renderFooter,
 }: DateInputProps) => {
   const store = useStore();
 
@@ -97,7 +95,6 @@ export const DateInput = ({
         onEscape={onEscape}
         onClear={handleClear}
         hideHeaderInput={hideHeaderInput}
-        footer={renderFooter?.(handleClose)}
       />
     </div>
   );
