@@ -11,6 +11,7 @@ import { useTimeInput } from '@/ui/input/components/internal/date/hooks/useTimeI
 import { getDatePickerDropdownIds } from '@/ui/input/components/internal/date/utils/getDatePickerDropdownIds';
 import { DATE_PICKER_YEAR_SELECT_OPTIONS } from '@/ui/input/components/internal/date/constants/DatePickerYearSelectOptions';
 import { getMonthSelectOptions } from '@/ui/input/components/internal/date/utils/getMonthSelectOptions';
+import { formatViewedMonthLabel } from '@/ui/input/components/internal/date/utils/formatViewedMonthLabel';
 import { getTimeBlocks } from '@/ui/input/components/internal/date/utils/getTimeBlocks';
 import { getTimeMask } from '@/ui/input/components/internal/date/utils/getTimeMask';
 import { DropdownContent } from '@/ui/layout/dropdown/components/DropdownContent';
@@ -20,11 +21,11 @@ import { Temporal } from 'temporal-polyfill';
 import { SOURCE_LOCALE } from 'twenty-shared/translations';
 import { isDefined } from 'twenty-shared/utils';
 import { doNotTranslate } from 'twenty-shared/i18n';
-import { LightIconButton } from 'twenty-ui/components/input';
+import { LightButton, LightIconButton } from 'twenty-ui/components/input';
 import { Dropdown } from 'twenty-ui/components/navigation';
 import { Field, Input, InputGroup } from 'twenty-ui/primitives/input';
 import {
-  IconCalendar,
+  IconChevronDown,
   IconChevronLeft,
   IconChevronRight,
   IconClock,
@@ -48,10 +49,12 @@ const StyledTimeInputWrapper = styled.div`
   flex-grow: 1;
 `;
 
-const StyledRightControls = styled.div`
+const StyledMonthRow = styled.div`
   align-items: center;
   display: flex;
-  gap: ${themeCssVariables.spacing[1]};
+  justify-content: space-between;
+  padding-left: ${themeCssVariables.spacing[2]};
+  padding-right: ${themeCssVariables.spacing[2]};
 `;
 
 const StyledNavigationButtons = styled.div`
@@ -167,64 +170,65 @@ export const DateTimePickerHeader = ({
             />
           </InputGroup>
         </Field.Root>
-        <StyledRightControls>
-          <DropdownRoot dropdownId={monthYearPanelDropdownId} type="panel">
-            <Dropdown.Trigger
-              render={
-                <LightIconButton
-                  size="md"
-                  aria-label={t`Select month and year`}
-                >
-                  <IconCalendar />
-                </LightIconButton>
-              }
-            />
-            <DropdownContent
-              align="start"
-              sideOffset={8}
-              width={170}
-              initialFocus={false}
-            >
-              <StyledMonthYearSelector>
-                <Select
-                  dropdownId={monthSelectDropdownId}
-                  options={getMonthSelectOptions(userLocale)}
-                  onChange={onChangeMonth}
-                  value={displayedMonth.month}
-                  fullWidth={false}
-                  dropdownWidth={160}
-                />
-                <Select
-                  dropdownId={yearSelectDropdownId}
-                  onChange={onChangeYear}
-                  value={displayedMonth.year}
-                  options={DATE_PICKER_YEAR_SELECT_OPTIONS}
-                  fullWidth={false}
-                  dropdownWidth={160}
-                />
-              </StyledMonthYearSelector>
-            </DropdownContent>
-          </DropdownRoot>
-          <StyledNavigationButtons>
-            <LightIconButton
-              onClick={onSubtractMonth}
-              size="md"
-              disabled={prevMonthButtonDisabled}
-              aria-label={t`Previous`}
-            >
-              <IconChevronLeft />
-            </LightIconButton>
-            <LightIconButton
-              onClick={onAddMonth}
-              size="md"
-              disabled={nextMonthButtonDisabled}
-              aria-label={t`Next`}
-            >
-              <IconChevronRight />
-            </LightIconButton>
-          </StyledNavigationButtons>
-        </StyledRightControls>
       </StyledTimeRow>
+      <StyledMonthRow>
+        <DropdownRoot dropdownId={monthYearPanelDropdownId} type="panel">
+          <Dropdown.Trigger
+            render={
+              <LightButton
+                size="md"
+                endIcon={<IconChevronDown />}
+                aria-label={t`Select month and year`}
+              >
+                {formatViewedMonthLabel(viewedMonth, userLocale)}
+              </LightButton>
+            }
+          />
+          <DropdownContent
+            align="start"
+            sideOffset={8}
+            width={170}
+            initialFocus={false}
+          >
+            <StyledMonthYearSelector>
+              <Select
+                dropdownId={monthSelectDropdownId}
+                options={getMonthSelectOptions(userLocale)}
+                onChange={onChangeMonth}
+                value={displayedMonth.month}
+                fullWidth={false}
+                dropdownWidth={160}
+              />
+              <Select
+                dropdownId={yearSelectDropdownId}
+                onChange={onChangeYear}
+                value={displayedMonth.year}
+                options={DATE_PICKER_YEAR_SELECT_OPTIONS}
+                fullWidth={false}
+                dropdownWidth={160}
+              />
+            </StyledMonthYearSelector>
+          </DropdownContent>
+        </DropdownRoot>
+        <StyledNavigationButtons>
+          <LightIconButton
+            onClick={onSubtractMonth}
+            size="md"
+            disabled={prevMonthButtonDisabled}
+            aria-label={t`Previous`}
+          >
+            <IconChevronLeft />
+          </LightIconButton>
+          <LightIconButton
+            onClick={onAddMonth}
+            size="md"
+            disabled={nextMonthButtonDisabled}
+            aria-label={t`Next`}
+          >
+            <IconChevronRight />
+          </LightIconButton>
+        </StyledNavigationButtons>
+      </StyledMonthRow>
     </>
   );
 };
