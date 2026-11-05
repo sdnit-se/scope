@@ -6,11 +6,13 @@ import { AnimatedPlaceholder } from '@/ui/feedback/empty-state/components/Animat
 import { EmptyState } from '@/ui/feedback/empty-state/components/EmptyState';
 import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
-import { type ReactNode } from 'react';
+import { isHubSpotHistoryNote } from '@/activities/notes/utils/isHubSpotHistoryNote';
+import { type ReactNode, useState } from 'react';
 import { isDefined } from 'twenty-shared/utils';
 
-import { IconPlus } from 'twenty-ui/icon';
+import { IconChevronDown, IconChevronRight, IconPlus } from 'twenty-ui/icon';
 import { Button } from 'twenty-ui/primitives/input';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 const StyledNotesContainer = styled.div`
   display: flex;
@@ -18,6 +20,10 @@ const StyledNotesContainer = styled.div`
   flex-direction: column;
   height: 100%;
   overflow: auto;
+`;
+
+const StyledHistoryToggle = styled.div`
+  padding: ${themeCssVariables.spacing[3]};
 `;
 
 type NotesCardContentProps = {
@@ -35,7 +41,10 @@ export const NotesCardContent = ({
   onLastRowVisible,
   composer,
 }: NotesCardContentProps) => {
+  const [isHistoryShown, setIsHistoryShown] = useState(false);
   const isNotesEmpty = notes.length === 0;
+  const historyNotes = notes.filter(isHubSpotHistoryNote);
+  const writtenNotes = notes.filter((note) => !isHubSpotHistoryNote(note));
 
   if (loading && isNotesEmpty) {
     return <SkeletonLoader />;
@@ -68,8 +77,25 @@ export const NotesCardContent = ({
   return (
     <StyledNotesContainer>
       {composer}
-      <NoteList notes={notes} />
+      <NoteList notes={writtenNotes} />
+      {historyNotes.length > 0 && (
+        <StyledHistoryToggle>
+          <Button
+            variant="ghost"
+            startIcon={
+              isHistoryShown ? <IconChevronDown /> : <IconChevronRight />
+            }
+            aria-expanded={isHistoryShown}
+            onClick={() => setIsHistoryShown(!isHistoryShown)}
+          >
+            {t`HubSpot history (${historyNotes.length})`}
+          </Button>
+        </StyledHistoryToggle>
+      )}
+      {isHistoryShown && <NoteList notes={historyNotes} />}
+      {/* Remounted per page: with history folded away a page can add nothing visible, so the loader must look again. */}
       <CustomResolverFetchMoreLoader
+        key={notes.length}
         loading={loading}
         onLastRowVisible={onLastRowVisible}
       />
