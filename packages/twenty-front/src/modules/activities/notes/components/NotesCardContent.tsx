@@ -6,6 +6,7 @@ import { AnimatedPlaceholder } from '@/ui/feedback/empty-state/components/Animat
 import { EmptyState } from '@/ui/feedback/empty-state/components/EmptyState';
 import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
+import { type ReactNode } from 'react';
 import { isDefined } from 'twenty-shared/utils';
 
 import { IconPlus } from 'twenty-ui/icon';
@@ -24,6 +25,7 @@ type NotesCardContentProps = {
   notes: Note[];
   onCreateNote: (() => void) | undefined;
   onLastRowVisible: () => Promise<void>;
+  composer?: ReactNode;
 };
 
 export const NotesCardContent = ({
@@ -31,6 +33,7 @@ export const NotesCardContent = ({
   notes,
   onCreateNote,
   onLastRowVisible,
+  composer,
 }: NotesCardContentProps) => {
   const isNotesEmpty = notes.length === 0;
 
@@ -40,27 +43,31 @@ export const NotesCardContent = ({
 
   if (isNotesEmpty) {
     return (
-      <EmptyState.Root>
-        <AnimatedPlaceholder type="noNote" />
-        <EmptyState.Content>
-          <EmptyState.Title>{t`No notes`}</EmptyState.Title>
-          <EmptyState.Description>
-            {t`There are no associated notes with this record.`}
-          </EmptyState.Description>
-        </EmptyState.Content>
-        {isDefined(onCreateNote) && (
-          <Button
-            startIcon={<IconPlus />}
-            onClick={onCreateNote}
-            variant="outline"
-          >{t`New note`}</Button>
-        )}
-      </EmptyState.Root>
+      <StyledNotesContainer>
+        {composer}
+        <EmptyState.Root>
+          <AnimatedPlaceholder type="noNote" />
+          <EmptyState.Content>
+            <EmptyState.Title>{t`No notes`}</EmptyState.Title>
+            <EmptyState.Description>
+              {t`There are no associated notes with this record.`}
+            </EmptyState.Description>
+          </EmptyState.Content>
+          {isDefined(onCreateNote) && (
+            <Button
+              startIcon={<IconPlus />}
+              onClick={onCreateNote}
+              variant="outline"
+            >{t`New note`}</Button>
+          )}
+        </EmptyState.Root>
+      </StyledNotesContainer>
     );
   }
 
   return (
     <StyledNotesContainer>
+      {composer}
       <NoteList notes={notes} />
       <CustomResolverFetchMoreLoader
         loading={loading}

@@ -1924,6 +1924,7 @@ msgstr "Aktör"
 #. js-lingui-id: m16xKo
 #: src/modules/navigation-menu-item/display/sections/favorites/components/FavoritesSection.tsx
 #: src/modules/navigation-menu-item/display/sections/workspace/components/WorkspaceSection.tsx
+#: src/modules/page-layout/widgets/field/components/FieldWidgetRelationEditAction.tsx
 #: src/modules/settings/data-model/object-details/components/SettingsObjectFieldItemTableRow.tsx
 msgid "Add"
 msgstr "Lägg till"
@@ -5231,6 +5232,11 @@ msgstr "Kalenderwidget"
 msgid "Calendars"
 msgstr "Kalendrar"
 
+#. js-lingui-id: 8hvxGX
+#: src/modules/activities/notes/components/NoteQuickComposer.tsx
+msgid "Call"
+msgstr "Samtal"
+
 #. js-lingui-id: cHma9m
 #: src/modules/activities/calendar/components/CalendarEventCallRecorderAvatar.tsx
 msgid "Call recorder"
@@ -8201,6 +8207,11 @@ msgstr "CSV-import och -export"
 msgid "cta"
 msgstr "cta"
 
+#. js-lingui-id: Y2lr+n
+#: src/modules/activities/notes/components/NoteQuickComposer.tsx
+msgid "Ctrl+Enter saves"
+msgstr "Ctrl+Enter sparar"
+
 #. js-lingui-id: J1QT+3
 #: src/modules/side-panel/pages/page-layout/constants/settings/ChartConfigurationSettingLabels.ts
 msgid "Cumulative"
@@ -8471,6 +8482,12 @@ msgstr "Kundaffärer behöver ett belopp"
 #: src/modules/workflow/workflow-steps/workflow-actions/classify-action/components/WorkflowEditActionClassify.tsx
 msgid "customer_satisfaction"
 msgstr "customer_satisfaction"
+
+#. js-lingui-id: 40QZrJ
+#: src/modules/navigation-menu-item/menu-choice/components/CustomiseMenuDropdown.tsx
+#: src/modules/navigation-menu-item/menu-choice/components/CustomiseMenuDropdown.tsx
+msgid "Customise menu"
+msgstr "Anpassa menyn"
 
 #. js-lingui-id: MNGIVW
 #: src/modules/settings/data-model/object-details/components/tabs/ObjectFields.tsx
@@ -9846,6 +9863,7 @@ msgstr "Importera inte händelser som är markerade som privata"
 #: src/modules/ai/constants/AgentChatChannelNavigationItems.ts
 #: src/modules/ai/constants/AgentChatThreadFilterStatusLabels.ts
 #: src/modules/object-core/agents/components/CoreAgentRunStatus.tsx
+#: src/modules/object-record/record-index/components/RecordIndexSelectButton.tsx
 #: src/modules/page-layout/widgets/fields/components/FieldsConfigurationGroupRenameInput.tsx
 msgid "Done"
 msgstr "Klar"
@@ -10415,6 +10433,12 @@ msgstr "annars om"
 #: src/pages/settings/profile/SettingsProfile.tsx
 msgid "Email"
 msgstr "E-post"
+
+#. js-lingui-id: YbQf4t
+#: src/modules/activities/notes/components/NoteQuickComposer.tsx
+msgctxt "note type"
+msgid "Email"
+msgstr "Mejl"
 
 #. js-lingui-id: 6SIWKr
 #: src/pages/settings/accounts/SettingsAccountsEmails.tsx
@@ -12793,7 +12817,6 @@ msgstr "Fyll med exempelindata från"
 #: src/modules/object-core/agents/hooks/useOpenCoreAgentFiltersSidePanel.ts
 #: src/modules/object-core/filters/components/CoreObjectFilterButton.tsx
 #: src/modules/object-core/workflows/hooks/useOpenCoreWorkflowFiltersSidePanel.ts
-#: src/modules/object-record/record-table/record-table-header/components/RecordTableColumnHeadDropdownMenu.tsx
 #: src/modules/settings/components/SettingsSearchFilterTrigger.tsx
 #: src/modules/settings/data-model/object-details/components/SettingsObjectRelationsTable.tsx
 #: src/modules/settings/roles/components/SettingsRolesList.tsx
@@ -13981,7 +14004,6 @@ msgstr "Dold från upptäckt via e-postdomän. Medlemmar och inbjudna ser den fo
 
 #. js-lingui-id: vLyv1R
 #: src/modules/object-record/record-group/hooks/useRecordGroupActions.ts
-#: src/modules/object-record/record-table/record-table-header/components/RecordTableColumnHeadDropdownMenu.tsx
 msgid "Hide"
 msgstr "Dölj"
 
@@ -17098,6 +17120,11 @@ msgstr "Mellanrubrik som döljer sitt innehåll"
 msgid "Medium section heading"
 msgstr ""
 
+#. js-lingui-id: oE8Gmu
+#: src/modules/activities/notes/components/NoteQuickComposer.tsx
+msgid "Meeting"
+msgstr "Möte"
+
 #. js-lingui-id: OvoEq7
 #: src/modules/ai/components/AiChatThreadAvatar.tsx
 #: src/modules/log-console/constants/LogConsolePageViewColumns.tsx
@@ -17161,6 +17188,11 @@ msgstr "Nämnde dig"
 #: src/modules/ai/constants/AgentChatThreadFilterStatusLabels.ts
 msgid "Mentions"
 msgstr "Omnämnanden"
+
+#. js-lingui-id: IFYqbq
+#: src/modules/navigation-menu-item/menu-choice/components/CustomiseMenuDropdown.tsx
+msgid "Menu entries"
+msgstr "Menyposter"
 
 #. js-lingui-id: hFJP7z
 #: src/modules/command-menu-item/edit/components/SidePanelCommandMenuItemEditPage.tsx
@@ -17664,7 +17696,6 @@ msgstr "Flytta dess chattar till"
 #. js-lingui-id: iSLA/r
 #: src/modules/keyboard-shortcut-menu/constants/KeyboardShortcutsTable.ts
 #: src/modules/object-record/record-group/hooks/useRecordGroupActions.ts
-#: src/modules/object-record/record-table/record-table-header/components/RecordTableColumnHeadDropdownMenu.tsx
 #: src/modules/side-panel/pages/page-layout/utils/getTabSettingsPlacementItems.ts
 msgid "Move left"
 msgstr "Flytta åt vänster"
@@ -17672,7 +17703,6 @@ msgstr "Flytta åt vänster"
 #. js-lingui-id: Ubl2by
 #: src/modules/keyboard-shortcut-menu/constants/KeyboardShortcutsTable.ts
 #: src/modules/object-record/record-group/hooks/useRecordGroupActions.ts
-#: src/modules/object-record/record-table/record-table-header/components/RecordTableColumnHeadDropdownMenu.tsx
 #: src/modules/side-panel/pages/page-layout/utils/getTabSettingsPlacementItems.ts
 msgid "Move right"
 msgstr "Flytta åt höger"
@@ -19516,6 +19546,8 @@ msgid "Not synced"
 msgstr "Inte synkroniserad"
 
 #. js-lingui-id: KiJn9B
+#: src/modules/activities/notes/components/NoteQuickComposer.tsx
+#: src/modules/activities/notes/components/NoteQuickComposer.tsx
 #: src/modules/page-layout/hooks/useCreateRecordPageNoteWidget.ts
 #: src/modules/page-layout/hooks/useCreateRecordPageNoteWidget.ts
 #: src/modules/page-layout/widgets/components/RecordPageAddWidgetSection.tsx
@@ -23037,6 +23069,11 @@ msgstr "Återställ"
 msgid "Restore {objectLabel}"
 msgstr "Återställ {objectLabel}"
 
+#. js-lingui-id: v3L03A
+#: src/modules/navigation-menu-item/menu-choice/components/CustomiseMenuDropdown.tsx
+msgid "Restore default"
+msgstr "Återställ standard"
+
 #. js-lingui-id: ZkHcxG
 #: src/pages/settings/applications/tabs/SettingsApplicationTimelineActivityTypeSettingsTab.tsx
 msgid "Restore the activity type settings defined by the application"
@@ -23518,6 +23555,7 @@ msgstr ""
 "urdag"
 
 #. js-lingui-id: tfDRzk
+#: src/modules/activities/notes/components/NoteQuickComposer.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceUsageLimitModal.tsx
 #: src/modules/settings/components/SaveAndCancelButtons/SaveButton.tsx
 #: src/modules/settings/config-variables/components/ConfigVariableEdit.tsx
@@ -23563,6 +23601,16 @@ msgstr "Spara inställningar"
 #: src/modules/settings/translations/components/SettingsTranslationsCard.tsx
 msgid "Save your changes first"
 msgstr "Spara dina ändringar först"
+
+#. js-lingui-id: 0zlN4a
+#: src/modules/activities/notes/components/NoteQuickComposer.tsx
+msgid "Saved ✓"
+msgstr "Sparat ✓"
+
+#. js-lingui-id: K/F6pa
+#: src/modules/activities/notes/components/NoteQuickComposer.tsx
+msgid "Saving…"
+msgstr "Sparas…"
 
 #. js-lingui-id: w9O5DJ
 #: src/pages/settings/developers/tabs/SettingsDevelopersCliTab.tsx
@@ -23688,6 +23736,7 @@ msgstr "SDK"
 #: src/modules/ui/input/components/SelectInput.tsx
 #: src/modules/ui/layout/dropdown/components/DropdownMenuSearchInput.tsx
 #: src/modules/ui/layout/overlay/components/OverlayMenuListSearchRow.tsx
+#: src/modules/views/components/ViewBarSearchInput.tsx
 #: src/pages/settings/data-model/SettingsObjectSearch.tsx
 #: src/pages/settings/data-model/SettingsObjectSearch.tsx
 #: src/pages/settings/data-model/SettingsObjectSearch.tsx
@@ -24264,6 +24313,7 @@ msgstr "Sök i inspelningen till {formattedStartTimestamp}"
 #: src/modules/object-record/record-field/ui/form-types/components/FormMultiRecordFieldChips.tsx
 #: src/modules/object-record/record-field/ui/form-types/components/FormSingleRecordFieldChip.tsx
 #: src/modules/object-record/record-field/ui/form-types/components/FormWorkspaceMemberFilterValueInputTrigger.tsx
+#: src/modules/object-record/record-index/components/RecordIndexSelectButton.tsx
 #: src/modules/spreadsheet-import/components/internal/getSpreadsheetImportSingleSelectColumn.tsx
 #: src/modules/spreadsheet-import/steps/components/ValidationStep/components/columns.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/form-action/constants/FormFieldDefaultTexts.ts
@@ -25691,12 +25741,21 @@ msgstr "Vi kunde tyvärr inte fastställa rätt objekttyp för denna relaterade 
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownRecordGroupSortContent.tsx
 #: src/modules/object-record/object-sort-dropdown/components/ObjectSortDropdownButton.tsx
 #: src/modules/object-record/object-sort-dropdown/components/ObjectSortDropdownButton.tsx
-#: src/modules/object-record/record-table/record-table-header/components/RecordTableColumnHeadDropdownMenu.tsx
 #: src/modules/side-panel/pages/page-layout/components/dashboard/SidePanelDashboardRecordTableSettings.tsx
 #: src/modules/sign-in-background-mock/components/BackgroundMockViewBar.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/find-records-action/components/WorkflowEditActionFindRecords.tsx
 msgid "Sort"
 msgstr "Sortera"
+
+#. js-lingui-id: z7hgLQ
+#: src/modules/object-record/record-table/record-table-header/components/RecordTableColumnHeadSortButton.tsx
+msgid "Sort {fieldLabel} ascending"
+msgstr "Sortera {fieldLabel} stigande"
+
+#. js-lingui-id: I4FGpo
+#: src/modules/object-record/record-table/record-table-header/components/RecordTableColumnHeadSortButton.tsx
+msgid "Sort {fieldLabel} descending"
+msgstr "Sortera {fieldLabel} fallande"
 
 #. js-lingui-id: /HgF9q
 #: src/modules/side-panel/pages/page-layout/components/__stories__/ChartSettings.navigation.stories.tsx
@@ -31156,6 +31215,12 @@ msgstr "Skriv en beskrivning"
 #: src/modules/object-core/agents/components/CoreAgentSettingsTab.tsx
 msgid "Write a description for this agent"
 msgstr "Skriv en beskrivning för denna agent"
+
+#. js-lingui-id: xZmwEU
+#: src/modules/activities/notes/components/NoteQuickComposer.tsx
+#: src/modules/activities/notes/components/NoteQuickComposer.tsx
+msgid "Write a note…"
+msgstr "Skriv en anteckning…"
 
 #. js-lingui-id: RLDVWD
 #: src/modules/marketplace/utils/getRecordAccessLabel.ts
