@@ -194,16 +194,19 @@ export const NoteQuickComposer = ({
     }
   };
 
-  // A save finishing later records only what the server now has. Text another tab stored for the same note in the
-  // meantime is newer and stays, and is then not in sync.
+  // A save finishing later records only what the server now has. Text another tab stored meanwhile, for this note or
+  // as a draft of its own, is newer and stays.
   const keepIdentity = () => {
     if (!isDefined(draftKey)) {
       return;
     }
     const stored = readNoteDraft(draftKey);
-    const isSameNote = isDefined(stored) && stored.noteId === draft.noteId;
-    const text = isSameNote ? stored.text : draft.text;
-    const noteType = isSameNote ? stored.noteType : draft.noteType;
+
+    if (isDefined(stored) && stored.noteId !== draft.noteId) {
+      return;
+    }
+    const text = stored?.text ?? draft.text;
+    const noteType = stored?.noteType ?? draft.noteType;
 
     writeNoteDraft(draftKey, {
       text,
@@ -454,6 +457,9 @@ export const NoteQuickComposer = ({
 
     // A failed save keeps the text and the draft, so trying again updates the same note.
     if (isSaved) {
+      const filedNoteId = draft.noteId;
+      const stored = isDefined(draftKey) ? readNoteDraft(draftKey) : undefined;
+
       draft.noteId = undefined;
       draft.linkId = undefined;
       draft.isCreated = false;
@@ -461,8 +467,12 @@ export const NoteQuickComposer = ({
       draft.text = '';
       draft.noteType = 'NOTE';
 
-      // Another tab may have written newer text to the same draft since; that text stays recoverable.
-      if (isDefined(draftKey) && readNoteDraft(draftKey)?.text === filedText) {
+      // Another tab may have written newer text or a draft of its own since; that stays recoverable.
+      if (
+        isDefined(draftKey) &&
+        stored?.noteId === filedNoteId &&
+        stored?.text === filedText
+      ) {
         removeNoteDraft(draftKey);
       }
       onDraftNoteChange(undefined);
