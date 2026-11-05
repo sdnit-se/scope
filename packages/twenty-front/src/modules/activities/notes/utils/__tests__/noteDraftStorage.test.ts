@@ -113,7 +113,17 @@ describe('noteDraftStorage', () => {
     expect(readNoteDraft(key)?.noteId).toBeUndefined();
   });
 
-  it('keeps working when storage refuses to write', () => {
+  it('keeps working when storage refuses to write, and drops the older draft it could not replace', () => {
+    const key = getNoteDraftStorageKey(scope);
+
+    writeNoteDraft(key, {
+      text: 'Äldre',
+      noteType: 'NOTE',
+      isCreated: false,
+      isLinked: false,
+      isSynced: false,
+    });
+
     const setItem = jest
       .spyOn(Storage.prototype, 'setItem')
       .mockImplementation(() => {
@@ -129,6 +139,7 @@ describe('noteDraftStorage', () => {
         isSynced: false,
       }),
     ).not.toThrow();
+    expect(readNoteDraft(key)).toBeUndefined();
 
     setItem.mockRestore();
   });

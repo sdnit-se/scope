@@ -68,6 +68,14 @@ export const readNoteDraft = (key: string): NoteDraft | undefined => {
   }
 };
 
+export const removeNoteDraft = (key: string) => {
+  try {
+    localStorage.removeItem(key);
+  } catch {
+    return;
+  }
+};
+
 export const writeNoteDraft = (key: string, draft: NoteDraft) => {
   try {
     if (draft.text.trim().length === 0 && !isDefined(draft.noteId)) {
@@ -78,14 +86,7 @@ export const writeNoteDraft = (key: string, draft: NoteDraft) => {
 
     localStorage.setItem(key, JSON.stringify(draft));
   } catch {
-    return;
-  }
-};
-
-export const removeNoteDraft = (key: string) => {
-  try {
-    localStorage.removeItem(key);
-  } catch {
-    return;
+    // An older draft left behind could later be replayed over newer text; without a fresh copy, keep none.
+    removeNoteDraft(key);
   }
 };
