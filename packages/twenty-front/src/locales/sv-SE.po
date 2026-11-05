@@ -14234,6 +14234,12 @@ msgstr "https://example.com/embed"
 msgid "https://example.com/webhook"
 msgstr "https://example.com/webhook"
 
+#. js-lingui-id: ItItaK
+#. placeholder {0}: historyNotes.length
+#: src/modules/activities/notes/components/NotesCardContent.tsx
+msgid "HubSpot history ({0})"
+msgstr "HubSpot-historik ({0})"
+
 #. js-lingui-id: khBRyu
 #: src/modules/side-panel/pages/workflow/action/components/SidePanelWorkflowSelectAction.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/utils/getActionHeaderTypeOrThrow.ts
