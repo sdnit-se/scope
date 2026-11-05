@@ -12,7 +12,7 @@ import { isRecordFilterConsideredEmpty } from '@/object-record/record-filter/uti
 import { useAtomComponentStateCallbackState } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateCallbackState';
 import { useStore } from 'jotai';
 import { useCallback } from 'react';
-import { isDefined } from 'twenty-shared/utils';
+import { getFilterTypeFromFieldType, isDefined } from 'twenty-shared/utils';
 
 export const getColumnHeadFilterInstanceId = (fieldMetadataItemId: string) =>
   `column-head-filter-${fieldMetadataItemId}`;
@@ -45,18 +45,28 @@ export const useColumnHeadFilter = (fieldMetadataItemId: string) => {
       return;
     }
 
+    const emptyRecordFilter =
+      createEmptyRecordFilterFromFieldMetadataItem(
+        fieldMetadataItem,
+      ).newRecordFilter;
+
+    // The header hides the operand, so it only edits a filter that searches the default way; a date keeps its operand.
+    const isDateFilter = ['DATE', 'DATE_TIME'].includes(
+      getFilterTypeFromFieldType(fieldMetadataItem.type),
+    );
+
     const existingRecordFilter = store
       .get(currentRecordFiltersCallbackState)
       .find(
         (recordFilter) =>
           recordFilter.fieldMetadataId === fieldMetadataItem.id &&
-          !isDefined(recordFilter.recordFilterGroupId),
+          !isDefined(recordFilter.recordFilterGroupId) &&
+          (recordFilter.subFieldName ?? null) ===
+            (emptyRecordFilter.subFieldName ?? null) &&
+          (isDateFilter || recordFilter.operand === emptyRecordFilter.operand),
       );
 
-    const recordFilter =
-      existingRecordFilter ??
-      createEmptyRecordFilterFromFieldMetadataItem(fieldMetadataItem)
-        .newRecordFilter;
+    const recordFilter = existingRecordFilter ?? emptyRecordFilter;
 
     store.set(
       fieldMetadataItemIdUsedInDropdownComponentState.atomFamily({

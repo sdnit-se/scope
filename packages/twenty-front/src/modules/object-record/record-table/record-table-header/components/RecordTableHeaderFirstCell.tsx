@@ -34,8 +34,7 @@ const StyledPlusButtonWrapper = styled.div`
 `;
 
 export const RecordTableHeaderFirstCell = () => {
-  const { objectMetadataItem, visibleRecordFields } =
-    useRecordTableContextOrThrow();
+  const { visibleRecordFields } = useRecordTableContextOrThrow();
 
   const isRecordTableColumnHeadersReadOnly = useAtomComponentStateValue(
     isRecordTableColumnHeadersReadOnlyComponentState,
@@ -105,7 +104,7 @@ export const RecordTableHeaderFirstCell = () => {
       ) : (
         <RecordTableColumnHeadWithDropdown
           recordField={recordField}
-          objectMetadataId={objectMetadataItem.id}
+          hasPlusButton
         />
       )}
       {iconIsVisible && !isRecordTableColumnHeadersReadOnly && (
