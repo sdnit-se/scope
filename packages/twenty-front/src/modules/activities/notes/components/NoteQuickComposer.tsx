@@ -26,6 +26,7 @@ import { getNoteTitleFromText } from '@/activities/notes/utils/getNoteTitleFromT
 import { getToastOptionsFromError } from '@/error-handler/utils/getToastOptionsFromError';
 import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
 import { useCreateOneRecord } from '@/object-record/hooks/useCreateOneRecord';
+import { useLazyFindOneRecord } from '@/object-record/hooks/useLazyFindOneRecord';
 import { useUpdateOneRecord } from '@/object-record/hooks/useUpdateOneRecord';
 
 const AUTOSAVE_DELAY_MS = 1000;
@@ -240,6 +241,25 @@ export const NoteQuickComposer = ({
     shouldMatchRootQueryFilter: true,
   });
   const { updateOneRecord } = useUpdateOneRecord();
+  const { findOneRecord: findNote } = useLazyFindOneRecord({
+    objectNameSingular: CoreObjectNameSingular.Note,
+    recordGqlFields: { id: true, deletedAt: true },
+    withSoftDeleted: true,
+    fetchPolicy: 'network-only',
+  });
+
+  const isNoteInTrash = async (noteId: string) => {
+    let deletedAt: string | null | undefined;
+
+    await findNote({
+      objectRecordId: noteId,
+      onCompleted: (note) => {
+        deletedAt = note.deletedAt;
+      },
+    }).catch(() => undefined);
+
+    return isDefined(deletedAt);
+  };
 
   const noteTypeLabels: Record<NoteType, string> = {
     NOTE: t`Note`,
@@ -266,7 +286,10 @@ export const NoteQuickComposer = ({
     // checked by updating before anything is created; a refused create would also drop the existing record from view.
     const isRecovering = draft.isRestored;
 
-    if (draft.isCreated || isRecovering) {
+    // Writing to a note in the trash would change what restoring it brings back.
+    if (isRecovering && (await isNoteInTrash(draft.noteId as string))) {
+      startNewNote();
+    } else if (draft.isCreated || isRecovering) {
       let updateError: unknown;
       const updated = await updateOneRecord({
         objectNameSingular: CoreObjectNameSingular.Note,
@@ -450,9 +473,10 @@ export const NoteQuickComposer = ({
     debouncedSave.cancel();
 
     const filedText = text;
+    const filedNoteType = noteType;
 
     setIsFinishing(true);
-    const isSaved = await queueSave(filedText, noteType);
+    const isSaved = await queueSave(filedText, filedNoteType);
     setIsFinishing(false);
 
     // A failed save keeps the text and the draft, so trying again updates the same note.
@@ -467,11 +491,12 @@ export const NoteQuickComposer = ({
       draft.text = '';
       draft.noteType = 'NOTE';
 
-      // Another tab may have written newer text or a draft of its own since; that stays recoverable.
+      // Another tab may have written newer text, another type or a draft of its own since; that stays recoverable.
       if (
         isDefined(draftKey) &&
         stored?.noteId === filedNoteId &&
-        stored?.text === filedText
+        stored?.text === filedText &&
+        stored?.noteType === filedNoteType
       ) {
         removeNoteDraft(draftKey);
       }
