@@ -97,8 +97,10 @@ export const GraphWidgetBarChartRenderer = () => {
     (field: { id: string }) =>
       field.id === configuration.primaryAxisGroupByFieldMetadataId,
   );
-  const canRedirectToFilteredView =
-    isFilteredViewRedirectionSupported(primaryGroupByField);
+  const canRedirectToFilteredView = isFilteredViewRedirectionSupported(
+    primaryGroupByField,
+    configuration.primaryAxisGroupBySubFieldName,
+  );
 
   const handleSliceClick = (slice: BarChartSlice) => {
     const displayValue = slice.indexValue;

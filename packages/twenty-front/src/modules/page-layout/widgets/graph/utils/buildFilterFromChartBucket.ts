@@ -57,6 +57,19 @@ export const buildFilterFromChartBucket = ({
     ];
   }
 
+  if (isFieldRelation(fieldMetadataItem) && !isNonEmptyString(subFieldName)) {
+    return [
+      {
+        fieldName,
+        operand: ViewFilterOperand.IS,
+        value: JSON.stringify({
+          isCurrentWorkspaceMemberSelected: false,
+          selectedRecordIds: [String(bucketRawValue)],
+        }),
+      },
+    ];
+  }
+
   if (
     isFieldRelation(fieldMetadataItem) ||
     isFieldMorphRelation(fieldMetadataItem)
