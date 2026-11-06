@@ -139,6 +139,9 @@ export const NoteQuickComposer = ({
 
     // Fully saved text is just a note in the list now; replaying it could overwrite edits made since.
     if (stored?.isSynced === true) {
+      if (isDefined(stored.noteId)) {
+        rememberFiledNote(draftKey, stored.noteId);
+      }
       removeNoteDraft(draftKey);
 
       return undefined;
