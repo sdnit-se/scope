@@ -61,6 +61,29 @@ const emojibaseDataPlugin = (): PluginOption => {
   };
 };
 
+// A running tab compares this file with the entry script it loaded and offers a reload after a release. The server
+// returns the page itself only to navigations, so a fetch needs a plain static file.
+const buildVersionFilePlugin = (): PluginOption => ({
+  name: 'build-version-file',
+  apply: 'build',
+  generateBundle(_options, bundle) {
+    const entryChunk = Object.values(bundle).find(
+      (chunk) =>
+        chunk.type === 'chunk' &&
+        chunk.isEntry &&
+        chunk.fileName.startsWith('assets/index-'),
+    );
+
+    if (entryChunk !== undefined) {
+      this.emitFile({
+        type: 'asset',
+        fileName: 'build-version.txt',
+        source: `/${entryChunk.fileName}\n`,
+      });
+    }
+  },
+});
+
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, __dirname, '');
 
@@ -126,6 +149,7 @@ export default defineConfig(({ mode }) => {
     },
 
     plugins: [
+      buildVersionFilePlugin(),
       react({
         plugins: [['@lingui/swc-plugin', {}]],
       }),
