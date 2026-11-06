@@ -189,6 +189,7 @@ jest.mock(
         draftRecord,
         validationRuleViolationsByFieldMetadataId = {},
         onFieldValueChange,
+        onFieldValueClear,
         formInstanceId,
       }: {
         fieldMetadataItems: { id: string; name: string; label: string }[];
@@ -198,6 +199,7 @@ jest.mock(
           { ruleId: string; message: string }[]
         >;
         onFieldValueChange: (gqlFieldName: string, value: string) => void;
+        onFieldValueClear: (gqlFieldName: string) => void;
         formInstanceId: string;
       }) =>
         ReactForMock.createElement(
@@ -211,6 +213,14 @@ jest.mock(
                 onFieldValueChange('pointOfContactId', 'contact-robert'),
             },
             'Pick contact',
+          ),
+          ReactForMock.createElement(
+            'button',
+            {
+              type: 'button',
+              onClick: () => onFieldValueClear('pointOfContactId'),
+            },
+            'Clear contact',
           ),
           fieldMetadataItems.map((fieldMetadataItem) =>
             ReactForMock.createElement(
@@ -477,6 +487,31 @@ describe('SidePanelRecordCreationFormPage', () => {
 
     await act(async () => finishLookup());
     await waitFor(() => expect(createButton).toBeEnabled());
+  });
+
+  it('stops holding Create when the contact is cleared during the lookup', async () => {
+    mockLookUpPointOfContact.mockReturnValue(new Promise(() => undefined));
+
+    renderPage();
+
+    fireEvent.click(screen.getAllByRole('button', { name: 'Pick contact' })[0]);
+
+    const createButton = screen.getByTestId(
+      'record-creation-form-create-button',
+    );
+
+    expect(createButton).toBeDisabled();
+
+    fireEvent.click(
+      screen.getAllByRole('button', { name: 'Clear contact' })[0],
+    );
+
+    await waitFor(() => expect(createButton).toBeEnabled());
+    fireEvent.click(createButton);
+
+    await waitFor(() =>
+      expect(settleRecordCreationDraft).toHaveBeenCalledTimes(1),
+    );
   });
 
   it('lets Create run again after a validation error', async () => {

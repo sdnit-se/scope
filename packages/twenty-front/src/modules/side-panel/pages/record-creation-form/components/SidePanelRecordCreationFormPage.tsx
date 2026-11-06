@@ -300,13 +300,24 @@ const SidePanelRecordCreationForm = ({
   const handleFieldValueChange = (gqlFieldName: string, value: JsonValue) => {
     updateDraftRecord(gqlFieldName, value);
 
-    if (gqlFieldName === 'pointOfContactId' && isNonEmptyString(value)) {
+    if (gqlFieldName !== 'pointOfContactId') {
+      return;
+    }
+
+    if (isNonEmptyString(value)) {
       void fillCompanyFromPointOfContact(value);
+    } else {
+      // No contact left to take a company from, so Create need not wait.
+      store.set(pendingContactLookupAtom, null);
     }
   };
 
   const handleFieldValueClear = (gqlFieldName: string) => {
     updateDraftRecord(gqlFieldName, null);
+
+    if (gqlFieldName === 'pointOfContactId') {
+      store.set(pendingContactLookupAtom, null);
+    }
   };
 
   const getFieldInputIsInErrorAtom = (fieldMetadataId: string) =>
