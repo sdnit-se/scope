@@ -1,7 +1,14 @@
 import { CombinedGraphQLErrors } from '@apollo/client/errors';
 import { i18n } from '@lingui/core';
 import { I18nProvider } from '@lingui/react';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Provider as JotaiProvider } from 'jotai';
 import { type createElement, type Fragment, type ReactNode } from 'react';
@@ -149,9 +156,11 @@ jest.mock(
   }),
 );
 
+const mockLookUpPointOfContact = jest.fn();
+
 jest.mock('@/object-record/record-form/hooks/usePointOfContactLookup', () => ({
   usePointOfContactLookup: () => ({
-    lookUpPointOfContact: async () => undefined,
+    lookUpPointOfContact: mockLookUpPointOfContact,
   }),
 }));
 
@@ -194,6 +203,15 @@ jest.mock(
         ReactForMock.createElement(
           ReactForMock.Fragment,
           null,
+          ReactForMock.createElement(
+            'button',
+            {
+              type: 'button',
+              onClick: () =>
+                onFieldValueChange('pointOfContactId', 'contact-robert'),
+            },
+            'Pick contact',
+          ),
           fieldMetadataItems.map((fieldMetadataItem) =>
             ReactForMock.createElement(
               'div',
@@ -321,6 +339,7 @@ describe('SidePanelRecordCreationFormPage', () => {
     resetJotaiStore();
     mockValidationRules = [];
     settleRecordCreationDraft.mockResolvedValue({});
+    mockLookUpPointOfContact.mockResolvedValue(undefined);
     mockHasPermissionFlag.mockReturnValue(true);
     seedRecordFormPageLayout();
     jotaiStore.set(
@@ -375,6 +394,126 @@ describe('SidePanelRecordCreationFormPage', () => {
       requestId: REQUEST_ID,
       draftRecord: { nickname: 'Apple' },
       shouldKeepOpen: false,
+    });
+  });
+
+  describe('while the picked contact is still being looked up', () => {
+    const holdContactLookup = () => {
+      let finishLookup: () => void = () => undefined;
+
+      mockLookUpPointOfContact.mockReturnValue(
+        new Promise((resolve) => {
+          finishLookup = () => resolve(undefined);
+        }),
+      );
+
+      return () => act(async () => finishLookup());
+    };
+
+    it('files the record once however often Create is pressed', async () => {
+      const finishLookup = holdContactLookup();
+
+      renderPage();
+
+      fireEvent.click(
+        screen.getAllByRole('button', { name: 'Pick contact' })[0],
+      );
+
+      const createButton = screen.getByTestId(
+        'record-creation-form-create-button',
+      );
+
+      fireEvent.click(createButton);
+      fireEvent.click(createButton);
+      fireEvent.click(createButton);
+
+      await finishLookup();
+
+      await waitFor(() =>
+        expect(settleRecordCreationDraft).toHaveBeenCalledTimes(1),
+      );
+      expect(settleRecordCreationDraft).toHaveBeenCalledWith({
+        requestId: REQUEST_ID,
+        draftRecord: { pointOfContactId: 'contact-robert' },
+        shouldKeepOpen: false,
+      });
+    });
+
+    it('files the record once when two activations arrive before the form re-renders', async () => {
+      const finishLookup = holdContactLookup();
+
+      renderPage();
+
+      fireEvent.click(
+        screen.getAllByRole('button', { name: 'Pick contact' })[0],
+      );
+
+      const createButton = screen.getByTestId(
+        'record-creation-form-create-button',
+      );
+
+      act(() => {
+        createButton.click();
+        createButton.click();
+      });
+
+      await finishLookup();
+
+      await waitFor(() =>
+        expect(settleRecordCreationDraft).toHaveBeenCalledTimes(1),
+      );
+    });
+
+    it('lets Create run again after a validation error', async () => {
+      mockValidationRules = [NICKNAME_RULE];
+      const finishLookup = holdContactLookup();
+      const user = userEvent.setup();
+
+      renderPage();
+
+      fireEvent.click(
+        screen.getAllByRole('button', { name: 'Pick contact' })[0],
+      );
+      fireEvent.click(screen.getByTestId('record-creation-form-create-button'));
+      await finishLookup();
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        'A company needs a nickname',
+      );
+      expect(settleRecordCreationDraft).not.toHaveBeenCalled();
+
+      await user.type(screen.getByLabelText('Nickname'), 'Big Apple');
+      await user.click(
+        screen.getByTestId('record-creation-form-create-button'),
+      );
+
+      expect(settleRecordCreationDraft).toHaveBeenCalledTimes(1);
+    });
+
+    it('lets Create run again after the server refuses the record', async () => {
+      settleRecordCreationDraft.mockResolvedValueOnce({
+        error: new Error('Network error'),
+      });
+      const finishLookup = holdContactLookup();
+      const user = userEvent.setup();
+
+      renderPage();
+
+      fireEvent.click(
+        screen.getAllByRole('button', { name: 'Pick contact' })[0],
+      );
+      fireEvent.click(screen.getByTestId('record-creation-form-create-button'));
+      await finishLookup();
+
+      await waitFor(() =>
+        expect(settleRecordCreationDraft).toHaveBeenCalledTimes(1),
+      );
+
+      await user.click(
+        screen.getByTestId('record-creation-form-create-button'),
+      );
+
+      expect(settleRecordCreationDraft).toHaveBeenCalledTimes(2);
     });
   });
 
