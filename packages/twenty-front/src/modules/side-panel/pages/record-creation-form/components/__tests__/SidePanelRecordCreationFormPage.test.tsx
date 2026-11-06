@@ -451,6 +451,34 @@ describe('SidePanelRecordCreationFormPage', () => {
     });
   });
 
+  it('still holds Create when the form is left and opened again during the lookup', async () => {
+    let finishLookup: () => void = () => undefined;
+
+    mockLookUpPointOfContact.mockReturnValue(
+      new Promise((resolve) => {
+        finishLookup = () => resolve(undefined);
+      }),
+    );
+
+    const { unmount } = renderPage();
+
+    fireEvent.click(screen.getAllByRole('button', { name: 'Pick contact' })[0]);
+    unmount();
+
+    renderPage();
+
+    const createButton = screen.getByTestId(
+      'record-creation-form-create-button',
+    );
+
+    expect(createButton).toBeDisabled();
+    fireEvent.click(createButton);
+    expect(settleRecordCreationDraft).not.toHaveBeenCalled();
+
+    await act(async () => finishLookup());
+    await waitFor(() => expect(createButton).toBeEnabled());
+  });
+
   it('lets Create run again after a validation error', async () => {
     mockValidationRules = [NICKNAME_RULE];
     const user = userEvent.setup();

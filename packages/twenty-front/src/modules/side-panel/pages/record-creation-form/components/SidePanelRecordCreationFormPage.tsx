@@ -25,6 +25,7 @@ import { useOpenRecordCreationFormSettingsInSidePanel } from '@/side-panel/hooks
 import { recordCreationFormAreHiddenFieldsShownComponentState } from '@/side-panel/pages/record-creation-form/states/recordCreationFormAreHiddenFieldsShownComponentState';
 import { recordCreationFormDraftComponentState } from '@/side-panel/pages/record-creation-form/states/recordCreationFormDraftComponentState';
 import { recordCreationFormIsSubmittingComponentState } from '@/side-panel/pages/record-creation-form/states/recordCreationFormIsSubmittingComponentState';
+import { recordCreationFormPendingContactLookupComponentState } from '@/side-panel/pages/record-creation-form/states/recordCreationFormPendingContactLookupComponentState';
 import { recordCreationFormRequestComponentState } from '@/side-panel/pages/record-creation-form/states/recordCreationFormRequestComponentState';
 import { SidePanelFooter } from '@/ui/layout/side-panel/components/SidePanelFooter';
 import { useValidationRules } from '@/validation-rules/hooks/useValidationRules';
@@ -237,8 +238,12 @@ const SidePanelRecordCreationForm = ({
   };
 
   const { lookUpPointOfContact } = usePointOfContactLookup();
-  const [pendingPointOfContactLookup, setPendingPointOfContactLookup] =
-    useState<Promise<PointOfContactLookup>>();
+  const recordCreationFormPendingContactLookup = useAtomComponentStateValue(
+    recordCreationFormPendingContactLookupComponentState,
+  );
+  const pendingContactLookupAtom = useAtomComponentStateCallbackState(
+    recordCreationFormPendingContactLookupComponentState,
+  );
 
   // A deal's company follows the contact picked in the form, unless a company is already chosen or the person may
   // not set it.
@@ -262,16 +267,17 @@ const SidePanelRecordCreationForm = ({
       : currentDraftRecord;
   };
 
-  const isWaitingForPointOfContact = isDefined(pendingPointOfContactLookup);
+  const isWaitingForPointOfContact = isDefined(
+    recordCreationFormPendingContactLookup,
+  );
 
   const fillCompanyFromPointOfContact = async (pointOfContactId: string) => {
-    const lookup = lookUpPointOfContact(pointOfContactId).then(
-      (pointOfContact) => ({ pointOfContactId, pointOfContact }),
-    );
+    store.set(pendingContactLookupAtom, pointOfContactId);
 
-    setPendingPointOfContactLookup(lookup);
-
-    const pointOfContactLookup = await lookup;
+    const pointOfContactLookup = {
+      pointOfContactId,
+      pointOfContact: await lookUpPointOfContact(pointOfContactId),
+    };
 
     setRecordCreationFormDraft((previousDraftRecord) => {
       const currentDraftRecord = previousDraftRecord ?? initialDraftRecord;
@@ -285,9 +291,10 @@ const SidePanelRecordCreationForm = ({
         : nextDraftRecord;
     });
 
-    setPendingPointOfContactLookup((currentLookup) =>
-      currentLookup === lookup ? undefined : currentLookup,
-    );
+    // A contact picked in the meantime keeps its own lookup pending.
+    if (store.get(pendingContactLookupAtom) === pointOfContactId) {
+      store.set(pendingContactLookupAtom, null);
+    }
   };
 
   const handleFieldValueChange = (gqlFieldName: string, value: JsonValue) => {
@@ -349,7 +356,10 @@ const SidePanelRecordCreationForm = ({
   }) => {
     // Read and taken from the store at once: a second Create or Ctrl+Enter that arrives before the next render must
     // not file the record again. Nothing is filed while the picked contact's company is still on its way.
-    if (store.get(isSubmittingAtom) || isDefined(pendingPointOfContactLookup)) {
+    if (
+      store.get(isSubmittingAtom) ||
+      isDefined(store.get(pendingContactLookupAtom))
+    ) {
       return;
     }
     store.set(isSubmittingAtom, true);
