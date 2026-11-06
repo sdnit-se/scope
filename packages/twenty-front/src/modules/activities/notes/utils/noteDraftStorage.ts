@@ -90,3 +90,25 @@ export const writeNoteDraft = (key: string, draft: NoteDraft) => {
     removeNoteDraft(key);
   }
 };
+
+// A filed draft leaves only its note id behind, so a save another tab still has queued for that note knows it is late.
+export const markNoteDraftFiled = (key: string, noteId: string) => {
+  try {
+    localStorage.setItem(key, JSON.stringify({ filedNoteId: noteId }));
+  } catch {
+    removeNoteDraft(key);
+  }
+};
+
+export const readFiledNoteId = (key: string): string | undefined => {
+  try {
+    const stored: unknown = JSON.parse(localStorage.getItem(key) ?? 'null');
+    const filedNoteId = isObject(stored)
+      ? (stored as { filedNoteId?: unknown }).filedNoteId
+      : undefined;
+
+    return isNonEmptyString(filedNoteId) ? filedNoteId : undefined;
+  } catch {
+    return undefined;
+  }
+};
