@@ -8,6 +8,7 @@ import { InformationBannerFailPaymentInfo } from '@/information-banner/component
 import { InformationBannerNoBillingSubscription } from '@/information-banner/components/billing/InformationBannerNoBillingSubscription';
 import { InformationBannerNonProductionInstance } from '@/information-banner/components/enterprise/InformationBannerNonProductionInstance';
 import { InformationBannerMaintenance } from '@/information-banner/components/maintenance/InformationBannerMaintenance';
+import { InformationBannerNewVersion } from '@/information-banner/components/new-version/InformationBannerNewVersion';
 import { InformationBannerReconnectAccountEmailAliases } from '@/information-banner/components/reconnect-account/InformationBannerReconnectAccountEmailAliases';
 import { InformationBannerReconnectAccountInsufficientPermissions } from '@/information-banner/components/reconnect-account/InformationBannerReconnectAccountInsufficientPermissions';
 import { useHasPermissionFlag } from '@/settings/roles/hooks/useHasPermissionFlag';
@@ -66,6 +67,7 @@ export const InformationBannerWrapper = () => {
     <StyledInformationBannerWrapper>
       <InformationBannerNonProductionInstance />
       <InformationBannerMaintenance />
+      <InformationBannerNewVersion />
       {isAccountSyncEnabled && (
         <InformationBannerReconnectAccountInsufficientPermissions />
       )}

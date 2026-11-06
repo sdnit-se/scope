@@ -1575,6 +1575,11 @@ msgstr "Ett formulär öppnas för personen som startar arbetsflödet och fylls 
 msgid "A new one each time the step runs"
 msgstr "Ett nytt varje gång steget körs"
 
+#. js-lingui-id: gAq/HN
+#: src/modules/information-banner/components/new-version/InformationBannerNewVersion.tsx
+msgid "A new version of the CRM is available"
+msgstr "Det finns en ny version av CRM"
+
 #. js-lingui-id: K3NJnJ
 #: src/modules/information-banner/components/billing/InformationBannerFailPaymentInfo.tsx
 msgid "A payment method is needed to keep your workspace active."
@@ -22468,6 +22473,7 @@ msgstr "Frigör & överför till den här servern"
 #. js-lingui-id: HpK/8d
 #: src/modules/error-handler/components/AppRootErrorFallback.tsx
 #: src/modules/error-handler/components/internal/AppErrorDisplay.tsx
+#: src/modules/information-banner/components/new-version/InformationBannerNewVersion.tsx
 #: src/modules/settings/domains/components/SettingPublicDomain.tsx
 #: src/modules/settings/domains/components/SettingsCustomDomain.tsx
 msgid "Reload"
