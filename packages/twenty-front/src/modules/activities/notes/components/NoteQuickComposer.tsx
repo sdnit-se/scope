@@ -13,9 +13,9 @@ import { v4 } from 'uuid';
 import { useNoteTypingFocus } from '@/activities/notes/hooks/useNoteTypingFocus';
 import {
   getNoteDraftStorageKey,
-  markNoteDraftFiled,
-  readFiledNoteId,
+  isNoteFiled,
   readNoteDraft,
+  rememberFiledNote,
   removeNoteDraft,
   writeNoteDraft,
 } from '@/activities/notes/utils/noteDraftStorage';
@@ -209,8 +209,9 @@ export const NoteQuickComposer = ({
     const stored = readNoteDraft(draftKey);
 
     if (
-      (isDefined(stored) && stored.noteId !== draft.noteId) ||
-      readFiledNoteId(draftKey) === draft.noteId
+      isDefined(stored)
+        ? stored.noteId !== draft.noteId
+        : isDefined(draft.noteId) && isNoteFiled(draftKey, draft.noteId)
     ) {
       return;
     }
@@ -393,16 +394,17 @@ export const NoteQuickComposer = ({
     if (!isDefined(draftKey) || !isDefined(draft.noteId)) {
       return false;
     }
-    if (readFiledNoteId(draftKey) === draft.noteId) {
-      return true;
-    }
     const stored = readNoteDraft(draftKey);
+    const isSameNote = isDefined(stored) && stored.noteId === draft.noteId;
+    const isLatestText =
+      isSameNote && stored.text === noteText && stored.noteType === type;
 
-    return (
-      isDefined(stored) &&
-      stored.noteId === draft.noteId &&
-      (stored.text !== noteText || stored.noteType !== type)
-    );
+    // A filed note is written again only for text typed into it after it was filed.
+    if (isNoteFiled(draftKey, draft.noteId)) {
+      return !isLatestText;
+    }
+
+    return isSameNote && !isLatestText;
   };
 
   const writeNoteUnlessOutdated = async (noteText: string, type: NoteType) => {
@@ -541,14 +543,16 @@ export const NoteQuickComposer = ({
       draft.noteType = 'NOTE';
 
       // Another tab may have written newer text, another type or a draft of its own since; that stays recoverable.
-      if (
-        isDefined(draftKey) &&
-        isDefined(filedNoteId) &&
-        stored?.noteId === filedNoteId &&
-        stored?.text === filedText &&
-        stored?.noteType === filedNoteType
-      ) {
-        markNoteDraftFiled(draftKey, filedNoteId);
+      if (isDefined(draftKey) && isDefined(filedNoteId)) {
+        rememberFiledNote(draftKey, filedNoteId);
+
+        if (
+          stored?.noteId === filedNoteId &&
+          stored.text === filedText &&
+          stored.noteType === filedNoteType
+        ) {
+          removeNoteDraft(draftKey);
+        }
       }
       onDraftNoteChange(undefined);
       setText('');

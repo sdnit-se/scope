@@ -91,24 +91,38 @@ export const writeNoteDraft = (key: string, draft: NoteDraft) => {
   }
 };
 
-// A filed draft leaves only its note id behind, so a save another tab still has queued for that note knows it is late.
-export const markNoteDraftFiled = (key: string, noteId: string) => {
+const FILED_NOTE_IDS_LIMIT = 20;
+
+const getFiledNoteIdsKey = (key: string) => `${key}:filed`;
+
+const readFiledNoteIds = (key: string): string[] => {
   try {
-    localStorage.setItem(key, JSON.stringify({ filedNoteId: noteId }));
+    const stored: unknown = JSON.parse(
+      localStorage.getItem(getFiledNoteIdsKey(key)) ?? '[]',
+    );
+
+    return Array.isArray(stored) ? stored.filter(isNonEmptyString) : [];
   } catch {
-    removeNoteDraft(key);
+    return [];
   }
 };
 
-export const readFiledNoteId = (key: string): string | undefined => {
+// Filed notes are kept apart from the draft, so a save another tab still has queued for one of them knows it is late
+// even after a new draft takes the record's place.
+export const rememberFiledNote = (key: string, noteId: string) => {
   try {
-    const stored: unknown = JSON.parse(localStorage.getItem(key) ?? 'null');
-    const filedNoteId = isObject(stored)
-      ? (stored as { filedNoteId?: unknown }).filedNoteId
-      : undefined;
-
-    return isNonEmptyString(filedNoteId) ? filedNoteId : undefined;
+    localStorage.setItem(
+      getFiledNoteIdsKey(key),
+      JSON.stringify(
+        [...readFiledNoteIds(key).filter((id) => id !== noteId), noteId].slice(
+          -FILED_NOTE_IDS_LIMIT,
+        ),
+      ),
+    );
   } catch {
-    return undefined;
+    return;
   }
 };
+
+export const isNoteFiled = (key: string, noteId: string) =>
+  readFiledNoteIds(key).includes(noteId);

@@ -1,8 +1,8 @@
 import {
   getNoteDraftStorageKey,
-  markNoteDraftFiled,
-  readFiledNoteId,
+  isNoteFiled,
   readNoteDraft,
+  rememberFiledNote,
   removeNoteDraft,
   writeNoteDraft,
 } from '@/activities/notes/utils/noteDraftStorage';
@@ -79,35 +79,28 @@ describe('noteDraftStorage', () => {
     expect(readNoteDraft(key)).toBeUndefined();
   });
 
-  it('remembers which note was filed, without offering its text again', () => {
+  it('remembers filed notes after a new draft takes the record, keeping only the latest', () => {
     const key = getNoteDraftStorageKey(scope);
 
-    writeNoteDraft(key, {
-      text: 'Ring tillbaka',
-      noteType: 'CALL',
-      noteId: 'note-1',
-      linkId: 'link-1',
-      isCreated: true,
-      isLinked: true,
-      isSynced: false,
-    });
-    markNoteDraftFiled(key, 'note-1');
-
-    expect(readNoteDraft(key)).toBeUndefined();
-    expect(readFiledNoteId(key)).toBe('note-1');
-
+    rememberFiledNote(key, 'note-1');
     writeNoteDraft(key, {
       text: 'Nästa',
       noteType: 'NOTE',
-      noteId: 'note-2',
-      linkId: 'link-2',
       isCreated: false,
       isLinked: false,
       isSynced: false,
     });
 
-    expect(readFiledNoteId(key)).toBeUndefined();
-    expect(readNoteDraft(key)?.noteId).toBe('note-2');
+    expect(isNoteFiled(key, 'note-1')).toBe(true);
+    expect(readNoteDraft(key)?.text).toBe('Nästa');
+    expect(isNoteFiled(key, 'note-2')).toBe(false);
+
+    for (let index = 2; index <= 21; index += 1) {
+      rememberFiledNote(key, `note-${index}`);
+    }
+
+    expect(isNoteFiled(key, 'note-1')).toBe(false);
+    expect(isNoteFiled(key, 'note-21')).toBe(true);
   });
 
   it('ignores damaged or foreign values instead of failing', () => {
