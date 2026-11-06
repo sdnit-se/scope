@@ -44,11 +44,29 @@ export const RecordTableNoRecordGroupScrollToPreviousRecordEffect = () => {
 
   // Only the browser's back and forward buttons return to an old position; a list opened anew is a new history
   // entry and starts at the top.
-  const [scrollTopOnReturn, setScrollTopOnReturn] = useState(() =>
+  const readScrollTopOnReturn = () =>
     navigationType === NavigationType.Pop
       ? store.get(scrollTopToRestoreAtom)[historyEntryKey]
-      : undefined,
+      : undefined;
+
+  const [scrollTopOnReturn, setScrollTopOnReturn] = useState(
+    readScrollTopOnReturn,
   );
+
+  // Going from one list to another from the menu keeps this table mounted and switches it to the other list's
+  // positions a render later, so coming back is read again once both have changed.
+  const [readFor, setReadFor] = useState({
+    historyEntryKey,
+    scrollTopToRestoreAtom,
+  });
+
+  if (
+    readFor.historyEntryKey !== historyEntryKey ||
+    readFor.scrollTopToRestoreAtom !== scrollTopToRestoreAtom
+  ) {
+    setReadFor({ historyEntryKey, scrollTopToRestoreAtom });
+    setScrollTopOnReturn(readScrollTopOnReturn());
+  }
 
   useEffect(() => {
     if (!isDefined(scrollWrapperHTMLElement)) {
