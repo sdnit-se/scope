@@ -407,7 +407,32 @@ export const NoteQuickComposer = ({
     return isSameNote && !isLatestText;
   };
 
+  // Another tab that restored this same text may already have given it a note; writing to that one avoids a second.
+  const adoptStoredNote = (noteText: string, type: NoteType) => {
+    if (!isDefined(draftKey) || isDefined(draft.noteId)) {
+      return;
+    }
+    const stored = readNoteDraft(draftKey);
+
+    if (
+      !isDefined(stored?.noteId) ||
+      stored.text !== noteText ||
+      stored.noteType !== type ||
+      isNoteFiled(draftKey, stored.noteId)
+    ) {
+      return;
+    }
+    draft.noteId = stored.noteId;
+    draft.linkId = stored.linkId;
+    draft.isCreated = stored.isCreated;
+    draft.isLinked = stored.isLinked;
+    draft.isRestored = true;
+    onDraftNoteChange(stored.noteId);
+  };
+
   const writeNoteUnlessOutdated = async (noteText: string, type: NoteType) => {
+    adoptStoredNote(noteText, type);
+
     if (isSaveOutdated(noteText, type)) {
       return false;
     }
@@ -505,7 +530,7 @@ export const NoteQuickComposer = ({
     draft.isSynced = false;
     keepDraft();
 
-    if (text.trim().length > 0) {
+    if (text.trim().length > 0 || isDefined(draft.noteId)) {
       debouncedSave(text, type);
     }
   };
