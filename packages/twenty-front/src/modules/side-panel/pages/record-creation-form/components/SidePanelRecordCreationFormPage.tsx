@@ -165,9 +165,6 @@ const SidePanelRecordCreationForm = ({
   const currentFocusId = useAtomStateValue(currentFocusIdSelector);
 
   const draftRecord = recordCreationFormDraft ?? initialDraftRecord;
-  const recordCreationFormDraftAtom = useAtomComponentStateCallbackState(
-    recordCreationFormDraftComponentState,
-  );
 
   const hasLayoutsPermission = useHasPermissionFlag(PermissionFlagType.LAYOUTS);
 
@@ -265,6 +262,8 @@ const SidePanelRecordCreationForm = ({
       : currentDraftRecord;
   };
 
+  const isWaitingForPointOfContact = isDefined(pendingPointOfContactLookup);
+
   const fillCompanyFromPointOfContact = async (pointOfContactId: string) => {
     const lookup = lookUpPointOfContact(pointOfContactId).then(
       (pointOfContact) => ({ pointOfContactId, pointOfContact }),
@@ -348,9 +347,9 @@ const SidePanelRecordCreationForm = ({
   }: {
     shouldKeepOpen: boolean;
   }) => {
-    // Read and taken from the store at once, before anything waits: a second Create or Ctrl+Enter that arrives
-    // before the next render must not file the record again.
-    if (store.get(isSubmittingAtom)) {
+    // Read and taken from the store at once: a second Create or Ctrl+Enter that arrives before the next render must
+    // not file the record again. Nothing is filed while the picked contact's company is still on its way.
+    if (store.get(isSubmittingAtom) || isDefined(pendingPointOfContactLookup)) {
       return;
     }
     store.set(isSubmittingAtom, true);
@@ -368,18 +367,8 @@ const SidePanelRecordCreationForm = ({
 
       setServerValidationRuleViolations([]);
 
-      // Create pressed before the picked contact's company arrived still files the deal with it; fields stay
-      // editable while it waits, so what the form shows then is what gets filed.
-      const pendingLookup = pendingPointOfContactLookup;
-      const draftRecordToSubmit = isDefined(pendingLookup)
-        ? withCompanyFromPointOfContact(
-            store.get(recordCreationFormDraftAtom) ?? initialDraftRecord,
-            await pendingLookup,
-          )
-        : draftRecord;
-
       if (validationRules.length > 0) {
-        const draftViolations = computeViolations(draftRecordToSubmit);
+        const draftViolations = computeViolations(draftRecord);
 
         flushSync(() => {
           setDraftValidationRuleViolations(draftViolations);
@@ -398,7 +387,7 @@ const SidePanelRecordCreationForm = ({
       const { error } = await settleRecordCreationDraft({
         requestId,
         draftRecord: computeRecordFormCreateRecordInput({
-          draftRecord: draftRecordToSubmit,
+          draftRecord,
           fieldMetadataItems: objectMetadataItem.fields,
           objectMetadataItems,
         }),
@@ -547,7 +536,9 @@ const SidePanelRecordCreationForm = ({
                 <Dropdown.ActionItem
                   startIcon={<IconPlus />}
                   shortcut={['Alt', 'Enter']}
-                  disabled={recordCreationFormIsSubmitting}
+                  disabled={
+                    recordCreationFormIsSubmitting || isWaitingForPointOfContact
+                  }
                   onClick={handleCreateAnotherClick}
                 >{t`Create another`}</Dropdown.ActionItem>
               )}
@@ -568,7 +559,10 @@ const SidePanelRecordCreationForm = ({
             startIcon={<IconPlus />}
             size="sm"
             onClick={handleCreateClick}
-            loading={recordCreationFormIsSubmitting}
+            loading={
+              recordCreationFormIsSubmitting || isWaitingForPointOfContact
+            }
+            disabled={isWaitingForPointOfContact}
             shortcut={['Mod', 'Enter']}
             data-testid="record-creation-form-create-button"
             variant="solid"
