@@ -394,10 +394,18 @@ export const NoteQuickComposer = ({
 
   // Another tab may have filed this note, or stored newer text for it, after this save was queued; that one wins.
   const isSaveOutdated = (noteText: string, type: NoteType) => {
-    if (!isDefined(draftKey) || !isDefined(draft.noteId)) {
+    if (!isDefined(draftKey)) {
       return false;
     }
     const stored = readNoteDraft(draftKey);
+
+    // Not yet a note: the record's stored draft is the latest typing, here or in another tab.
+    if (!isDefined(draft.noteId)) {
+      return (
+        isDefined(stored) &&
+        (stored.text !== noteText || stored.noteType !== type)
+      );
+    }
     const isSameNote = isDefined(stored) && stored.noteId === draft.noteId;
     const isLatestText =
       isSameNote && stored.text === noteText && stored.noteType === type;
