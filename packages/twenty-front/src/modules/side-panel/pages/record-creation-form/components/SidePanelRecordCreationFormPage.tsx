@@ -354,11 +354,18 @@ const SidePanelRecordCreationForm = ({
 
     setServerValidationRuleViolations([]);
 
-    // Create pressed before the picked contact's company arrived still files the deal with it.
+    // Create pressed before the picked contact's company arrived still files the deal with it; the form is locked
+    // while it waits so a second click cannot file it twice.
     const pendingLookup = pendingPointOfContactLookup;
-    const draftRecordToSubmit = isDefined(pendingLookup)
-      ? withCompanyFromPointOfContact(draftRecord, await pendingLookup)
-      : draftRecord;
+    let draftRecordToSubmit = draftRecord;
+
+    if (isDefined(pendingLookup)) {
+      setIsSubmitting(true);
+      draftRecordToSubmit = withCompanyFromPointOfContact(
+        draftRecord,
+        await pendingLookup,
+      );
+    }
 
     if (validationRules.length > 0) {
       const draftViolations = computeViolations(draftRecordToSubmit);
@@ -372,6 +379,7 @@ const SidePanelRecordCreationForm = ({
       });
 
       if (draftViolations.length > 0) {
+        setIsSubmitting(false);
         scrollToFirstFieldViolation();
         return;
       }
