@@ -23,6 +23,7 @@ import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomState
 import { type ActivityTargetableObject } from '@/activities/types/ActivityTargetableEntity';
 import { getActivityTargetObjectFieldIdName } from '@/activities/utils/getActivityTargetObjectFieldIdName';
 import { getNoteTitleFromText } from '@/activities/notes/utils/getNoteTitleFromText';
+import { withNoteDraftLock } from '@/activities/notes/utils/withNoteDraftLock';
 import { getToastOptionsFromError } from '@/error-handler/utils/getToastOptionsFromError';
 import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
 import { useCreateOneRecord } from '@/object-record/hooks/useCreateOneRecord';
@@ -387,7 +388,11 @@ export const NoteQuickComposer = ({
     draft.queuedSaves += 1;
 
     const save = draft.queue
-      .then(() => writeNote(noteText, type))
+      .then(() =>
+        isDefined(draftKey)
+          ? withNoteDraftLock(draftKey, () => writeNote(noteText, type))
+          : writeNote(noteText, type),
+      )
       .then(() => {
         draft.queuedSaves -= 1;
         setStatus('saved');
