@@ -294,6 +294,11 @@ export const NoteQuickComposer = ({
       startNewNote();
     }
 
+    // Text erased before its note was ever made leaves nothing to write.
+    if (noteText.trim().length === 0 && !draft.isCreated) {
+      return;
+    }
+
     // A recovered draft's ids may already have been written by an interrupted save or another tab, so they are
     // checked by updating before anything is created; a refused create would also drop the existing record from view.
     const isRecovering = draft.isRestored;
@@ -394,18 +399,10 @@ export const NoteQuickComposer = ({
 
   // Another tab may have filed this note, or stored newer text for it, after this save was queued; that one wins.
   const isSaveOutdated = (noteText: string, type: NoteType) => {
-    if (!isDefined(draftKey)) {
+    if (!isDefined(draftKey) || !isDefined(draft.noteId)) {
       return false;
     }
     const stored = readNoteDraft(draftKey);
-
-    // Not yet a note: the record's stored draft is the latest typing, here or in another tab.
-    if (!isDefined(draft.noteId)) {
-      return (
-        isDefined(stored) &&
-        (stored.text !== noteText || stored.noteType !== type)
-      );
-    }
     const isSameNote = isDefined(stored) && stored.noteId === draft.noteId;
     const isLatestText =
       isSameNote && stored.text === noteText && stored.noteType === type;
@@ -418,32 +415,7 @@ export const NoteQuickComposer = ({
     return isSameNote && !isLatestText;
   };
 
-  // Another tab that restored this same text may already have given it a note; writing to that one avoids a second.
-  const adoptStoredNote = (noteText: string, type: NoteType) => {
-    if (!isDefined(draftKey) || isDefined(draft.noteId)) {
-      return;
-    }
-    const stored = readNoteDraft(draftKey);
-
-    if (
-      !isDefined(stored?.noteId) ||
-      stored.text !== noteText ||
-      stored.noteType !== type ||
-      isNoteFiled(draftKey, stored.noteId)
-    ) {
-      return;
-    }
-    draft.noteId = stored.noteId;
-    draft.linkId = stored.linkId;
-    draft.isCreated = stored.isCreated;
-    draft.isLinked = stored.isLinked;
-    draft.isRestored = true;
-    onDraftNoteChange(stored.noteId);
-  };
-
   const writeNoteUnlessOutdated = async (noteText: string, type: NoteType) => {
-    adoptStoredNote(noteText, type);
-
     if (isSaveOutdated(noteText, type)) {
       return false;
     }
@@ -531,7 +503,13 @@ export const NoteQuickComposer = ({
     setText(nextText);
     draft.text = nextText;
     draft.isSynced = false;
-    keepDraft();
+
+    // The note's id is fixed with the first word, so every tab that later restores this draft writes the same note.
+    if (!isDefined(draft.noteId) && nextText.trim().length > 0) {
+      startNewNote();
+    } else {
+      keepDraft();
+    }
     debouncedSave(nextText, noteType);
   };
 
