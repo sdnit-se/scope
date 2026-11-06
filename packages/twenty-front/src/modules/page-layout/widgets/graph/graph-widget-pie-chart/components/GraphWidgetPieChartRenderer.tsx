@@ -69,8 +69,10 @@ export const GraphWidgetPieChartRenderer = () => {
   const groupByField = objectMetadataItem.fields.find(
     (field) => field.id === widget.configuration.groupByFieldMetadataId,
   );
-  const canRedirectToFilteredView =
-    isFilteredViewRedirectionSupported(groupByField);
+  const canRedirectToFilteredView = isFilteredViewRedirectionSupported(
+    groupByField,
+    widget.configuration.groupBySubFieldName,
+  );
 
   const handleSliceClick = (datum: PieChartDataItemWithColor) => {
     const rawValue = formattedToRawLookup.get(datum.key) ?? null;
