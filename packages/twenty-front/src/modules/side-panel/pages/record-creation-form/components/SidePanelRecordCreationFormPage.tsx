@@ -87,6 +87,11 @@ const StyledHiddenFieldsToggle = styled.div`
   display: flex;
 `;
 
+type PointOfContactLookup = {
+  pointOfContactId: string;
+  pointOfContact: ObjectRecord | undefined;
+};
+
 export const SidePanelRecordCreationFormPage = () => {
   const recordCreationFormRequest = useAtomComponentStateValue(
     recordCreationFormRequestComponentState,
@@ -225,26 +230,55 @@ const SidePanelRecordCreationForm = ({
   };
 
   const { lookUpPointOfContact } = usePointOfContactLookup();
+  const [pendingPointOfContactLookup, setPendingPointOfContactLookup] =
+    useState<Promise<PointOfContactLookup>>();
 
-  // A deal's company follows the contact picked in the form, unless a company is already chosen.
+  // A deal's company follows the contact picked in the form, unless a company is already chosen or the person may
+  // not set it.
+  const withCompanyFromPointOfContact = (
+    currentDraftRecord: Partial<ObjectRecord>,
+    { pointOfContactId, pointOfContact }: PointOfContactLookup,
+  ) => {
+    const { companyId } = computeRecordCreationDefaults({
+      objectNameSingular: objectMetadataItem.nameSingular,
+      fields: editableRecordFormFields.map(
+        ({ fieldMetadataItem }) => fieldMetadataItem,
+      ),
+      draftRecord: currentDraftRecord,
+      getRecord: (recordId) =>
+        recordId === pointOfContactId ? pointOfContact : undefined,
+    });
+
+    return isDefined(companyId) &&
+      currentDraftRecord.pointOfContactId === pointOfContactId
+      ? { ...currentDraftRecord, companyId }
+      : currentDraftRecord;
+  };
+
   const fillCompanyFromPointOfContact = async (pointOfContactId: string) => {
-    const pointOfContact = await lookUpPointOfContact(pointOfContactId);
+    const lookup = lookUpPointOfContact(pointOfContactId).then(
+      (pointOfContact) => ({ pointOfContactId, pointOfContact }),
+    );
+
+    setPendingPointOfContactLookup(lookup);
+
+    const pointOfContactLookup = await lookup;
 
     setRecordCreationFormDraft((previousDraftRecord) => {
       const currentDraftRecord = previousDraftRecord ?? initialDraftRecord;
-      const { companyId } = computeRecordCreationDefaults({
-        objectNameSingular: objectMetadataItem.nameSingular,
-        fields: objectMetadataItem.fields,
-        draftRecord: currentDraftRecord,
-        getRecord: (recordId) =>
-          recordId === pointOfContactId ? pointOfContact : undefined,
-      });
+      const nextDraftRecord = withCompanyFromPointOfContact(
+        currentDraftRecord,
+        pointOfContactLookup,
+      );
 
-      return isDefined(companyId) &&
-        currentDraftRecord.pointOfContactId === pointOfContactId
-        ? { ...currentDraftRecord, companyId }
-        : previousDraftRecord;
+      return nextDraftRecord === currentDraftRecord
+        ? previousDraftRecord
+        : nextDraftRecord;
     });
+
+    setPendingPointOfContactLookup((currentLookup) =>
+      currentLookup === lookup ? undefined : currentLookup,
+    );
   };
 
   const handleFieldValueChange = (gqlFieldName: string, value: JsonValue) => {
@@ -320,8 +354,14 @@ const SidePanelRecordCreationForm = ({
 
     setServerValidationRuleViolations([]);
 
+    // Create pressed before the picked contact's company arrived still files the deal with it.
+    const pendingLookup = pendingPointOfContactLookup;
+    const draftRecordToSubmit = isDefined(pendingLookup)
+      ? withCompanyFromPointOfContact(draftRecord, await pendingLookup)
+      : draftRecord;
+
     if (validationRules.length > 0) {
-      const draftViolations = computeViolations(draftRecord);
+      const draftViolations = computeViolations(draftRecordToSubmit);
 
       flushSync(() => {
         setDraftValidationRuleViolations(draftViolations);
@@ -342,7 +382,7 @@ const SidePanelRecordCreationForm = ({
       const { error } = await settleRecordCreationDraft({
         requestId,
         draftRecord: computeRecordFormCreateRecordInput({
-          draftRecord,
+          draftRecord: draftRecordToSubmit,
           fieldMetadataItems: objectMetadataItem.fields,
           objectMetadataItems,
         }),
