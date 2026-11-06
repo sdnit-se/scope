@@ -106,8 +106,10 @@ export const GraphWidgetLineChartRenderer = () => {
   const primaryGroupByField = objectMetadataItem.fields.find(
     (field) => field.id === configuration.primaryAxisGroupByFieldMetadataId,
   );
-  const canRedirectToFilteredView =
-    isFilteredViewRedirectionSupported(primaryGroupByField);
+  const canRedirectToFilteredView = isFilteredViewRedirectionSupported(
+    primaryGroupByField,
+    configuration.primaryAxisGroupBySubFieldName,
+  );
 
   const handlePointClick = (point: Point<LineSeries>) => {
     const xValue = (point.data as LineChartDataPoint).x;
