@@ -24,6 +24,7 @@ import { useHasPermissionFlag } from '@/settings/roles/hooks/useHasPermissionFla
 import { useOpenRecordCreationFormSettingsInSidePanel } from '@/side-panel/hooks/useOpenRecordCreationFormSettingsInSidePanel';
 import { recordCreationFormAreHiddenFieldsShownComponentState } from '@/side-panel/pages/record-creation-form/states/recordCreationFormAreHiddenFieldsShownComponentState';
 import { recordCreationFormDraftComponentState } from '@/side-panel/pages/record-creation-form/states/recordCreationFormDraftComponentState';
+import { recordCreationFormIsSubmittingComponentState } from '@/side-panel/pages/record-creation-form/states/recordCreationFormIsSubmittingComponentState';
 import { recordCreationFormRequestComponentState } from '@/side-panel/pages/record-creation-form/states/recordCreationFormRequestComponentState';
 import { SidePanelFooter } from '@/ui/layout/side-panel/components/SidePanelFooter';
 import { useValidationRules } from '@/validation-rules/hooks/useValidationRules';
@@ -144,7 +145,12 @@ const SidePanelRecordCreationForm = ({
     recordCreationFormAreHiddenFieldsShownComponentState,
   );
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const recordCreationFormIsSubmitting = useAtomComponentStateValue(
+    recordCreationFormIsSubmittingComponentState,
+  );
+  const isSubmittingAtom = useAtomComponentStateCallbackState(
+    recordCreationFormIsSubmittingComponentState,
+  );
   const [formResetCount, setFormResetCount] = useState(0);
   const contentId = useId();
   const formMountId = useId();
@@ -342,59 +348,53 @@ const SidePanelRecordCreationForm = ({
   }: {
     shouldKeepOpen: boolean;
   }) => {
-    if (isSubmitting) {
+    // Read and taken from the store at once, before anything waits: a second Create or Ctrl+Enter that arrives
+    // before the next render must not file the record again.
+    if (store.get(isSubmittingAtom)) {
       return;
     }
+    store.set(isSubmittingAtom, true);
 
-    const isAnyDisplayedFieldInputInError = displayedFieldMetadataItems.some(
-      (fieldMetadataItem) =>
-        store.get(getFieldInputIsInErrorAtom(fieldMetadataItem.id)),
-    );
-
-    if (isAnyDisplayedFieldInputInError) {
-      scrollToFirstFieldViolation();
-      return;
-    }
-
-    setServerValidationRuleViolations([]);
-
-    // Create pressed before the picked contact's company arrived still files the deal with it; the form is locked
-    // while it waits so a second click cannot file it twice.
-    const pendingLookup = pendingPointOfContactLookup;
-    let draftRecordToSubmit = draftRecord;
-
-    if (isDefined(pendingLookup)) {
-      setIsSubmitting(true);
-
-      const pointOfContactLookup = await pendingLookup;
-
-      // Fields stay editable while it waits; what the form shows now is what gets filed.
-      draftRecordToSubmit = withCompanyFromPointOfContact(
-        store.get(recordCreationFormDraftAtom) ?? initialDraftRecord,
-        pointOfContactLookup,
+    try {
+      const isAnyDisplayedFieldInputInError = displayedFieldMetadataItems.some(
+        (fieldMetadataItem) =>
+          store.get(getFieldInputIsInErrorAtom(fieldMetadataItem.id)),
       );
-    }
 
-    if (validationRules.length > 0) {
-      const draftViolations = computeViolations(draftRecordToSubmit);
-
-      flushSync(() => {
-        setDraftValidationRuleViolations(draftViolations);
-
-        revealHiddenFieldsIfTargeted(
-          draftViolations.map((violation) => violation.fieldMetadataId),
-        );
-      });
-
-      if (draftViolations.length > 0) {
-        setIsSubmitting(false);
+      if (isAnyDisplayedFieldInputInError) {
         scrollToFirstFieldViolation();
         return;
       }
-    }
 
-    setIsSubmitting(true);
-    try {
+      setServerValidationRuleViolations([]);
+
+      // Create pressed before the picked contact's company arrived still files the deal with it; fields stay
+      // editable while it waits, so what the form shows then is what gets filed.
+      const pendingLookup = pendingPointOfContactLookup;
+      const draftRecordToSubmit = isDefined(pendingLookup)
+        ? withCompanyFromPointOfContact(
+            store.get(recordCreationFormDraftAtom) ?? initialDraftRecord,
+            await pendingLookup,
+          )
+        : draftRecord;
+
+      if (validationRules.length > 0) {
+        const draftViolations = computeViolations(draftRecordToSubmit);
+
+        flushSync(() => {
+          setDraftValidationRuleViolations(draftViolations);
+
+          revealHiddenFieldsIfTargeted(
+            draftViolations.map((violation) => violation.fieldMetadataId),
+          );
+        });
+
+        if (draftViolations.length > 0) {
+          scrollToFirstFieldViolation();
+          return;
+        }
+      }
+
       const { error } = await settleRecordCreationDraft({
         requestId,
         draftRecord: computeRecordFormCreateRecordInput({
@@ -439,7 +439,7 @@ const SidePanelRecordCreationForm = ({
 
       scrollToFirstFieldViolation();
     } finally {
-      setIsSubmitting(false);
+      store.set(isSubmittingAtom, false);
     }
   };
 
@@ -547,7 +547,7 @@ const SidePanelRecordCreationForm = ({
                 <Dropdown.ActionItem
                   startIcon={<IconPlus />}
                   shortcut={['Alt', 'Enter']}
-                  disabled={isSubmitting}
+                  disabled={recordCreationFormIsSubmitting}
                   onClick={handleCreateAnotherClick}
                 >{t`Create another`}</Dropdown.ActionItem>
               )}
@@ -568,7 +568,7 @@ const SidePanelRecordCreationForm = ({
             startIcon={<IconPlus />}
             size="sm"
             onClick={handleCreateClick}
-            loading={isSubmitting}
+            loading={recordCreationFormIsSubmitting}
             shortcut={['Mod', 'Enter']}
             data-testid="record-creation-form-create-button"
             variant="solid"
