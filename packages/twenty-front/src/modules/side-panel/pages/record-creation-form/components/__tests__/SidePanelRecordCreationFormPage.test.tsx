@@ -149,6 +149,12 @@ jest.mock(
   }),
 );
 
+jest.mock('@/object-record/record-form/hooks/usePointOfContactLookup', () => ({
+  usePointOfContactLookup: () => ({
+    lookUpPointOfContact: async () => undefined,
+  }),
+}));
+
 jest.mock('@/ui/utilities/hotkey/hooks/useHotkeysOnFocusedElement', () => ({
   useHotkeysOnFocusedElement: () => undefined,
 }));
