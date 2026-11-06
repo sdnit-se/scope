@@ -13,7 +13,9 @@ import { getFieldPermissions } from '@/object-metadata/utils/getFieldPermissions
 import { useObjectPermissionsForObject } from '@/object-record/hooks/useObjectPermissionsForObject';
 import { recordFieldInputIsFieldInErrorComponentState } from '@/object-record/record-field/ui/states/recordFieldInputIsFieldInErrorComponentState';
 import { RecordFormFieldInputs } from '@/object-record/record-form/components/RecordFormFieldInputs';
+import { usePointOfContactLookup } from '@/object-record/record-form/hooks/usePointOfContactLookup';
 import { useRecordCreationFormSettle } from '@/object-record/record-form/hooks/useRecordCreationFormSettle';
+import { computeRecordCreationDefaults } from '@/object-record/record-form/utils/computeRecordCreationDefaults';
 import { useRecordFormFields } from '@/object-record/record-form/hooks/useRecordFormFields';
 import { computeRecordFormCreateRecordInput } from '@/object-record/record-form/utils/computeRecordFormCreateRecordInput';
 import { getRecordFormFieldInputInstanceId } from '@/object-record/record-form/utils/getRecordFormFieldInputInstanceId';
@@ -40,6 +42,7 @@ import { t } from '@lingui/core/macro';
 import { Key } from 'ts-key-enum';
 import { type JsonValue } from 'type-fest';
 import { PermissionFlagType } from 'twenty-shared/constants';
+import { isNonEmptyString } from '@sniptt/guards';
 import { isDefined } from 'twenty-shared/utils';
 import { InlineBanner, useToast } from 'twenty-ui/components/feedback';
 import { LightButton } from 'twenty-ui/components/input';
@@ -221,8 +224,35 @@ const SidePanelRecordCreationForm = ({
     }
   };
 
+  const { lookUpPointOfContact } = usePointOfContactLookup();
+
+  // A deal's company follows the contact picked in the form, unless a company is already chosen.
+  const fillCompanyFromPointOfContact = async (pointOfContactId: string) => {
+    const pointOfContact = await lookUpPointOfContact(pointOfContactId);
+
+    setRecordCreationFormDraft((previousDraftRecord) => {
+      const currentDraftRecord = previousDraftRecord ?? initialDraftRecord;
+      const { companyId } = computeRecordCreationDefaults({
+        objectNameSingular: objectMetadataItem.nameSingular,
+        fields: objectMetadataItem.fields,
+        draftRecord: currentDraftRecord,
+        getRecord: (recordId) =>
+          recordId === pointOfContactId ? pointOfContact : undefined,
+      });
+
+      return isDefined(companyId) &&
+        currentDraftRecord.pointOfContactId === pointOfContactId
+        ? { ...currentDraftRecord, companyId }
+        : previousDraftRecord;
+    });
+  };
+
   const handleFieldValueChange = (gqlFieldName: string, value: JsonValue) => {
     updateDraftRecord(gqlFieldName, value);
+
+    if (gqlFieldName === 'pointOfContactId' && isNonEmptyString(value)) {
+      void fillCompanyFromPointOfContact(value);
+    }
   };
 
   const handleFieldValueClear = (gqlFieldName: string) => {
