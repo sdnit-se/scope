@@ -397,124 +397,91 @@ describe('SidePanelRecordCreationFormPage', () => {
     });
   });
 
-  describe('while the picked contact is still being looked up', () => {
-    const holdContactLookup = () => {
-      let finishLookup: () => void = () => undefined;
+  it('files the record once when two activations arrive before the form re-renders', async () => {
+    renderPage();
 
-      mockLookUpPointOfContact.mockReturnValue(
-        new Promise((resolve) => {
-          finishLookup = () => resolve(undefined);
-        }),
-      );
+    const createButton = screen.getByTestId(
+      'record-creation-form-create-button',
+    );
 
-      return () => act(async () => finishLookup());
-    };
-
-    it('files the record once however often Create is pressed', async () => {
-      const finishLookup = holdContactLookup();
-
-      renderPage();
-
-      fireEvent.click(
-        screen.getAllByRole('button', { name: 'Pick contact' })[0],
-      );
-
-      const createButton = screen.getByTestId(
-        'record-creation-form-create-button',
-      );
-
-      fireEvent.click(createButton);
-      fireEvent.click(createButton);
-      fireEvent.click(createButton);
-
-      await finishLookup();
-
-      await waitFor(() =>
-        expect(settleRecordCreationDraft).toHaveBeenCalledTimes(1),
-      );
-      expect(settleRecordCreationDraft).toHaveBeenCalledWith({
-        requestId: REQUEST_ID,
-        draftRecord: { pointOfContactId: 'contact-robert' },
-        shouldKeepOpen: false,
-      });
+    act(() => {
+      createButton.click();
+      createButton.click();
     });
 
-    it('files the record once when two activations arrive before the form re-renders', async () => {
-      const finishLookup = holdContactLookup();
+    await waitFor(() =>
+      expect(settleRecordCreationDraft).toHaveBeenCalledTimes(1),
+    );
+  });
 
-      renderPage();
+  it('files nothing until the picked contact has been looked up, then files once', async () => {
+    let finishLookup: () => void = () => undefined;
 
-      fireEvent.click(
-        screen.getAllByRole('button', { name: 'Pick contact' })[0],
-      );
+    mockLookUpPointOfContact.mockReturnValue(
+      new Promise((resolve) => {
+        finishLookup = () => resolve(undefined);
+      }),
+    );
 
-      const createButton = screen.getByTestId(
-        'record-creation-form-create-button',
-      );
+    renderPage();
 
-      act(() => {
-        createButton.click();
-        createButton.click();
-      });
+    fireEvent.click(screen.getAllByRole('button', { name: 'Pick contact' })[0]);
 
-      await finishLookup();
+    const createButton = screen.getByTestId(
+      'record-creation-form-create-button',
+    );
 
-      await waitFor(() =>
-        expect(settleRecordCreationDraft).toHaveBeenCalledTimes(1),
-      );
+    expect(createButton).toBeDisabled();
+    fireEvent.click(createButton);
+    fireEvent.click(createButton);
+    expect(settleRecordCreationDraft).not.toHaveBeenCalled();
+
+    await act(async () => finishLookup());
+    await waitFor(() => expect(createButton).toBeEnabled());
+
+    fireEvent.click(createButton);
+
+    await waitFor(() =>
+      expect(settleRecordCreationDraft).toHaveBeenCalledTimes(1),
+    );
+    expect(settleRecordCreationDraft).toHaveBeenCalledWith({
+      requestId: REQUEST_ID,
+      draftRecord: { pointOfContactId: 'contact-robert' },
+      shouldKeepOpen: false,
     });
+  });
 
-    it('lets Create run again after a validation error', async () => {
-      mockValidationRules = [NICKNAME_RULE];
-      const finishLookup = holdContactLookup();
-      const user = userEvent.setup();
+  it('lets Create run again after a validation error', async () => {
+    mockValidationRules = [NICKNAME_RULE];
+    const user = userEvent.setup();
 
-      renderPage();
+    renderPage();
 
-      fireEvent.click(
-        screen.getAllByRole('button', { name: 'Pick contact' })[0],
-      );
-      fireEvent.click(screen.getByTestId('record-creation-form-create-button'));
-      await finishLookup();
+    await user.click(screen.getByTestId('record-creation-form-create-button'));
 
-      expect(await screen.findByRole('alert')).toHaveTextContent(
-        'A company needs a nickname',
-      );
-      expect(settleRecordCreationDraft).not.toHaveBeenCalled();
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'A company needs a nickname',
+    );
+    expect(settleRecordCreationDraft).not.toHaveBeenCalled();
 
-      await user.type(screen.getByLabelText('Nickname'), 'Big Apple');
-      await user.click(
-        screen.getByTestId('record-creation-form-create-button'),
-      );
+    await user.type(screen.getByLabelText('Nickname'), 'Big Apple');
+    await user.click(screen.getByTestId('record-creation-form-create-button'));
 
-      expect(settleRecordCreationDraft).toHaveBeenCalledTimes(1);
+    expect(settleRecordCreationDraft).toHaveBeenCalledTimes(1);
+  });
+
+  it('lets Create run again after the server refuses the record', async () => {
+    settleRecordCreationDraft.mockResolvedValueOnce({
+      error: new Error('Network error'),
     });
+    const user = userEvent.setup();
 
-    it('lets Create run again after the server refuses the record', async () => {
-      settleRecordCreationDraft.mockResolvedValueOnce({
-        error: new Error('Network error'),
-      });
-      const finishLookup = holdContactLookup();
-      const user = userEvent.setup();
+    renderPage();
 
-      renderPage();
+    await user.click(screen.getByTestId('record-creation-form-create-button'));
+    await user.click(screen.getByTestId('record-creation-form-create-button'));
 
-      fireEvent.click(
-        screen.getAllByRole('button', { name: 'Pick contact' })[0],
-      );
-      fireEvent.click(screen.getByTestId('record-creation-form-create-button'));
-      await finishLookup();
-
-      await waitFor(() =>
-        expect(settleRecordCreationDraft).toHaveBeenCalledTimes(1),
-      );
-
-      await user.click(
-        screen.getByTestId('record-creation-form-create-button'),
-      );
-
-      expect(settleRecordCreationDraft).toHaveBeenCalledTimes(2);
-    });
+    expect(settleRecordCreationDraft).toHaveBeenCalledTimes(2);
   });
 
   it('restores the draft and revealed fields when the form is shown again', async () => {
