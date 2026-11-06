@@ -13,6 +13,8 @@ import { v4 } from 'uuid';
 import { useNoteTypingFocus } from '@/activities/notes/hooks/useNoteTypingFocus';
 import {
   getNoteDraftStorageKey,
+  markNoteDraftFiled,
+  readFiledNoteId,
   readNoteDraft,
   removeNoteDraft,
   writeNoteDraft,
@@ -206,7 +208,10 @@ export const NoteQuickComposer = ({
     }
     const stored = readNoteDraft(draftKey);
 
-    if (isDefined(stored) && stored.noteId !== draft.noteId) {
+    if (
+      (isDefined(stored) && stored.noteId !== draft.noteId) ||
+      readFiledNoteId(draftKey) === draft.noteId
+    ) {
       return;
     }
     const text = stored?.text ?? draft.text;
@@ -383,6 +388,32 @@ export const NoteQuickComposer = ({
     draft.isRestored = false;
   };
 
+  // Another tab may have filed this note, or stored newer text for it, after this save was queued; that one wins.
+  const isSaveOutdated = (noteText: string, type: NoteType) => {
+    if (!isDefined(draftKey) || !isDefined(draft.noteId)) {
+      return false;
+    }
+    if (readFiledNoteId(draftKey) === draft.noteId) {
+      return true;
+    }
+    const stored = readNoteDraft(draftKey);
+
+    return (
+      isDefined(stored) &&
+      stored.noteId === draft.noteId &&
+      (stored.text !== noteText || stored.noteType !== type)
+    );
+  };
+
+  const writeNoteUnlessOutdated = async (noteText: string, type: NoteType) => {
+    if (isSaveOutdated(noteText, type)) {
+      return false;
+    }
+    await writeNote(noteText, type);
+
+    return true;
+  };
+
   const queueSave = (noteText: string, type: NoteType): Promise<boolean> => {
     setStatus('saving');
     draft.queuedSaves += 1;
@@ -390,15 +421,18 @@ export const NoteQuickComposer = ({
     const save = draft.queue
       .then(() =>
         isDefined(draftKey)
-          ? withNoteDraftLock(draftKey, () => writeNote(noteText, type))
-          : writeNote(noteText, type),
+          ? withNoteDraftLock(draftKey, () =>
+              writeNoteUnlessOutdated(noteText, type),
+            )
+          : writeNoteUnlessOutdated(noteText, type),
       )
-      .then(() => {
+      .then((isWritten) => {
         draft.queuedSaves -= 1;
         setStatus('saved');
 
         // A save still queued behind this one writes other text over it, so only the last one can be in sync.
         if (
+          isWritten &&
           draft.queuedSaves === 0 &&
           noteText === draft.text &&
           type === draft.noteType
@@ -509,11 +543,12 @@ export const NoteQuickComposer = ({
       // Another tab may have written newer text, another type or a draft of its own since; that stays recoverable.
       if (
         isDefined(draftKey) &&
+        isDefined(filedNoteId) &&
         stored?.noteId === filedNoteId &&
         stored?.text === filedText &&
         stored?.noteType === filedNoteType
       ) {
-        removeNoteDraft(draftKey);
+        markNoteDraftFiled(draftKey, filedNoteId);
       }
       onDraftNoteChange(undefined);
       setText('');

@@ -1,5 +1,7 @@
 import {
   getNoteDraftStorageKey,
+  markNoteDraftFiled,
+  readFiledNoteId,
   readNoteDraft,
   removeNoteDraft,
   writeNoteDraft,
@@ -75,6 +77,37 @@ describe('noteDraftStorage', () => {
     });
     removeNoteDraft(key);
     expect(readNoteDraft(key)).toBeUndefined();
+  });
+
+  it('remembers which note was filed, without offering its text again', () => {
+    const key = getNoteDraftStorageKey(scope);
+
+    writeNoteDraft(key, {
+      text: 'Ring tillbaka',
+      noteType: 'CALL',
+      noteId: 'note-1',
+      linkId: 'link-1',
+      isCreated: true,
+      isLinked: true,
+      isSynced: false,
+    });
+    markNoteDraftFiled(key, 'note-1');
+
+    expect(readNoteDraft(key)).toBeUndefined();
+    expect(readFiledNoteId(key)).toBe('note-1');
+
+    writeNoteDraft(key, {
+      text: 'Nästa',
+      noteType: 'NOTE',
+      noteId: 'note-2',
+      linkId: 'link-2',
+      isCreated: false,
+      isLinked: false,
+      isSynced: false,
+    });
+
+    expect(readFiledNoteId(key)).toBeUndefined();
+    expect(readNoteDraft(key)?.noteId).toBe('note-2');
   });
 
   it('ignores damaged or foreign values instead of failing', () => {
