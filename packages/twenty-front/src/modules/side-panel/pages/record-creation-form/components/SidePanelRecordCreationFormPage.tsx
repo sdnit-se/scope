@@ -33,6 +33,7 @@ import { computeDraftValidationRuleViolations } from '@/validation-rules/utils/c
 import { getValidationRuleViolationsFromError } from '@/validation-rules/utils/getValidationRuleViolationsFromError';
 import { groupValidationRuleViolationsByField } from '@/validation-rules/utils/groupValidationRuleViolationsByField';
 import { useAtomComponentState } from '@/ui/utilities/state/jotai/hooks/useAtomComponentState';
+import { useAtomComponentStateCallbackState } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateCallbackState';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { useStore } from 'jotai';
 import { useId, useState } from 'react';
@@ -158,6 +159,9 @@ const SidePanelRecordCreationForm = ({
   const currentFocusId = useAtomStateValue(currentFocusIdSelector);
 
   const draftRecord = recordCreationFormDraft ?? initialDraftRecord;
+  const recordCreationFormDraftAtom = useAtomComponentStateCallbackState(
+    recordCreationFormDraftComponentState,
+  );
 
   const hasLayoutsPermission = useHasPermissionFlag(PermissionFlagType.LAYOUTS);
 
@@ -361,9 +365,13 @@ const SidePanelRecordCreationForm = ({
 
     if (isDefined(pendingLookup)) {
       setIsSubmitting(true);
+
+      const pointOfContactLookup = await pendingLookup;
+
+      // Fields stay editable while it waits; what the form shows now is what gets filed.
       draftRecordToSubmit = withCompanyFromPointOfContact(
-        draftRecord,
-        await pendingLookup,
+        store.get(recordCreationFormDraftAtom) ?? initialDraftRecord,
+        pointOfContactLookup,
       );
     }
 
