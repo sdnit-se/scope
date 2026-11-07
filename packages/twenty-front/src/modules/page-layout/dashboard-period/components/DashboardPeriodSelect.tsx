@@ -6,6 +6,7 @@ import { findSavedDashboardPeriod } from '@/page-layout/dashboard-period/utils/f
 import { useCurrentPageLayoutOrThrow } from '@/page-layout/hooks/useCurrentPageLayoutOrThrow';
 import { Select } from '@/ui/input/components/Select';
 import { t } from '@lingui/core/macro';
+import { isDefined } from 'twenty-shared/utils';
 import { IconCalendarEvent } from 'twenty-ui/icon';
 
 export const DashboardPeriodSelect = () => {
@@ -13,18 +14,23 @@ export const DashboardPeriodSelect = () => {
   const { chosenPeriod, setChosenPeriod } = useDashboardPeriod();
   const { chartFiltersOfWidgets } = useDashboardPeriodSelectVisibility();
   const labels = useDashboardPeriodLabels();
+  const savedPeriod = findSavedDashboardPeriod(chartFiltersOfWidgets);
 
   return (
     <Select
       dropdownId={`dashboard-period-${currentPageLayout.id}`}
-      value={chosenPeriod ?? findSavedDashboardPeriod(chartFiltersOfWidgets)}
+      value={chosenPeriod ?? savedPeriod}
       options={DASHBOARD_PERIODS.map((period) => ({
         label: labels[period],
         value: period,
         Icon: IconCalendarEvent,
       }))}
-      // Widgets that disagree keep their own periods; the control then names none.
-      emptyOption={{ label: t`Period`, value: null, Icon: IconCalendarEvent }}
+      // Charts saved with different periods keep them until someone picks one, and can go back.
+      pinnedOption={
+        isDefined(savedPeriod)
+          ? undefined
+          : { label: t`As saved`, value: null, Icon: IconCalendarEvent }
+      }
       selectSizeVariant="small"
       dropdownWidth={160}
       onChange={setChosenPeriod}

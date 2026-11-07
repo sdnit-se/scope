@@ -4070,6 +4070,11 @@ msgstr "Uppåtpil"
 msgid "As it will be displayed in the workspace"
 msgstr ""
 
+#. js-lingui-id: HZ7ORd
+#: src/modules/page-layout/dashboard-period/components/DashboardPeriodSelect.tsx
+msgid "As saved"
+msgstr "Som sparat"
+
 #. js-lingui-id: 54PdN4
 #: src/modules/side-panel/pages/page-layout/utils/getSortLabelSuffixForFieldType.ts
 #: src/modules/side-panel/pages/page-layout/utils/getSortLabelSuffixForFieldType.ts
@@ -20925,7 +20930,6 @@ msgid "Perform administrative actions or permanently delete this user"
 msgstr ""
 
 #. js-lingui-id: NtQvjo
-#: src/modules/page-layout/dashboard-period/components/DashboardPeriodSelect.tsx
 #: src/modules/settings/billing/components/SettingsBillingLimitForm.tsx
 #: src/modules/settings/billing/components/SettingsBillingLimitsTable.tsx
 #: src/modules/settings/event-logs/components/EventLogFilters.tsx

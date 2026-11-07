@@ -1,6 +1,10 @@
 import { applyDashboardPeriodToChartFilters } from '@/page-layout/dashboard-period/utils/applyDashboardPeriodToChartFilters';
 import { Temporal } from 'temporal-polyfill';
-import { FieldMetadataType, ViewFilterOperand } from 'twenty-shared/types';
+import {
+  FieldMetadataType,
+  RecordFilterGroupLogicalOperator,
+  ViewFilterOperand,
+} from 'twenty-shared/types';
 
 const createdAt = 'created-at-field';
 const dueDate = 'due-date-field';
@@ -57,12 +61,17 @@ describe('applyDashboardPeriodToChartFilters', () => {
     );
   });
 
-  it('counts the last 30 days from the start of the day 29 days ago, today included', () => {
+  it('counts the last 30 days from the start of the day 29 days ago up to the end of today', () => {
     expect(apply('LAST_30_DAYS', [thisWeek])).toEqual([
       {
         ...thisWeek,
         operand: ViewFilterOperand.IS_AFTER,
         value: '2026-10-08T22:00:00Z',
+      },
+      {
+        ...thisWeek,
+        operand: ViewFilterOperand.IS_BEFORE,
+        value: '2026-11-07T23:00:00Z',
       },
     ]);
     expect(
@@ -73,6 +82,40 @@ describe('applyDashboardPeriodToChartFilters', () => {
         fieldMetadataId: dueDate,
         operand: ViewFilterOperand.IS_AFTER,
         value: '2026-10-09',
+      },
+      {
+        ...thisWeek,
+        fieldMetadataId: dueDate,
+        operand: ViewFilterOperand.IS_BEFORE,
+        value: '2026-11-08',
+      },
+    ]);
+  });
+
+  it('keeps only the start of the last 30 days inside an OR group, where an end would widen it', () => {
+    const inOrGroup = { ...thisWeek, recordFilterGroupId: 'or-group' };
+
+    expect(
+      applyDashboardPeriodToChartFilters({
+        chartFilters: {
+          recordFilters: [inOrGroup],
+          recordFilterGroups: [
+            {
+              id: 'or-group',
+              logicalOperator: RecordFilterGroupLogicalOperator.OR,
+            },
+          ],
+        },
+        period: 'LAST_30_DAYS',
+        getFieldType,
+        timeZone: 'Europe/Stockholm',
+        now,
+      }).recordFilters,
+    ).toEqual([
+      {
+        ...inOrGroup,
+        operand: ViewFilterOperand.IS_AFTER,
+        value: '2026-10-08T22:00:00Z',
       },
     ]);
   });
