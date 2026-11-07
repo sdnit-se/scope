@@ -7,7 +7,6 @@ const StyledNoDataLine = styled.div`
   font-size: ${themeCssVariables.font.size.sm};
 `;
 
-// An empty chart says so in one line instead of drawing empty axes across its card.
 export const GraphWidgetNoDataLine = () => (
   <StyledNoDataLine>{t`No data`}</StyledNoDataLine>
 );
