@@ -92,6 +92,18 @@ describe('applyDashboardPeriodToChartFilters', () => {
     ]);
   });
 
+  it('formats the last 30 days for the related field when the filter goes through a relation', () => {
+    const throughRelation = {
+      ...thisWeek,
+      fieldMetadataId: 'company-relation-field',
+      relationTargetFieldMetadataId: dueDate,
+    };
+
+    expect(
+      apply('LAST_30_DAYS', [throughRelation])?.map((filter) => filter.value),
+    ).toEqual(['2026-10-09', '2026-11-08']);
+  });
+
   it('keeps only the start of the last 30 days inside an OR group, where an end would widen it', () => {
     const inOrGroup = { ...thisWeek, recordFilterGroupId: 'or-group' };
 
