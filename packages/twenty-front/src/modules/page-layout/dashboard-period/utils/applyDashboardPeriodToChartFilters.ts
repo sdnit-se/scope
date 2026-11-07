@@ -46,7 +46,11 @@ const applyDashboardPeriodToRecordFilter = (
     const today = now.toZonedDateTimeISO(filterTimeZone).toPlainDate();
 
     const dayValue = (day: Temporal.PlainDate) =>
-      getFieldType(recordFilter.fieldMetadataId) === FieldMetadataType.DATE
+      getFieldType(
+        // A filter through a relation compares the related record's field.
+        recordFilter.relationTargetFieldMetadataId ??
+          recordFilter.fieldMetadataId,
+      ) === FieldMetadataType.DATE
         ? day.toString()
         : day
             .toZonedDateTime({ timeZone: filterTimeZone })
