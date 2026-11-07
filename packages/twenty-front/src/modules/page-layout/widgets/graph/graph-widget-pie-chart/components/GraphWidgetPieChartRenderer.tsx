@@ -8,7 +8,7 @@ import { assertPieChartWidgetOrThrow } from '@/page-layout/widgets/graph/utils/a
 import { buildChartDrilldownQueryParams } from '@/page-layout/widgets/graph/utils/buildChartDrilldownQueryParams';
 import { getChartValueFormatOptions } from '@/page-layout/widgets/graph/utils/getChartValueFormatOptions';
 import { isFilteredViewRedirectionSupported } from '@/page-layout/widgets/graph/utils/isFilteredViewRedirectionSupported';
-import { useCurrentWidget } from '@/page-layout/widgets/hooks/useCurrentWidget';
+import { useCurrentWidgetWithDashboardPeriod } from '@/page-layout/dashboard-period/hooks/useCurrentWidgetWithDashboardPeriod';
 import { useUserFirstDayOfTheWeek } from '@/ui/input/components/internal/date/hooks/useUserFirstDayOfTheWeek';
 import { useUserTimezone } from '@/ui/input/components/internal/date/hooks/useUserTimezone';
 import { useAtomFamilySelectorValue } from '@/ui/utilities/state/jotai/hooks/useAtomFamilySelectorValue';
@@ -27,7 +27,7 @@ const GraphWidgetPieChart = lazy(() =>
 );
 
 export const GraphWidgetPieChartRenderer = () => {
-  const widget = useCurrentWidget();
+  const widget = useCurrentWidgetWithDashboardPeriod();
 
   assertPieChartWidgetOrThrow(widget);
 

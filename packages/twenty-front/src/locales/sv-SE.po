@@ -1499,6 +1499,7 @@ msgid "3 Columns"
 msgstr "3 kolumner"
 
 #. js-lingui-id: P9cEa2
+#: src/modules/page-layout/dashboard-period/hooks/useDashboardPeriodLabels.ts
 #: src/modules/settings/developers/constants/ExpirationDates.ts
 msgid "30 days"
 msgstr "30 dagar"
@@ -15842,6 +15843,11 @@ msgstr "Senaste uppdatering"
 msgid "Last Updated: {0}"
 msgstr "Senast uppdaterad: {0}"
 
+#. js-lingui-id: j9tmna
+#: src/modules/page-layout/dashboard-period/hooks/useDashboardPeriodLabels.ts
+msgid "Last week"
+msgstr "Förra veckan"
+
 #. js-lingui-id: p9uaTd
 #: src/modules/ai/utils/getAgentChatThreadSnoozeOptions.ts
 msgid "Later today"
@@ -27670,6 +27676,11 @@ msgstr "Den här leverantören har ännu inget inbyggt SDK — den kommer att an
 msgid "This provider is built in. Set its API key from its page."
 msgstr "Den här leverantören är inbyggd. Ange dess API-nyckel på dess sida."
 
+#. js-lingui-id: jkA2we
+#: src/modules/page-layout/dashboard-period/hooks/useDashboardPeriodLabels.ts
+msgid "This quarter"
+msgstr "Kvartal"
+
 #. js-lingui-id: Wf1hgt
 #: src/modules/ai/components/internal/AiChatToolCallApprovalRecord.tsx
 msgid "This record could not be loaded."
@@ -27771,6 +27782,7 @@ msgstr "Den här vyn använder {usageLabel} på objektet \"{0}\" som inte är å
 
 #. js-lingui-id: yByRxz
 #: src/modules/ai/utils/groupThreadsByDate.ts
+#: src/modules/page-layout/dashboard-period/hooks/useDashboardPeriodLabels.ts
 #: src/modules/settings/admin-panel/health-status/constants/WorkerQueueMetricsSelectOptions.ts
 #: src/modules/settings/billing/constants/UsageLimitPeriodSpanLabels.ts
 msgid "This week"
@@ -27823,6 +27835,11 @@ msgstr "Detta kommer permanent att radera din tvåfaktorsautentiseringsmetod.<0/
 #: src/modules/settings/admin-panel/components/SettingsAdminServerAdminAccess.tsx
 msgid "This will revoke {0} for {userLabel}."
 msgstr "Detta kommer att återkalla {0} för {userLabel}."
+
+#. js-lingui-id: xYHlfW
+#: src/modules/page-layout/dashboard-period/hooks/useDashboardPeriodLabels.ts
+msgid "This year"
+msgstr "År"
 
 #. js-lingui-id: f8HOUp
 #: src/modules/ai/components/ThinkingStepsDisplay.tsx
@@ -27974,6 +27991,7 @@ msgstr "Till"
 #: src/modules/localization/utils/formatDateISOStringToRelativeDate.ts
 #: src/modules/log-console/components/LogConsoleTimeRangeDropdown.tsx
 #: src/modules/object-record/record-calendar/components/RecordCalendarTopBar.tsx
+#: src/modules/page-layout/dashboard-period/hooks/useDashboardPeriodLabels.ts
 #: src/modules/settings/admin-panel/health-status/constants/WorkerQueueMetricsSelectOptions.ts
 #: src/modules/settings/billing/constants/UsageLimitPeriodSpanLabels.ts
 #: src/utils/date-utils.ts
