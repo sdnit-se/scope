@@ -1,6 +1,8 @@
 import { TabListRoot } from '@/ui/layout/tab-list/components/TabListRoot';
 import { Tabs } from 'twenty-ui/primitives/navigation';
 import { PageLayoutWidgetDndProvider } from '@/page-layout/components/dnd/PageLayoutWidgetDndProvider';
+import { DashboardPeriodSelect } from '@/page-layout/dashboard-period/components/DashboardPeriodSelect';
+import { useDashboardPeriodSelectVisibility } from '@/page-layout/dashboard-period/hooks/useDashboardPeriodSelectVisibility';
 import { PageLayoutLeftPanel } from '@/page-layout/components/PageLayoutLeftPanel';
 import { PageLayoutPrerenderedTabIdsResetEffect } from '@/page-layout/components/PageLayoutPrerenderedTabIdsResetEffect';
 import { PageLayoutRecordIdentifierBar } from '@/page-layout/components/PageLayoutRecordIdentifierBar';
@@ -29,6 +31,7 @@ import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/use
 import { styled } from '@linaria/react';
 import { isDefined } from 'twenty-shared/utils';
 import { MOBILE_VIEWPORT, themeCssVariables } from 'twenty-ui/theme';
+import { TAB_LIST_HEIGHT } from '@/ui/layout/tab-list/constants/TabListHeight';
 import { PageLayoutType } from '~/generated-metadata/graphql';
 
 const StyledRoot = styled.div`
@@ -106,6 +109,47 @@ const StyledTabPanel = styled.div`
   }
 `;
 
+const StyledDashboardTabRow = styled.div`
+  align-items: center;
+  display: flex;
+  min-height: ${TAB_LIST_HEIGHT};
+  position: relative;
+
+  // On a phone the period goes under the tabs so every tab keeps its name.
+  @media (max-width: ${MOBILE_VIEWPORT}px) {
+    flex-wrap: wrap;
+  }
+
+  &::after {
+    background-color: ${themeCssVariables.border.color.light};
+    bottom: 0;
+    content: '';
+    height: 1px;
+    left: 0;
+    position: absolute;
+    right: 0;
+  }
+
+  @media print {
+    display: none;
+  }
+`;
+
+const StyledDashboardTabListSlot = styled.div`
+  flex: 1;
+  min-width: 0;
+
+  @media (max-width: ${MOBILE_VIEWPORT}px) {
+    flex-basis: 100%;
+  }
+`;
+
+const StyledDashboardPeriodSlot = styled.div`
+  flex-shrink: 0;
+  margin-left: auto;
+  padding: ${themeCssVariables.spacing[1]} ${themeCssVariables.spacing[2]};
+`;
+
 const StyledScrollWrapperContainer = styled.div`
   flex: 1;
   min-height: 0;
@@ -143,6 +187,9 @@ export const PageLayoutTabsRenderer = () => {
   const isPageLayoutInEditMode = useIsPageLayoutInEditMode();
 
   const isMobile = useIsMobile();
+
+  const { isDashboardPeriodSelectVisible } =
+    useDashboardPeriodSelectVisibility();
 
   const activeTabId = useAtomComponentStateValue(activeTabIdComponentState);
 
@@ -265,7 +312,16 @@ export const PageLayoutTabsRenderer = () => {
                   undefined
                 }
               />
-              {!shouldRenderRecordIdentifierBar && tabList}
+              {isDashboardPeriodSelectVisible ? (
+                <StyledDashboardTabRow>
+                  <StyledDashboardTabListSlot>{tabList}</StyledDashboardTabListSlot>
+                  <StyledDashboardPeriodSlot>
+                    <DashboardPeriodSelect />
+                  </StyledDashboardPeriodSlot>
+                </StyledDashboardTabRow>
+              ) : (
+                !shouldRenderRecordIdentifierBar && tabList
+              )}
 
               <StyledScrollWrapperContainer>
                 <ScrollWrapper
