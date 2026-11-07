@@ -73,7 +73,8 @@ const StyledWidgetCard = styled.div<WidgetCardStyledProps>`
 
   box-sizing: border-box;
 
-  // A one-row tile lays its title and number side by side: the title truncates, the number keeps its width.
+  // A one-row tile lays its title and number side by side. The title keeps at least 40% of the row;
+  // a number wider than the rest ends in an ellipsis, with the full value on hover.
   @container ${WIDGET_CARD_CONTAINER_NAME} (max-height: ${ONE_ROW_WIDGET_CARD_MAX_HEIGHT}) {
     &:has([data-widget-card-inline-value]) {
       align-items: center;
@@ -83,11 +84,12 @@ const StyledWidgetCard = styled.div<WidgetCardStyledProps>`
 
     &:has([data-widget-card-inline-value]) > [data-widget-card-header] {
       flex: 1 1 0;
-      min-width: 0;
+      min-width: 40%;
     }
 
     &:has([data-widget-card-inline-value]) > [data-widget-card-content] {
-      flex: 0 0 auto;
+      flex: 0 1 auto;
+      min-width: 0;
       height: auto;
       margin-top: 0;
       padding-block: 0;

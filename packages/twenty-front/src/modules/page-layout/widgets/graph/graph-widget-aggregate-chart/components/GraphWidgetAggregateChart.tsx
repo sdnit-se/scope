@@ -29,11 +29,14 @@ const StyledContainer = styled.div`
 
   // A one-row tile shows its number beside the title instead of under it.
   @container ${WIDGET_CARD_CONTAINER_NAME} (max-height: ${ONE_ROW_WIDGET_CARD_MAX_HEIGHT}) {
+    min-width: 0;
     white-space: nowrap;
     width: auto;
 
     h2 {
       font-size: ${themeCssVariables.font.size.xl};
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 `;
@@ -59,7 +62,7 @@ export const GraphWidgetAggregateChart = ({
   const displayValue = `${prefix ?? ''}${value}${suffix ?? ''}`;
 
   return (
-    <StyledContainer data-widget-card-inline-value>
+    <StyledContainer data-widget-card-inline-value title={displayValue}>
       <Heading level={2} size="xxl">
         {displayValue}
       </Heading>
