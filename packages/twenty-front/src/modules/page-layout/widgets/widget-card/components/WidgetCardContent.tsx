@@ -23,7 +23,7 @@ const StyledWidgetCardContent = styled.div<WidgetCardContentStyledProps>`
     isFixedHeight ? VERTICAL_LIST_IFRAME_HEIGHT : 'var(--widget-height, 100%)'};
 
   margin-top: ${({ hasHeader, variant }) =>
-    hasHeader && variant === 'framed' ? themeCssVariables.spacing[2] : '0'};
+    hasHeader && variant === 'framed' ? themeCssVariables.spacing[1] : '0'};
 
   min-height: ${({ isFixedHeight }) =>
     isFixedHeight ? VERTICAL_LIST_IFRAME_HEIGHT : '0'};

@@ -6,7 +6,7 @@ export const GRAPH_WIDGET_SIZES: Partial<
 > = {
   [WidgetConfigurationType.AGGREGATE_CHART]: {
     default: { w: 2, h: 2 },
-    minimum: { w: 2, h: 2 },
+    minimum: { w: 2, h: 1 },
   },
   [WidgetConfigurationType.PIE_CHART]: {
     default: { w: 4, h: 4 },

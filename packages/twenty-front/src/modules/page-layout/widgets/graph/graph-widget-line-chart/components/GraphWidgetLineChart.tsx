@@ -39,6 +39,7 @@ import { useCallback, useRef, useState } from 'react';
 import { isDefined } from 'twenty-shared/utils';
 import { useTheme } from 'twenty-ui/theme';
 import { useDebouncedCallback } from 'use-debounce';
+import { GraphWidgetNoDataLine } from '@/page-layout/widgets/graph/components/GraphWidgetNoDataLine';
 
 type CrosshairLayerProps = LineCustomSvgLayerProps<LineSeries>;
 type PointLabelsLayerProps = LineCustomSvgLayerProps<LineSeries>;
@@ -295,6 +296,10 @@ export const GraphWidgetLineChart = ({
       hasNoData={hasNoData}
     />
   );
+
+  if (hasNoData) {
+    return <GraphWidgetNoDataLine />;
+  }
 
   return (
     <StyledContainer id={id}>

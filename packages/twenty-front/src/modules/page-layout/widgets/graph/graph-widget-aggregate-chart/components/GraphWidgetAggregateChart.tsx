@@ -4,6 +4,8 @@ import { isDefined } from 'twenty-shared/utils';
 import { IconTrendingDown, IconTrendingUp } from 'twenty-ui/icon';
 import { Heading } from 'twenty-ui/primitives/typography';
 import { useTheme, themeCssVariables } from 'twenty-ui/theme';
+import { ONE_ROW_WIDGET_CARD_MAX_HEIGHT } from '@/page-layout/widgets/widget-card/constants/OneRowWidgetCardMaxHeight';
+import { WIDGET_CARD_CONTAINER_NAME } from '@/page-layout/widgets/widget-card/constants/WidgetCardContainerName';
 type GraphWidgetAggregateChartProps = {
   value: string | number;
   trendPercentage?: number;
@@ -24,6 +26,19 @@ const StyledContainer = styled.div`
   height: 100%;
   justify-content: space-between;
   width: 100%;
+
+  // A one-row tile shows its number beside the title instead of under it.
+  @container ${WIDGET_CARD_CONTAINER_NAME} (max-height: ${ONE_ROW_WIDGET_CARD_MAX_HEIGHT}) {
+    height: ${themeCssVariables.spacing[6]};
+    inset: var(--widget-card-title-padding-top) var(--widget-card-padding-inline)
+      auto auto;
+    position: absolute;
+    width: auto;
+
+    h2 {
+      font-size: ${themeCssVariables.font.size.xl};
+    }
+  }
 `;
 
 const StyledTrendIconContainer = styled.div`
