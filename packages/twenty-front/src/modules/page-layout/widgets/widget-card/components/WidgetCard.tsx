@@ -71,6 +71,11 @@ const StyledWidgetCard = styled.div<WidgetCardStyledProps>`
 
   box-sizing: border-box;
 
+  // A one-row tile's number sits in the header row; the title and edit controls keep clear of it.
+  &:has([data-widget-card-inline-value]) {
+    --widget-card-inline-value-width: 5rem;
+  }
+
   cursor: ${({
     isEditable,
     isDragging,

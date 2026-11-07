@@ -251,7 +251,8 @@ export const GraphWidgetBarChart = ({
     debouncedHideTooltip();
   };
 
-  if (hasNoData) {
+  // Series hidden in the legend still have data; only a chart without any says so in one line.
+  if (data.length === 0 || keys.length === 0) {
     return <GraphWidgetNoDataLine />;
   }
 

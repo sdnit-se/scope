@@ -15,6 +15,8 @@ import { WidgetGrip } from '@/page-layout/widgets/widget-card/components/WidgetG
 import { AnimatePresence, motion } from 'framer-motion';
 import { isDefined } from 'twenty-shared/utils';
 import { useTheme, themeCssVariables } from 'twenty-ui/theme';
+import { ONE_ROW_WIDGET_CARD_MAX_HEIGHT } from '@/page-layout/widgets/widget-card/constants/OneRowWidgetCardMaxHeight';
+import { WIDGET_CARD_CONTAINER_NAME } from '@/page-layout/widgets/widget-card/constants/WidgetCardContainerName';
 export type WidgetCardHeaderProps = {
   variant: WidgetCardVariant;
   widgetId: string;
@@ -41,6 +43,10 @@ const StyledWidgetCardHeader = styled.div<{ shouldInset: boolean }>`
     shouldInset
       ? `var(--widget-card-title-padding-top) var(--widget-card-padding-inline) 0`
       : '0'};
+
+  @container ${WIDGET_CARD_CONTAINER_NAME} (max-height: ${ONE_ROW_WIDGET_CARD_MAX_HEIGHT}) {
+    margin-right: var(--widget-card-inline-value-width, 0px);
+  }
 `;
 
 const StyledTitleContainer = styled.div`
