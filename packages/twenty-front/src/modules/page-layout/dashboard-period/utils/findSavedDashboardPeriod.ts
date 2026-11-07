@@ -1,7 +1,10 @@
 import { DASHBOARD_PERIOD_RELATIVE_DATE_FILTERS } from '@/page-layout/dashboard-period/constants/DashboardPeriodRelativeDateFilters';
 import { type DashboardPeriod } from '@/page-layout/dashboard-period/types/DashboardPeriod';
 import { type ChartFilters } from '@/side-panel/pages/page-layout/types/ChartFilters';
-import { isDefined, relativeDateFilterStringifiedSchema } from 'twenty-shared/utils';
+import {
+  isDefined,
+  relativeDateFilterStringifiedSchema,
+} from 'twenty-shared/utils';
 import { ViewFilterOperand } from 'twenty-shared/types';
 
 const periodOfRelativeValue = (value: string): DashboardPeriod | null => {
