@@ -1,4 +1,5 @@
 import { forwardRef } from 'react';
+import { WIDGET_CARD_CONTAINER_NAME } from '@/page-layout/widgets/widget-card/constants/WidgetCardContainerName';
 
 export const ReactGridLayoutCardWrapper = forwardRef<
   HTMLDivElement,
@@ -22,7 +23,12 @@ export const ReactGridLayoutCardWrapper = forwardRef<
         key={key}
         data-select-disable="true"
         className={className}
-        style={style}
+        // A grid cell has a fixed height, so a widget can adapt to it, like a one-row tile.
+        style={{
+          ...style,
+          containerName: WIDGET_CARD_CONTAINER_NAME,
+          containerType: 'size',
+        }}
         onMouseDown={onMouseDown}
         onMouseUp={onMouseUp}
         onMouseMove={onMouseMove}

@@ -33,6 +33,7 @@ import { isDefined } from 'twenty-shared/utils';
 import { useTheme } from 'twenty-ui/theme';
 import { useDebouncedCallback } from 'use-debounce';
 import { BarChartLayout } from '~/generated-metadata/graphql';
+import { GraphWidgetNoDataLine } from '@/page-layout/widgets/graph/components/GraphWidgetNoDataLine';
 
 type GraphWidgetBarChartProps = {
   axisDisplayType?: GraphValueFormatOptions['displayType'];
@@ -249,6 +250,10 @@ export const GraphWidgetBarChart = ({
   const handleSliceLeave = () => {
     debouncedHideTooltip();
   };
+
+  if (hasNoData) {
+    return <GraphWidgetNoDataLine />;
+  }
 
   return (
     <StyledContainer id={id}>

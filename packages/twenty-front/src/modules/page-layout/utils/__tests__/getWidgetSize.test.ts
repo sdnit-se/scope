@@ -18,7 +18,7 @@ describe('getWidgetSize', () => {
         'minimum',
       );
 
-      expect(result).toEqual({ w: 2, h: 2 });
+      expect(result).toEqual({ w: 2, h: 1 });
     });
 
     it('returns correct default size for PIE_CHART', () => {
