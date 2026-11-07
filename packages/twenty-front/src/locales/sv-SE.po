@@ -18659,7 +18659,6 @@ msgid "No current user result"
 msgstr "Inget resultat för aktuell användare"
 
 #. js-lingui-id: plhHQt
-#: src/modules/page-layout/widgets/graph/components/GraphWidgetNoDataLine.tsx
 #: src/modules/page-layout/widgets/graph/components/GraphWidgetTooltip.tsx
 #: src/modules/page-layout/widgets/graph/components/NoDataLayer.tsx
 #: src/modules/page-layout/widgets/graph/graph-widget-pie-chart/components/PieChartCenterMetricLayer.tsx

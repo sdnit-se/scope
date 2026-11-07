@@ -297,7 +297,8 @@ export const GraphWidgetLineChart = ({
     />
   );
 
-  if (hasNoData) {
+  // Series hidden in the legend still have data; only a chart without any says so in one line.
+  if (data.every((series) => series.data.length === 0)) {
     return <GraphWidgetNoDataLine />;
   }
 
