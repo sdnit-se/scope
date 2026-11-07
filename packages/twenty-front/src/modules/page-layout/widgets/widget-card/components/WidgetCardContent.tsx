@@ -79,6 +79,7 @@ export const WidgetCardContent = ({
 
   return (
     <StyledWidgetCardContent
+      data-widget-card-content
       variant={variant}
       hasHeader={hasHeader}
       isEditable={isEditable}

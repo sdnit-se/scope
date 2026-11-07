@@ -3,6 +3,8 @@ import { isDefined } from 'twenty-shared/utils';
 import { themeCssVariables } from 'twenty-ui/theme';
 import { type WidgetCardVariant } from '@/page-layout/widgets/types/WidgetCardVariant';
 import { isWidgetCardFlushInViewMode } from '@/page-layout/widgets/utils/isWidgetCardFlushInViewMode';
+import { ONE_ROW_WIDGET_CARD_MAX_HEIGHT } from '@/page-layout/widgets/widget-card/constants/OneRowWidgetCardMaxHeight';
+import { WIDGET_CARD_CONTAINER_NAME } from '@/page-layout/widgets/widget-card/constants/WidgetCardContainerName';
 
 type WidgetCardStyledProps = {
   variant: WidgetCardVariant;
@@ -71,9 +73,25 @@ const StyledWidgetCard = styled.div<WidgetCardStyledProps>`
 
   box-sizing: border-box;
 
-  // A one-row tile's number sits in the header row; the title and edit controls keep clear of it.
-  &:has([data-widget-card-inline-value]) {
-    --widget-card-inline-value-width: 5rem;
+  // A one-row tile lays its title and number side by side: the title truncates, the number keeps its width.
+  @container ${WIDGET_CARD_CONTAINER_NAME} (max-height: ${ONE_ROW_WIDGET_CARD_MAX_HEIGHT}) {
+    &:has([data-widget-card-inline-value]) {
+      align-items: center;
+      flex-direction: row;
+      gap: ${themeCssVariables.spacing[2]};
+    }
+
+    &:has([data-widget-card-inline-value]) > [data-widget-card-header] {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    &:has([data-widget-card-inline-value]) > [data-widget-card-content] {
+      flex: 0 0 auto;
+      height: auto;
+      margin-top: 0;
+      padding-block: 0;
+    }
   }
 
   cursor: ${({
