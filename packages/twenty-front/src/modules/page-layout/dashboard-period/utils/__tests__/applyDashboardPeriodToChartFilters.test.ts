@@ -77,10 +77,15 @@ describe('applyDashboardPeriodToChartFilters', () => {
     ]);
   });
 
+  it('keeps a week that names no start day on Monday', () => {
+    expect(
+      apply('THIS_WEEK', [{ ...thisWeek, value: 'THIS_1_WEEK' }])?.[0].value,
+    ).toBe('THIS_1_WEEK;;America/New_York;;MONDAY;;');
+  });
+
   it('uses the viewer time zone when the filter has none', () => {
     expect(
-      apply('LAST_30_DAYS', [{ ...thisWeek, value: 'THIS_1_WEEK' }])?.[0]
-        .value,
+      apply('LAST_30_DAYS', [{ ...thisWeek, value: 'THIS_1_WEEK' }])?.[0].value,
     ).toBe('2026-10-09T04:00:00Z');
   });
 

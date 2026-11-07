@@ -314,7 +314,9 @@ export const PageLayoutTabsRenderer = () => {
               />
               {isDashboardPeriodSelectVisible ? (
                 <StyledDashboardTabRow>
-                  <StyledDashboardTabListSlot>{tabList}</StyledDashboardTabListSlot>
+                  <StyledDashboardTabListSlot>
+                    {tabList}
+                  </StyledDashboardTabListSlot>
                   <StyledDashboardPeriodSlot>
                     <DashboardPeriodSelect />
                   </StyledDashboardPeriodSlot>

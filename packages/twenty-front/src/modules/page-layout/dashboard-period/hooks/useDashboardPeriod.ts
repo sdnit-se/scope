@@ -18,8 +18,7 @@ export const useDashboardPeriod = () => {
 
   return {
     isDashboard,
-    appliedPeriod:
-      isDashboard && !isPageLayoutInEditMode ? chosenPeriod : null,
+    appliedPeriod: isDashboard && !isPageLayoutInEditMode ? chosenPeriod : null,
     chosenPeriod,
     setChosenPeriod,
   };

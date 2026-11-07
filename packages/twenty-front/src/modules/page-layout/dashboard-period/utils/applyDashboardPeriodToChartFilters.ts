@@ -5,7 +5,11 @@ import { type PersistedRecordFilter } from '@/object-record/record-filter/types/
 import { type ChartFilters } from '@/side-panel/pages/page-layout/types/ChartFilters';
 import { stringifyRelativeDateFilter } from '@/views/view-filter-value/utils/stringifyRelativeDateFilter';
 import { Temporal } from 'temporal-polyfill';
-import { FieldMetadataType, ViewFilterOperand } from 'twenty-shared/types';
+import {
+  FieldMetadataType,
+  FirstDayOfTheWeek,
+  ViewFilterOperand,
+} from 'twenty-shared/types';
 import { relativeDateFilterStringifiedSchema } from 'twenty-shared/utils';
 
 const LAST_30_DAYS_EARLIER_DAYS = 29;
@@ -58,9 +62,10 @@ const applyDashboardPeriodToRecordFilter = (
     value: stringifyRelativeDateFilter({
       ...DASHBOARD_PERIOD_RELATIVE_DATE_FILTERS[period],
       timezone: filterTimeZone,
-      firstDayOfTheWeek: saved.success
-        ? saved.data.firstDayOfTheWeek
-        : undefined,
+      // Twenty's resolver starts an unspecified week on Monday, not on the browser's locale.
+      firstDayOfTheWeek:
+        (saved.success ? saved.data.firstDayOfTheWeek : undefined) ??
+        FirstDayOfTheWeek.MONDAY,
     }),
   };
 };

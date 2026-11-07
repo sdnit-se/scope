@@ -9,7 +9,11 @@ export const DASHBOARD_PERIOD_RELATIVE_DATE_FILTERS: Record<
   Exclude<DashboardPeriod, 'LAST_30_DAYS'>,
   Pick<RelativeDateFilter, 'direction' | 'amount' | 'unit'>
 > = {
-  TODAY: { direction: 'THIS', amount: 1, unit: relativeDateFilterUnitSchema.enum.DAY },
+  TODAY: {
+    direction: 'THIS',
+    amount: 1,
+    unit: relativeDateFilterUnitSchema.enum.DAY,
+  },
   THIS_WEEK: { direction: 'THIS', amount: 1, unit: 'WEEK' },
   LAST_WEEK: { direction: 'PAST', amount: 1, unit: 'WEEK' },
   THIS_QUARTER: { direction: 'THIS', amount: 1, unit: 'QUARTER' },

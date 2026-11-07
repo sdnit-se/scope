@@ -1,7 +1,10 @@
 import { type DashboardPeriod } from '@/page-layout/dashboard-period/types/DashboardPeriod';
 import { t } from '@lingui/core/macro';
 
-export const useDashboardPeriodLabels = (): Record<DashboardPeriod, string> => ({
+export const useDashboardPeriodLabels = (): Record<
+  DashboardPeriod,
+  string
+> => ({
   TODAY: t`Today`,
   THIS_WEEK: t`This week`,
   LAST_WEEK: t`Last week`,

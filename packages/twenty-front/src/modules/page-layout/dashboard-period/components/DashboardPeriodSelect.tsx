@@ -5,6 +5,7 @@ import { useDashboardPeriodSelectVisibility } from '@/page-layout/dashboard-peri
 import { findSavedDashboardPeriod } from '@/page-layout/dashboard-period/utils/findSavedDashboardPeriod';
 import { useCurrentPageLayoutOrThrow } from '@/page-layout/hooks/useCurrentPageLayoutOrThrow';
 import { Select } from '@/ui/input/components/Select';
+import { t } from '@lingui/core/macro';
 import { IconCalendarEvent } from 'twenty-ui/icon';
 
 export const DashboardPeriodSelect = () => {
@@ -22,6 +23,8 @@ export const DashboardPeriodSelect = () => {
         value: period,
         Icon: IconCalendarEvent,
       }))}
+      // Widgets that disagree keep their own periods; the control then names none.
+      emptyOption={{ label: t`Period`, value: null, Icon: IconCalendarEvent }}
       selectSizeVariant="small"
       dropdownWidth={160}
       onChange={setChosenPeriod}
