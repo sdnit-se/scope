@@ -262,14 +262,6 @@ const SettingsSubdomainPage = lazy(() =>
   })),
 );
 
-const SettingsCustomDomainPage = lazy(() =>
-  import('~/pages/settings/domains/SettingsCustomDomainPage').then(
-    (module) => ({
-      default: module.SettingsCustomDomainPage,
-    }),
-  ),
-);
-
 const SettingsDevelopers = lazy(() =>
   import('~/pages/settings/developers/SettingsDevelopers').then((module) => ({
     default: module.SettingsDevelopers,
@@ -612,14 +604,6 @@ const SettingsObjectTranslations = lazy(() =>
   ),
 );
 
-const SettingsSecuritySsoIdentifyProvider = lazy(() =>
-  import('~/pages/settings/security/SettingsSecuritySsoIdentifyProvider').then(
-    (module) => ({
-      default: module.SettingsSecuritySsoIdentifyProvider,
-    }),
-  ),
-);
-
 const SettingsSecurityApprovedAccessDomain = lazy(() =>
   import('~/pages/settings/security/SettingsSecurityApprovedAccessDomain').then(
     (module) => ({
@@ -956,10 +940,6 @@ const createSettingsRouteElements = ({
         element={<SettingsSubdomainPage />}
       />
       <Route
-        path={SettingsPath.CustomDomain}
-        element={<SettingsCustomDomainPage />}
-      />
-      <Route
         path={SettingsPath.ApplicationPublicDomainNew}
         element={<SettingPublicDomain />}
       />
@@ -1258,10 +1238,6 @@ const createSettingsRouteElements = ({
         />
       }
     >
-      <Route
-        path={SettingsPath.NewSsoIdentityProvider}
-        element={<SettingsSecuritySsoIdentifyProvider />}
-      />
       <Route
         path={SettingsPath.NewApprovedAccessDomain}
         element={<SettingsSecurityApprovedAccessDomain />}
