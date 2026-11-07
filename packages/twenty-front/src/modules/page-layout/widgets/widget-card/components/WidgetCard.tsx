@@ -73,8 +73,7 @@ const StyledWidgetCard = styled.div<WidgetCardStyledProps>`
 
   box-sizing: border-box;
 
-  // A one-row tile lays its title and number side by side. The title keeps at least 40% of the row;
-  // a number wider than the rest ends in an ellipsis, with the full value on hover.
+  // The title keeps 40% of a one-row tile so a wide number cannot push it out.
   @container ${WIDGET_CARD_CONTAINER_NAME} (max-height: ${ONE_ROW_WIDGET_CARD_MAX_HEIGHT}) {
     &:has([data-widget-card-inline-value]) {
       align-items: center;

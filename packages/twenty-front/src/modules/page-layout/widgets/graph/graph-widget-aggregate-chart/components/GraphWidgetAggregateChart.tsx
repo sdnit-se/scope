@@ -27,7 +27,6 @@ const StyledContainer = styled.div`
   justify-content: space-between;
   width: 100%;
 
-  // A one-row tile shows its number beside the title instead of under it.
   @container ${WIDGET_CARD_CONTAINER_NAME} (max-height: ${ONE_ROW_WIDGET_CARD_MAX_HEIGHT}) {
     min-width: 0;
     white-space: nowrap;
