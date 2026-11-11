@@ -1,0 +1,3 @@
+# Gemini Code Assist does not review pull requests here: its comments were mostly wrong and each one cost a check.
+code_review:
+  disable: true
