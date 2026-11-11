@@ -2,6 +2,7 @@ import { type MultiItemFieldInputSpacing } from '@/object-record/record-field/ui
 import { getMultiItemInputKeyDownHandler } from '@/object-record/record-field/ui/meta-types/input/utils/getMultiItemInputKeyDownHandler';
 import { PhoneCountryPickerDropdownButton } from '@/ui/input/components/internal/phone/components/PhoneCountryPickerDropdownButton';
 import { styled } from '@linaria/react';
+import { isNonEmptyString } from '@sniptt/guards';
 import { type CountryCode, type E164Number } from 'libphonenumber-js';
 import { type Ref } from 'react';
 import ReactPhoneNumberInput from 'react-phone-number-input';
@@ -115,7 +116,9 @@ export const PhonesFieldPhoneInput = ({
         ref={ref as unknown as Ref<InstanceType<typeof ReactPhoneNumberInput>>}
         autoFocus={autoFocus}
         placeholder={placeholder}
-        value={value as E164Number}
+        // The library's empty value is undefined; '' reads as a reset from
+        // outside and drops the country the seller picked.
+        value={isNonEmptyString(value) ? (value as E164Number) : undefined}
         onChange={(newValue?: E164Number) => onChange(newValue ?? '')}
         onBlur={onBlur}
         onKeyDown={getMultiItemInputKeyDownHandler({
@@ -123,7 +126,9 @@ export const PhonesFieldPhoneInput = ({
           onEscape,
           shouldPreventTabNavigation,
         })}
-        international={true}
+        // Unset, a number typed without "+" belongs to the default country;
+        // true forces a "+", which turns 070… into the invalid +070….
+        international={isNonEmptyString(defaultCountry) ? undefined : true}
         withCountryCallingCode={true}
         countrySelectComponent={PhoneCountryPickerDropdownButton}
         defaultCountry={defaultCountry}

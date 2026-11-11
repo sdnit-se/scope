@@ -1,5 +1,6 @@
 import { type MultiItemFieldInputSpacing } from '@/object-record/record-field/ui/meta-types/input/types/MultiItemFieldInputSpacing';
 import { styled } from '@linaria/react';
+import { isNonEmptyString } from '@sniptt/guards';
 import { type ReactNode } from 'react';
 import { isDefined } from 'twenty-shared/utils';
 import { themeCssVariables } from 'twenty-ui/theme';
@@ -48,9 +49,16 @@ const StyledRightContainer = styled.div<{
       : themeCssVariables.spacing[2]};
 `;
 
+const StyledErrorMessage = styled.div`
+  color: ${themeCssVariables.font.color.danger};
+  font-size: ${themeCssVariables.font.size.sm};
+  padding: 0 ${themeCssVariables.spacing[2]} ${themeCssVariables.spacing[1]};
+`;
+
 type MultiItemFieldInputRowProps = {
   children: ReactNode;
   rightComponent?: ReactNode;
+  errorMessage?: string;
   spacing?: MultiItemFieldInputSpacing;
   hasPadding?: boolean;
 };
@@ -58,15 +66,21 @@ type MultiItemFieldInputRowProps = {
 export const MultiItemFieldInputRow = ({
   children,
   rightComponent,
+  errorMessage,
   spacing = 'default',
   hasPadding = false,
 }: MultiItemFieldInputRowProps) => (
-  <StyledInputRow spacing={spacing} hasPadding={hasPadding}>
-    {children}
-    {isDefined(rightComponent) && (
-      <StyledRightContainer spacing={spacing}>
-        {rightComponent}
-      </StyledRightContainer>
+  <>
+    <StyledInputRow spacing={spacing} hasPadding={hasPadding}>
+      {children}
+      {isDefined(rightComponent) && (
+        <StyledRightContainer spacing={spacing}>
+          {rightComponent}
+        </StyledRightContainer>
+      )}
+    </StyledInputRow>
+    {isNonEmptyString(errorMessage) && (
+      <StyledErrorMessage role="alert">{errorMessage}</StyledErrorMessage>
     )}
-  </StyledInputRow>
+  </>
 );

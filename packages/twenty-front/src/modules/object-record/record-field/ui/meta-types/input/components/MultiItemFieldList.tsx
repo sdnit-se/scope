@@ -1,4 +1,5 @@
 import { MultiItemFieldSearchHeader } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldSearchHeader';
+import { GenericDropdownContentWidth } from '@/ui/layout/dropdown/constants/GenericDropdownContentWidth';
 import { OverlayMenuList } from '@/ui/layout/overlay/components/OverlayMenuList';
 import { OverlayMenuListSeparator } from '@/ui/layout/overlay/components/OverlayMenuListSeparator';
 import { type ReactNode, type Ref } from 'react';
@@ -30,6 +31,8 @@ export const MultiItemFieldList = ({
   return (
     <OverlayMenuList
       ref={ref}
+      // Wide enough for an international phone number beside the Save button.
+      width={GenericDropdownContentWidth.Large}
       header={
         shouldShowSearch ? (
           <MultiItemFieldSearchHeader

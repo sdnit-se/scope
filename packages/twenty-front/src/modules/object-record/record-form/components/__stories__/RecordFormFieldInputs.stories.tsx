@@ -357,7 +357,7 @@ export const Emails: Story = {
     await expect(canvas.getByRole('textbox')).toHaveFocus();
 
     await userEvent.keyboard('lea.martin@gmail.com');
-    await userEvent.click(canvas.getByRole('button', { name: 'Add item' }));
+    await userEvent.click(canvas.getByRole('button', { name: 'Save' }));
 
     await expect(args.onFieldValueChange).toHaveBeenLastCalledWith('emails', {
       primaryEmail: 'lea@northwind.io',

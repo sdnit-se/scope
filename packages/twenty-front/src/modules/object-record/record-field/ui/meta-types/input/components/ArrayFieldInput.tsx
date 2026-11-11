@@ -193,10 +193,7 @@ export const ArrayFieldInput = () => {
       hasPadding={shouldShowInputInFooter && shouldShowItems}
       rightComponent={
         isNonEmptyArray(arrayItems) ? (
-          <MultiItemFieldSaveButton
-            isAddingNewItem={!isDefined(editedItemIndex)}
-            onClick={handleInputEnter}
-          />
+          <MultiItemFieldSaveButton onClick={handleInputEnter} />
         ) : undefined
       }
     >

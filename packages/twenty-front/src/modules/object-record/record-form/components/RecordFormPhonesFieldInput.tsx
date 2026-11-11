@@ -255,10 +255,7 @@ export const RecordFormPhonesFieldInput = ({
       hasPadding={shouldShowItems && shouldShowInputInFooter}
       rightComponent={
         isSingleItemMode ? undefined : (
-          <MultiItemFieldSaveButton
-            isAddingNewItem={!isDefined(editedItemIndex)}
-            onClick={handleEnter}
-          />
+          <MultiItemFieldSaveButton onClick={handleEnter} />
         )
       }
     >
