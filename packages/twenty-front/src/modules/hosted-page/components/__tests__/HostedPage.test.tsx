@@ -24,6 +24,19 @@ jest.mock('@/information-banner/components/InformationBannerWrapper', () => ({
   InformationBannerWrapper: () => null,
 }));
 
+const mockIsSidebarExpanded = jest.fn(() => true);
+
+jest.mock(
+  '@/ui/navigation/navigation-drawer/hooks/useNavigationDrawerExpanded',
+  () => ({ useNavigationDrawerExpanded: () => mockIsSidebarExpanded() }),
+);
+jest.mock(
+  '@/ui/navigation/navigation-drawer/components/NavigationDrawerCollapseButton',
+  () => ({
+    NavigationDrawerCollapseButton: () => <button>Expand sidebar</button>,
+  }),
+);
+
 const ERROR_MESSAGE = 'The page could not be loaded.';
 const FRAME_SOURCE = '/platform/kontakter?q=anna';
 
@@ -158,6 +171,31 @@ describe('HostedPage', () => {
 
     expect(screen.getByText('A page of Twenty')).toBeVisible();
     expect(screen.getByRole('status')).toHaveTextContent('/objects/people');
+  });
+
+  it('starts the frame over when it wandered to another hosted address', () => {
+    const { frame } = renderHostedPage();
+
+    loadInFrame(frame, '/shebang/kontakter/7');
+
+    expect(screen.getByRole('status')).toHaveTextContent(
+      '/shebang/kontakter/7',
+    );
+    expect(getFrame()).not.toBe(frame);
+    expect(getFrame()).toHaveAttribute('src', '/platform/kontakter/7');
+  });
+
+  it('keeps a way to expand the sidebar while it is collapsed', () => {
+    mockIsSidebarExpanded.mockReturnValue(false);
+    const { frame } = renderHostedPage();
+
+    // The loading skeleton has a control of its own; this is the page once shown.
+    sendFromFrame(frame, { type: 'ready' });
+
+    expect(
+      screen.getByRole('button', { name: 'Expand sidebar' }),
+    ).toBeVisible();
+    mockIsSidebarExpanded.mockReturnValue(true);
   });
 
   it('offers to try again when the loaded document is not a hosted page', async () => {

@@ -4,14 +4,19 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { isDefined, isSafeInternalPath } from 'twenty-shared/utils';
 import { Button } from 'twenty-ui/primitives/input';
+import { themeCssVariables } from 'twenty-ui/theme';
+import { useIsMobile } from 'twenty-ui/utilities';
 
 import { HOSTED_PAGE_FRAME_PREFIX } from '@/hosted-page/constants/HostedPageFramePrefix';
 import { HOSTED_PAGE_READY_TIMEOUT_MS } from '@/hosted-page/constants/HostedPageReadyTimeoutMs';
+import { HOSTED_PAGE_ROUTE_PREFIX } from '@/hosted-page/constants/HostedPageRoutePrefix';
 import { useHostedPageBridge } from '@/hosted-page/hooks/useHostedPageBridge';
 import { toHostedFramePath } from '@/hosted-page/utils/toHostedFramePath';
 import { RecordIndexSkeletonLoader } from '@/object-record/record-index/components/RecordIndexSkeletonLoader';
 import { EmptyState } from '@/ui/feedback/empty-state/components/EmptyState';
 import { PageCardLayout } from '@/ui/layout/page/components/PageCardLayout';
+import { NavigationDrawerCollapseButton } from '@/ui/navigation/navigation-drawer/components/NavigationDrawerCollapseButton';
+import { useNavigationDrawerExpanded } from '@/ui/navigation/navigation-drawer/hooks/useNavigationDrawerExpanded';
 import { PageTitle } from '@/ui/utilities/page-title/components/PageTitle';
 
 // 'loaded' is a document of the hosted app that has not said `ready` yet.
@@ -23,6 +28,11 @@ const StyledContainer = styled.div`
   min-height: 0;
   min-width: 0;
   position: relative;
+`;
+
+// Twenty's own pages keep this control in their header, which a hosted page has not.
+const StyledExpandSidebar = styled.div`
+  padding: ${themeCssVariables.spacing[3]} ${themeCssVariables.spacing[1]};
 `;
 
 const StyledFrame = styled.iframe`
@@ -41,6 +51,8 @@ export const HostedPage = () => {
   const framePath = toHostedFramePath(useLocation());
   const { t } = useLingui();
   const navigate = useNavigate();
+  const isSidebarExpanded = useNavigationDrawerExpanded();
+  const isMobile = useIsMobile();
   const frameRef = useRef<HTMLIFrameElement>(null);
   // The source is fixed per attempt: a new `src` would reload the hosted page.
   const [frame, setFrame] = useState({ source: framePath, attempt: 0 });
@@ -73,6 +85,17 @@ export const HostedPage = () => {
     if (!isHostedPath && isSafeInternalPath(pathname)) {
       navigate(pathname + search + hash, { replace: true });
 
+      // Another hosted address keeps this component, so the frame starts over there.
+      if (pathname.startsWith(HOSTED_PAGE_ROUTE_PREFIX)) {
+        const source = toHostedFramePath({
+          pathname,
+          search: search ?? '',
+          hash: hash ?? '',
+        });
+        setFrame({ source, attempt: frame.attempt + 1 });
+        setStatus('loading');
+      }
+
       return;
     }
 
@@ -99,6 +122,11 @@ export const HostedPage = () => {
   return (
     <StyledContainer aria-busy={isPending}>
       {isDefined(title) && <PageTitle title={title} />}
+      {!isSidebarExpanded && !isMobile && (
+        <StyledExpandSidebar>
+          <NavigationDrawerCollapseButton direction="right" />
+        </StyledExpandSidebar>
+      )}
       <PageCardLayout header={null}>
         {status === 'failed' ? (
           <EmptyState.Root>
