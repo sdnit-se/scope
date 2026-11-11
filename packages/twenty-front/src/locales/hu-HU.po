@@ -11153,11 +11153,6 @@ msgstr "Írja be a szövegét"
 msgid "Enter your two-factor authentication code to confirm."
 msgstr "A megerősítéshez adja meg a kétfaktoros hitelesítési kódját."
 
-#. js-lingui-id: YKwRCb
-#: src/modules/salesfarce/components/SalesfarceBadge.tsx
-msgid "Enterprise only"
-msgstr "Csak Enterprise"
-
 #. js-lingui-id: SLuq/l
 #: src/modules/settings/security/components/sso/SettingsSsoSamlForm.tsx
 msgid "Entity ID"
@@ -23474,11 +23469,6 @@ msgstr "Orosz"
 #: src/modules/settings/admin-panel/constants/CreditGrantTypeLabels.ts
 msgid "Sales"
 msgstr "Értékesítés"
-
-#. js-lingui-id: T3H3GG
-#: src/pages/settings/profile/appearance/components/SettingsAppearance.tsx
-msgid "Salesfarce"
-msgstr "Salesfarce"
 
 #. js-lingui-id: L8TxaD
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceUsageLimitModal.tsx
