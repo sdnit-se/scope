@@ -8,5 +8,5 @@ type MultiItemFieldSaveButtonProps = {
 export const MultiItemFieldSaveButton = ({
   onClick,
 }: MultiItemFieldSaveButtonProps) => (
-  <LightButton onClick={onClick}>{t`Save`}</LightButton>
+  <LightButton color="accent" onClick={onClick}>{t`Save`}</LightButton>
 );
