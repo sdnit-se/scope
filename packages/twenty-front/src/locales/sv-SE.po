@@ -10911,25 +10911,9 @@ msgstr "Ange en start- och sluttid."
 msgid "Enter a UUID"
 msgstr "Ange ett UUID"
 
-#. js-lingui-id: /AaSIU
-#: src/modules/object-record/record-form/components/RecordFormLinksFieldInput.tsx
-msgid "Enter a valid domain"
-msgstr "Ange en giltig domän"
-
-#. js-lingui-id: qg4y3S
-#: src/modules/object-record/record-form/components/RecordFormEmailsFieldInput.tsx
-msgid "Enter a valid email"
-msgstr "Ange en giltig e-postadress"
-
-#. js-lingui-id: w8A3K2
-#: src/modules/object-record/record-form/components/RecordFormPhonesFieldInput.tsx
-msgid "Enter a valid phone number"
-msgstr "Ange ett giltigt telefonnummer"
-
 #. js-lingui-id: DXBlEM
 #: src/modules/navigation-menu-item/edit/components/NavigationMenuItemLinkEditor.tsx
 #: src/modules/object-record/record-field/ui/meta-types/input/components/LinksFieldEditInputs.tsx
-#: src/modules/object-record/record-form/components/RecordFormLinksFieldInput.tsx
 msgid "Enter a valid URL"
 msgstr "Ange en giltig URL"
 
@@ -15316,6 +15300,18 @@ msgstr "Är i dag{timeZoneAbbreviationSuffix}"
 #: src/modules/settings/security/components/sso/SettingsSsoOidcForm.tsx
 msgid "Issuer URI"
 msgstr "Issuer URI"
+
+#. js-lingui-id: ZB6s9Q
+#: src/modules/object-record/record-field/ui/meta-types/input/components/EmailsFieldInput.tsx
+#: src/modules/object-record/record-form/components/RecordFormEmailsFieldInput.tsx
+msgid "It is not a valid email address. Check the spelling."
+msgstr "Det är inte en giltig e-postadress. Kontrollera stavningen."
+
+#. js-lingui-id: 0XEhO7
+#: src/modules/object-record/record-field/ui/meta-types/input/components/LinksFieldInput.tsx
+#: src/modules/object-record/record-form/components/RecordFormLinksFieldInput.tsx
+msgid "It is not a valid web address. Check the spelling."
+msgstr "Det är inte en giltig webbadress. Kontrollera stavningen."
 
 #. js-lingui-id: Lj7sBL
 #: src/modules/localization/hooks/useLocaleOptions.ts
@@ -27119,6 +27115,7 @@ msgstr "Namnet som mottagarna ser bredvid din adress. Det anges när kanalen ska
 
 #. js-lingui-id: 8kMezl
 #: src/modules/object-record/record-field/ui/meta-types/input/components/PhonesFieldInput.tsx
+#: src/modules/object-record/record-form/components/RecordFormPhonesFieldInput.tsx
 msgid "The number is not a valid phone number. Check the digits."
 msgstr "Numret är inte ett giltigt telefonnummer. Kontrollera siffrorna."
 

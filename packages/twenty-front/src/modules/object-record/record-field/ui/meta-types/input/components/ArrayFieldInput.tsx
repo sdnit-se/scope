@@ -5,7 +5,6 @@ import { MultiItemFieldAddButton } from '@/object-record/record-field/ui/meta-ty
 import { MultiItemFieldEditedItem } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldEditedItem';
 import { MultiItemFieldInputRow } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldInputRow';
 import { MultiItemFieldList } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldList';
-import { MultiItemFieldSaveButton } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldSaveButton';
 import { MultiItemFieldTextInput } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldTextInput';
 import { MULTI_ITEM_FIELD_INPUT_DROPDOWN_ID_PREFIX } from '@/object-record/record-field/ui/meta-types/input/constants/MultiItemFieldInputDropdownClickOutsideId';
 import { useMultiItemFieldDismiss } from '@/object-record/record-field/ui/meta-types/input/hooks/useMultiItemFieldDismiss';
@@ -191,11 +190,7 @@ export const ArrayFieldInput = () => {
     <MultiItemFieldInputRow
       spacing={inputSpacing}
       hasPadding={shouldShowInputInFooter && shouldShowItems}
-      rightComponent={
-        isNonEmptyArray(arrayItems) ? (
-          <MultiItemFieldSaveButton onClick={handleInputEnter} />
-        ) : undefined
-      }
+      onSave={handleInputEnter}
     >
       <MultiItemFieldTextInput
         autoFocus

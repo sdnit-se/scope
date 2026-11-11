@@ -10,7 +10,6 @@ import { MultiItemFieldEditedItem } from '@/object-record/record-field/ui/meta-t
 import { MultiItemFieldAddButton } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldAddButton';
 import { MultiItemFieldInputRow } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldInputRow';
 import { MultiItemFieldList } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldList';
-import { MultiItemFieldSaveButton } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldSaveButton';
 import { MULTI_ITEM_FIELD_INPUT_DROPDOWN_ID_PREFIX } from '@/object-record/record-field/ui/meta-types/input/constants/MultiItemFieldInputDropdownClickOutsideId';
 import { useMultiItemFieldDismiss } from '@/object-record/record-field/ui/meta-types/input/hooks/useMultiItemFieldDismiss';
 import { useMultiItemInput } from '@/object-record/record-field/ui/meta-types/input/hooks/useMultiItemInput';
@@ -320,7 +319,7 @@ export const FilesFieldInput = () => {
     <MultiItemFieldInputRow
       spacing={isEditingItemInPlace ? 'compact' : 'default'}
       hasPadding={shouldShowInputInFooter && shouldShowItems}
-      rightComponent={<MultiItemFieldSaveButton onClick={handleInputEnter} />}
+      onSave={handleInputEnter}
     >
       <FilesFieldLabelInput
         file={editedFile}

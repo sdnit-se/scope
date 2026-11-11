@@ -1,82 +1,20 @@
-import { FieldContext } from '@/object-record/record-field/ui/contexts/FieldContext';
-import { FieldInputEventContext } from '@/object-record/record-field/ui/contexts/FieldInputEventContext';
 import { PhonesFieldInput } from '@/object-record/record-field/ui/meta-types/input/components/PhonesFieldInput';
-import { RecordFieldComponentInstanceContext } from '@/object-record/record-field/ui/states/contexts/RecordFieldComponentInstanceContext';
-import { usePushFocusItemToFocusStack } from '@/ui/utilities/focus/hooks/usePushFocusItemToFocusStack';
-import { FocusComponentType } from '@/ui/utilities/focus/types/FocusComponentType';
-import { i18n } from '@lingui/core';
-import { I18nProvider } from '@lingui/react';
-import { render, screen } from '@testing-library/react';
+import {
+  clickElsewhere,
+  openFieldInputOfRecordWithoutValue,
+} from '@/object-record/record-field/ui/meta-types/input/components/__tests__/utils/openFieldInputOfRecordWithoutValue';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createStore, Provider } from 'jotai';
-import { useEffect } from 'react';
 import { FieldMetadataType } from '~/generated-metadata/graphql';
-import { messages } from '~/locales/generated/sv-SE';
 
-i18n.load({ 'sv-SE': messages });
-i18n.activate('sv-SE');
-
-const INSTANCE_ID = 'phones-field-input';
-
-const OpenedFieldInputFocusEffect = () => {
-  const { pushFocusItemToFocusStack } = usePushFocusItemToFocusStack();
-
-  useEffect(() => {
-    pushFocusItemToFocusStack({
-      focusId: INSTANCE_ID,
-      component: {
-        type: FocusComponentType.OPENED_FIELD_INPUT,
-        instanceId: INSTANCE_ID,
-      },
-    });
-  }, [pushFocusItemToFocusStack]);
-
-  return null;
-};
-
-const openPhoneInputOfContactWithoutNumber = () => {
-  const onSubmit = jest.fn();
-  const onClickOutside = jest.fn();
-
-  render(
-    <I18nProvider i18n={i18n}>
-      <Provider store={createStore()}>
-        <RecordFieldComponentInstanceContext.Provider
-          value={{ instanceId: INSTANCE_ID }}
-        >
-          <FieldContext.Provider
-            value={{
-              fieldDefinition: {
-                fieldMetadataId: 'phones',
-                label: 'Telefon',
-                type: FieldMetadataType.PHONES,
-                iconName: 'IconPhone',
-                metadata: { fieldName: 'phones' },
-                defaultValue: { primaryPhoneCountryCode: "'SE'" },
-              },
-              recordId: 'person-id',
-              isLabelIdentifier: false,
-              isRecordFieldReadOnly: false,
-            }}
-          >
-            <FieldInputEventContext.Provider
-              value={{ onSubmit, onClickOutside }}
-            >
-              <OpenedFieldInputFocusEffect />
-              <PhonesFieldInput />
-            </FieldInputEventContext.Provider>
-          </FieldContext.Provider>
-        </RecordFieldComponentInstanceContext.Provider>
-        <button>Elsewhere</button>
-      </Provider>
-    </I18nProvider>,
+const openPhoneInputOfContactWithoutNumber = () =>
+  openFieldInputOfRecordWithoutValue(
+    {
+      type: FieldMetadataType.PHONES,
+      defaultValue: { primaryPhoneCountryCode: "'SE'" },
+    },
+    <PhonesFieldInput />,
   );
-
-  return { onSubmit, onClickOutside, input: screen.getByRole('textbox') };
-};
-
-const clickElsewhere = () =>
-  userEvent.click(screen.getByRole('button', { name: 'Elsewhere' }));
 
 const savedPhone = (number: string, callingCode = '+46', country = 'SE') => ({
   primaryPhoneNumber: number,

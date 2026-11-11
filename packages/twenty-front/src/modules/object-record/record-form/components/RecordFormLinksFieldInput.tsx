@@ -302,10 +302,6 @@ export const RecordFormLinksFieldInput = ({
     ? 'compact'
     : 'default';
 
-  const saveButton = isSingleItemMode ? undefined : (
-    <MultiItemFieldSaveButton onClick={handleEnter} />
-  );
-
   const handleInputBlur = () =>
     setIsInvalidInputLeft(!isInputValueValid(inputValue));
 
@@ -313,7 +309,7 @@ export const RecordFormLinksFieldInput = ({
     <MultiItemFieldInputRow
       spacing={inputSpacing}
       hasPadding={shouldShowItems && shouldShowInputInFooter}
-      rightComponent={saveButton}
+      onSave={isSingleItemMode ? undefined : handleEnter}
     >
       {isDomainField && <LinksFieldDomainFavicon domain={inputValue} />}
       <MultiItemFieldTextInput
@@ -335,7 +331,7 @@ export const RecordFormLinksFieldInput = ({
       <LinksFieldEditPreview
         url={inputValue}
         label={getLinkLabelFromDraft(labelDraft)}
-        saveButton={saveButton}
+        saveButton={<MultiItemFieldSaveButton onClick={handleEnter} />}
       />
       <MultiItemFieldItemSeparator />
       <LinksFieldEditInputs
@@ -398,7 +394,7 @@ export const RecordFormLinksFieldInput = ({
       </RecordFormMultiItemList>
       {isInputValueInvalid ? (
         <Field.Error match role="alert">
-          {isDomainField ? t`Enter a valid domain` : t`Enter a valid URL`}
+          {t`It is not a valid web address. Check the spelling.`}
         </Field.Error>
       ) : null}
     </FormFieldInputContainer>

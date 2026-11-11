@@ -5,13 +5,13 @@ import { MultiItemFieldAddButton } from '@/object-record/record-field/ui/meta-ty
 import { MultiItemFieldEditedItem } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldEditedItem';
 import { MultiItemFieldInputRow } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldInputRow';
 import { MultiItemFieldList } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldList';
-import { MultiItemFieldSaveButton } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldSaveButton';
 import { MultiItemFieldTextInput } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldTextInput';
 import { MULTI_ITEM_FIELD_INPUT_DROPDOWN_ID_PREFIX } from '@/object-record/record-field/ui/meta-types/input/constants/MultiItemFieldInputDropdownClickOutsideId';
 import { useMultiItemFieldDismiss } from '@/object-record/record-field/ui/meta-types/input/hooks/useMultiItemFieldDismiss';
 import { useMultiItemInput } from '@/object-record/record-field/ui/meta-types/input/hooks/useMultiItemInput';
 import { useMultiItemSearch } from '@/object-record/record-field/ui/meta-types/input/hooks/useMultiItemSearch';
 import { computeUpdatedMultiItemFieldItems } from '@/object-record/record-field/ui/meta-types/input/utils/computeUpdatedMultiItemFieldItems';
+import { sanitizeEmailInput } from '@/object-record/record-field/ui/meta-types/input/utils/sanitizeEmailInput';
 import { type MultiItemFieldInputSpacing } from '@/object-record/record-field/ui/meta-types/input/types/MultiItemFieldInputSpacing';
 import { recordFieldInputIsFieldInErrorComponentState } from '@/object-record/record-field/ui/states/recordFieldInputIsFieldInErrorComponentState';
 import { type FieldEmailsValue } from '@/object-record/record-field/ui/types/FieldMetadata';
@@ -112,6 +112,7 @@ export const EmailsFieldInput = () => {
     getItemText: getEmailText,
     isInputInitiallyOpen: emails.length === 0 || isSingleItemMode,
     initialEditedItemIndex: isSingleItemMode && emails.length > 0 ? 0 : null,
+    sanitizeInput: sanitizeEmailInput,
     validateInput: validateEmail,
     onHasErrorChange: (hasError) =>
       setRecordFieldInputIsFieldInError(hasError && emails.length === 0),
@@ -238,10 +239,11 @@ export const EmailsFieldInput = () => {
     <MultiItemFieldInputRow
       spacing={inputSpacing}
       hasPadding={shouldShowInputInFooter && shouldShowItems}
-      rightComponent={
-        isNonEmptyArray(emails) ? (
-          <MultiItemFieldSaveButton onClick={handleInputEnter} />
-        ) : undefined
+      onSave={handleInputEnter}
+      errorMessage={
+        hasError
+          ? t`It is not a valid email address. Check the spelling.`
+          : undefined
       }
     >
       <MultiItemFieldTextInput

@@ -161,7 +161,7 @@ export const BlocksApplyWhileAFieldIsInError: Story = {
     await userEvent.tab();
 
     await expect(await canvas.findByRole('alert')).toHaveTextContent(
-      'Enter a valid URL',
+      'It is not a valid web address. Check the spelling.',
     );
 
     await userEvent.click(canvas.getByRole('button', { name: /Apply/i }));

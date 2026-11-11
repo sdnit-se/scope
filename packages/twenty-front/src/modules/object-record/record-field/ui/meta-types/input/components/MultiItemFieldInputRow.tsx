@@ -1,3 +1,4 @@
+import { MultiItemFieldSaveButton } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldSaveButton';
 import { type MultiItemFieldInputSpacing } from '@/object-record/record-field/ui/meta-types/input/types/MultiItemFieldInputSpacing';
 import { styled } from '@linaria/react';
 import { isNonEmptyString } from '@sniptt/guards';
@@ -57,7 +58,7 @@ const StyledErrorMessage = styled.div`
 
 type MultiItemFieldInputRowProps = {
   children: ReactNode;
-  rightComponent?: ReactNode;
+  onSave?: () => void;
   errorMessage?: string;
   spacing?: MultiItemFieldInputSpacing;
   hasPadding?: boolean;
@@ -65,7 +66,7 @@ type MultiItemFieldInputRowProps = {
 
 export const MultiItemFieldInputRow = ({
   children,
-  rightComponent,
+  onSave,
   errorMessage,
   spacing = 'default',
   hasPadding = false,
@@ -73,9 +74,9 @@ export const MultiItemFieldInputRow = ({
   <>
     <StyledInputRow spacing={spacing} hasPadding={hasPadding}>
       {children}
-      {isDefined(rightComponent) && (
+      {isDefined(onSave) && (
         <StyledRightContainer spacing={spacing}>
-          {rightComponent}
+          <MultiItemFieldSaveButton onClick={onSave} />
         </StyledRightContainer>
       )}
     </StyledInputRow>

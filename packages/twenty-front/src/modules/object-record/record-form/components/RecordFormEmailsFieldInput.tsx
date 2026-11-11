@@ -2,9 +2,9 @@ import { EmailsFieldMenuItem } from '@/object-record/record-field/ui/meta-types/
 import { MultiItemFieldEditedItem } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldEditedItem';
 import { RecordFormMultiItemList } from '@/object-record/record-form/components/RecordFormMultiItemList';
 import { MultiItemFieldInputRow } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldInputRow';
-import { MultiItemFieldSaveButton } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldSaveButton';
 import { MultiItemFieldTextInput } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldTextInput';
 import { useMultiItemInput } from '@/object-record/record-field/ui/meta-types/input/hooks/useMultiItemInput';
+import { sanitizeEmailInput } from '@/object-record/record-field/ui/meta-types/input/utils/sanitizeEmailInput';
 import { type MultiItemFieldInputSpacing } from '@/object-record/record-field/ui/meta-types/input/types/MultiItemFieldInputSpacing';
 import { computeUpdatedMultiItemFieldItems } from '@/object-record/record-field/ui/meta-types/input/utils/computeUpdatedMultiItemFieldItems';
 import { getRecordFormItemIndexAfterSave } from '@/object-record/record-form/utils/getRecordFormItemIndexAfterSave';
@@ -90,6 +90,7 @@ export const RecordFormEmailsFieldInput = ({
     isInputInitiallyOpen: isSingleItemMode || savedEmails.length < maxItemCount,
     initialEditedItemIndex:
       isSingleItemMode && savedEmails.length > 0 ? 0 : null,
+    sanitizeInput: sanitizeEmailInput,
     validateInput: validateEmail,
   });
 
@@ -125,7 +126,7 @@ export const RecordFormEmailsFieldInput = ({
   };
 
   const isInputValueValid = (value: string) => {
-    const sanitizedInput = value.trim();
+    const sanitizedInput = sanitizeEmailInput(value);
 
     return (
       !isNonEmptyString(sanitizedInput) || validateEmail(sanitizedInput).isValid
@@ -136,7 +137,7 @@ export const RecordFormEmailsFieldInput = ({
     handleInputChange(value);
     setIsInvalidInputLeft(false);
 
-    const sanitizedInput = value.trim();
+    const sanitizedInput = sanitizeEmailInput(value);
     const isValid = isInputValueValid(value);
 
     setRecordFieldInputIsFieldInError(!isValid);
@@ -254,11 +255,7 @@ export const RecordFormEmailsFieldInput = ({
     <MultiItemFieldInputRow
       spacing={inputSpacing}
       hasPadding={shouldShowItems && shouldShowInputInFooter}
-      rightComponent={
-        isSingleItemMode ? undefined : (
-          <MultiItemFieldSaveButton onClick={handleEnter} />
-        )
-      }
+      onSave={isSingleItemMode ? undefined : handleEnter}
     >
       <MultiItemFieldTextInput
         ref={inputRef}
@@ -325,7 +322,7 @@ export const RecordFormEmailsFieldInput = ({
       </RecordFormMultiItemList>
       {isInputValueInvalid ? (
         <Field.Error match role="alert">
-          {t`Enter a valid email`}
+          {t`It is not a valid email address. Check the spelling.`}
         </Field.Error>
       ) : null}
     </FormFieldInputContainer>

@@ -2,7 +2,6 @@ import { ArrayFieldMenuItem } from '@/object-record/record-field/ui/meta-types/i
 import { MultiItemFieldEditedItem } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldEditedItem';
 import { RecordFormMultiItemList } from '@/object-record/record-form/components/RecordFormMultiItemList';
 import { MultiItemFieldInputRow } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldInputRow';
-import { MultiItemFieldSaveButton } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldSaveButton';
 import { MultiItemFieldTextInput } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldTextInput';
 import { useMultiItemInput } from '@/object-record/record-field/ui/meta-types/input/hooks/useMultiItemInput';
 import { type MultiItemFieldInputSpacing } from '@/object-record/record-field/ui/meta-types/input/types/MultiItemFieldInputSpacing';
@@ -190,11 +189,7 @@ export const RecordFormArrayFieldInput = ({
     <MultiItemFieldInputRow
       spacing={inputSpacing}
       hasPadding={shouldShowItems && shouldShowInputInFooter}
-      rightComponent={
-        isSingleItemMode ? undefined : (
-          <MultiItemFieldSaveButton onClick={handleEnter} />
-        )
-      }
+      onSave={isSingleItemMode ? undefined : handleEnter}
     >
       <MultiItemFieldTextInput
         ref={inputRef}
