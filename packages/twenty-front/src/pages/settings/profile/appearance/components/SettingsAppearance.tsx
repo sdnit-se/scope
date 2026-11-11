@@ -2,10 +2,7 @@ import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 
 import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
-// Salesfarce: on removal, import useColorScheme from '@/workspace-member/hooks/useColorScheme'
-import { useSalesfarceColorScheme } from '@/salesfarce/hooks/useSalesfarceColorScheme';
-// Salesfarce: remove with the theme
-import { SALESFARCE_APPEARANCE_VALUE } from '@/salesfarce/constants/SalesfarceAppearanceValue';
+import { useColorScheme } from '@/workspace-member/hooks/useColorScheme';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { isDefined } from 'twenty-shared/utils';
 import { doNotTranslate } from 'twenty-shared/i18n';
@@ -26,19 +23,12 @@ const StyledChoices = styled.div`
 
 export const SettingsAppearance = () => {
   const { t } = useLingui();
-  // Salesfarce: on removal, call useColorScheme() instead
-  const { colorScheme, setColorScheme } = useSalesfarceColorScheme();
+  const { colorScheme, setColorScheme } = useColorScheme();
   const currentWorkspaceMember = useAtomStateValue(currentWorkspaceMemberState);
-  const choices: {
-    // Salesfarce: on removal, drop the Salesfarce union
-    value: ColorScheme | typeof SALESFARCE_APPEARANCE_VALUE;
-    label: string;
-  }[] = [
+  const choices: { value: ColorScheme; label: string }[] = [
     { value: doNotTranslate('Light'), label: t`Light` },
     { value: doNotTranslate('Dark'), label: t`Dark` },
     { value: doNotTranslate('System'), label: t`System settings` },
-    // Salesfarce: remove with the theme
-    { value: SALESFARCE_APPEARANCE_VALUE, label: t`Salesfarce` },
   ];
 
   return (
@@ -50,10 +40,7 @@ export const SettingsAppearance = () => {
         aria-label={t`Appearance`}
         value={colorScheme}
         disabled={!isDefined(currentWorkspaceMember)}
-        // Salesfarce: on removal, drop the Salesfarce union
-        onValueChange={(
-          value: ColorScheme | typeof SALESFARCE_APPEARANCE_VALUE,
-        ) => {
+        onValueChange={(value: ColorScheme) => {
           void setColorScheme(value);
         }}
       >

@@ -11148,11 +11148,6 @@ msgstr ""
 msgid "Enter your two-factor authentication code to confirm."
 msgstr ""
 
-#. js-lingui-id: YKwRCb
-#: src/modules/salesfarce/components/SalesfarceBadge.tsx
-msgid "Enterprise only"
-msgstr ""
-
 #. js-lingui-id: SLuq/l
 #: src/modules/settings/security/components/sso/SettingsSsoSamlForm.tsx
 msgid "Entity ID"
@@ -23432,11 +23427,6 @@ msgstr ""
 #. js-lingui-id: mUv9U4
 #: src/modules/settings/admin-panel/constants/CreditGrantTypeLabels.ts
 msgid "Sales"
-msgstr ""
-
-#. js-lingui-id: T3H3GG
-#: src/pages/settings/profile/appearance/components/SettingsAppearance.tsx
-msgid "Salesfarce"
 msgstr ""
 
 #. js-lingui-id: L8TxaD
