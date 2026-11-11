@@ -89,12 +89,15 @@ it.each(['anna.prov@example.org', 'Anna Prov <anna.prov@example.org>'])(
   },
 );
 
-it('refuses a pasted name whose address is not one', async () => {
-  const { onClickOutside } = openEmailInput();
+it.each(['Anna Prov <anna.prov@>', 'Anna Prov <>'])(
+  'refuses a pasted name whose address is not one: %s',
+  async (pasted) => {
+    const { onClickOutside } = openEmailInput();
 
-  await userEvent.paste('Anna Prov <anna.prov@>');
-  await clickElsewhere();
+    await userEvent.paste(pasted);
+    await clickElsewhere();
 
-  expect(screen.getByRole('alert')).toBeVisible();
-  expect(onClickOutside).not.toHaveBeenCalled();
-});
+    expect(screen.getByRole('alert')).toBeVisible();
+    expect(onClickOutside).not.toHaveBeenCalled();
+  },
+);
