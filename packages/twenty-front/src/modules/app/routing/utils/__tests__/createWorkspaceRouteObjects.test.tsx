@@ -57,6 +57,18 @@ describe('workspace route objects', () => {
     );
   });
 
+  it('hosts a page in the main area only, sub-pages included', () => {
+    const routeObjects = createWorkspaceRouteObjects({});
+    const matchedPath = (surface: 'main' | 'side-panel', pathname: string) =>
+      matchRoutes(
+        getWorkspaceRouteObjectsForSurface(routeObjects, surface),
+        pathname,
+      )?.at(-1)?.route.path;
+
+    expect(matchedPath('main', '/shebang/kontakter/7')).toBe('/shebang/*');
+    expect(matchedPath('side-panel', '/shebang/kontakter')).toBeUndefined();
+  });
+
   it('preserves settings guards while recursively filtering their leaves', () => {
     const routeObjects = createWorkspaceRouteObjects({});
     const mainRoutes = getWorkspaceRouteObjectsForSurface(routeObjects, 'main');

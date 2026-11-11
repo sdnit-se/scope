@@ -78,4 +78,18 @@ describe('isLinkNavigationMenuItemActive', () => {
       }),
     ).toBe(false);
   });
+
+  it('stays active on the sub-pages of a hosted page, and only there', () => {
+    const isActiveOn = (computedLink: string, pathname: string) =>
+      isLinkNavigationMenuItemActive({
+        computedLink,
+        location: { pathname, search: '' },
+      });
+
+    expect(isActiveOn('/shebang/kontakter', '/shebang/kontakter/7')).toBe(true);
+    expect(isActiveOn('/shebang/kontakter', '/shebang/kontakter-2')).toBe(
+      false,
+    );
+    expect(isActiveOn('/objects/people', '/objects/people/7')).toBe(false);
+  });
 });

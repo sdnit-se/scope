@@ -120,6 +120,7 @@ const routeObjects: WorkspaceRouteObject[] = [
     element: null,
     handle: { workspaceSurfaces: MAIN_AND_SIDE_PANEL },
   },
+  { path: '/shebang/*', element: null },
   {
     path: `/${AppPath.Settings}`,
     element: <Outlet />,
@@ -237,6 +238,15 @@ describe('RouteContextStoreProvider', () => {
     expect(screen.getByTestId('route-context-store')).not.toHaveAttribute(
       'data-object-metadata-id',
     );
+  });
+
+  it('clears the object and the view on a hosted page', () => {
+    renderAt('/shebang/kontakter/7', <MainSurfaceRoutes />);
+
+    const routeContextStore = screen.getByTestId('route-context-store');
+
+    expect(routeContextStore).not.toHaveAttribute('data-view-id');
+    expect(routeContextStore).not.toHaveAttribute('data-object-metadata-id');
   });
 
   it('resolves the side panel object from the panel location rather than the main surface route params', () => {

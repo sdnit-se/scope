@@ -20136,6 +20136,11 @@ msgstr "Öppna i appen"
 msgid "Open in full page"
 msgstr "Öppna på helsida"
 
+#. js-lingui-id: PQN8R0
+#: src/modules/hosted-page/components/HostedPage.tsx
+msgid "Open in its own tab"
+msgstr "Öppna i egen flik"
+
 #. js-lingui-id: DP5C7w
 #: src/modules/settings/members/components/MemberPermissionsTab.tsx
 msgid "Open in Roles"
@@ -27132,6 +27137,11 @@ msgstr "Namnet som mottagarna ser bredvid din adress. Det anges när kanalen ska
 msgid "The number of items in the list, or 0 when it is not a list."
 msgstr "Antalet objekt i listan, eller 0 om det inte är en lista."
 
+#. js-lingui-id: 13kP7o
+#: src/modules/hosted-page/components/HostedPage.tsx
+msgid "The page could not be loaded."
+msgstr "Sidan kunde inte laddas."
+
 #. js-lingui-id: L97sPr
 #: src/pages/not-found/NotFound.tsx
 msgid "The page you're seeking is either gone or never was. Let's get you back on track"
@@ -28463,6 +28473,7 @@ msgstr "Sant/falskt"
 
 #. js-lingui-id: KDw4GX
 #: src/modules/ai/components/AiChatSchedulingSlots.tsx
+#: src/modules/hosted-page/components/HostedPage.tsx
 #: src/modules/onboarding/components/upgrade-free-trial/ChooseYourPlanErrorState.tsx
 #: src/modules/page-layout/widgets/chat-threads/components/ChatThreadsCardContent.tsx
 #: src/modules/settings/billing/components/SettingsBillingPlansErrorState.tsx

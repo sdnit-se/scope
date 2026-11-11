@@ -1,5 +1,6 @@
 import { useWorkspaceRouteObjects } from '@/app/routing/components/WorkspaceRouteObjectsProvider';
 import { RouteContextStoreProviderEffect } from '@/context-store/components/RouteContextStoreProviderEffect';
+import { HOSTED_PAGE_ROUTE_PREFIX } from '@/hosted-page/constants/HostedPageRoutePrefix';
 import { metadataStoreState } from '@/metadata-store/states/metadataStoreState';
 import { useIsSettingsPage } from '@/navigation/hooks/useIsSettingsPage';
 import { useLastVisitedView } from '@/navigation/hooks/useLastVisitedView';
@@ -66,7 +67,10 @@ export const RouteContextStoreProvider = () => {
     isCoreWorkflowShowPage ||
     isAiChatPage ||
     isMatchingLocation(location, AppPath.RecordShowPage);
-  const isStandalonePage = isMatchingLocation(location, AppPath.PageLayoutPage);
+  // A hosted page has no object or view; the store must drop the last list's.
+  const isStandalonePage =
+    isMatchingLocation(location, AppPath.PageLayoutPage) ||
+    isMatchingLocation(location, `${HOSTED_PAGE_ROUTE_PREFIX}*`);
   const isSettingsPage = useIsSettingsPage();
 
   const objectNamePlural = routeParams?.objectNamePlural;

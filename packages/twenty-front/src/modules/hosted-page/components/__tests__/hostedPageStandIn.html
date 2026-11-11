@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="hosted-page" />
+    <title>Stand-in hosted page</title>
+  </head>
+  <body>
+    <h1 id="screen"></h1>
+    <p id="context"></p>
+    <a href="/platform/kontakter">Kontakter</a>
+    <a href="/platform/kontakter/7?flik=affarer">Kontakt 7</a>
+    <a href="/objects/people">A page of Twenty</a>
+    <a href="/objects/companies" data-stray>A link the page forgot to send</a>
+    <input placeholder="Sök" />
+    <script>
+      const FRAME_PREFIX = '/platform/';
+      const post = (message) =>
+        window.parent.postMessage(
+          { hostedPage: 1, ...message },
+          location.origin,
+        );
+      const show = () => {
+        const screen = location.pathname.slice(FRAME_PREFIX.length) || 'start';
+        document.getElementById('screen').textContent = screen;
+        post({ type: 'title', title: `${screen} (stand-in)` });
+      };
+
+      addEventListener('message', ({ source, origin, data }) => {
+        if (source !== window.parent || origin !== location.origin) return;
+        if (data?.hostedPage !== 1 || data.type !== 'context') return;
+        const isDark = data.colorScheme === 'dark';
+        document.body.style.cssText = isDark
+          ? 'background:#171717;color:#eee'
+          : '';
+        document.getElementById('context').textContent =
+          `Theme ${data.colorScheme}, locale ${data.locale}`;
+        history.replaceState(null, '', data.path);
+        show();
+      });
+
+      addEventListener('click', (event) => {
+        const path = event.target
+          .closest('a:not([data-stray])')
+          ?.getAttribute('href');
+        if (!path) return;
+        event.preventDefault();
+        post({
+          type: 'navigate',
+          path: path.replace(FRAME_PREFIX, '/shebang/'),
+        });
+      });
+
+      addEventListener('keydown', (event) => {
+        const { key, code, ctrlKey, metaKey, shiftKey, altKey } = event;
+        const isTyping = event.target.matches?.('input, textarea');
+        const isForTwenty =
+          ((ctrlKey || metaKey) && key === 'k') ||
+          (!isTyping && ['/', '@'].includes(key));
+        if (!isForTwenty) return;
+        event.preventDefault();
+        post({ type: 'key', key, code, ctrlKey, metaKey, shiftKey, altKey });
+      });
+
+      show();
+      post({ type: 'ready' });
+    </script>
+  </body>
+</html>
