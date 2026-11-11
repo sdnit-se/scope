@@ -303,10 +303,7 @@ export const RecordFormLinksFieldInput = ({
     : 'default';
 
   const saveButton = isSingleItemMode ? undefined : (
-    <MultiItemFieldSaveButton
-      isAddingNewItem={!isDefined(editedItemIndex)}
-      onClick={handleEnter}
-    />
+    <MultiItemFieldSaveButton onClick={handleEnter} />
   );
 
   const handleInputBlur = () =>

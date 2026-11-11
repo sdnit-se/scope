@@ -240,10 +240,7 @@ export const EmailsFieldInput = () => {
       hasPadding={shouldShowInputInFooter && shouldShowItems}
       rightComponent={
         isNonEmptyArray(emails) ? (
-          <MultiItemFieldSaveButton
-            isAddingNewItem={!isDefined(editedItemIndex)}
-            onClick={handleInputEnter}
-          />
+          <MultiItemFieldSaveButton onClick={handleInputEnter} />
         ) : undefined
       }
     >

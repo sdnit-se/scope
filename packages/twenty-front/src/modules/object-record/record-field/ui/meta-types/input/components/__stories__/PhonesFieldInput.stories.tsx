@@ -262,7 +262,7 @@ export const CountryChangePreservesStoredPhoneFields: Story = {
     await waitFor(() => expect(phoneInput).toHaveFocus());
     expect(phoneInput).toHaveValue('+49');
     await userEvent.type(phoneInput, '30123456');
-    await userEvent.click(canvas.getByRole('button', { name: 'Save item' }));
+    await userEvent.click(canvas.getByRole('button', { name: 'Save' }));
 
     expect(handleSubmitMocked).toHaveBeenLastCalledWith({
       newValue: {

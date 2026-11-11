@@ -190,10 +190,7 @@ export const RecordFormFilesFieldInput = ({
                 <MultiItemFieldInputRow
                   spacing="compact"
                   rightComponent={
-                    <MultiItemFieldSaveButton
-                      isAddingNewItem={false}
-                      onClick={saveInputValue}
-                    />
+                    <MultiItemFieldSaveButton onClick={saveInputValue} />
                   }
                 >
                   <FilesFieldLabelInput

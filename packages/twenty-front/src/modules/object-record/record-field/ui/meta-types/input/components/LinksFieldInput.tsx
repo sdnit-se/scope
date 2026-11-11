@@ -255,10 +255,7 @@ export const LinksFieldInput = () => {
     isNonEmptyArray(links) && !isSingleItemMode ? 'compact' : 'default';
 
   const saveButton = isNonEmptyArray(links) ? (
-    <MultiItemFieldSaveButton
-      isAddingNewItem={!isDefined(editedItemIndex)}
-      onClick={handleInputEnter}
-    />
+    <MultiItemFieldSaveButton onClick={handleInputEnter} />
   ) : undefined;
 
   const itemInput = (

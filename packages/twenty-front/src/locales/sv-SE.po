@@ -2266,7 +2266,6 @@ msgstr "Lägg till inmatningar på ditt formulär"
 
 #. js-lingui-id: NQ8llq
 #: src/modules/object-record/record-field/ui/form-types/components/FormArrayFieldInput.tsx
-#: src/modules/object-record/record-field/ui/meta-types/input/components/MultiItemFieldSaveButton.tsx
 msgid "Add item"
 msgstr "Lägg till objekt"
 
@@ -23574,6 +23573,7 @@ msgstr ""
 
 #. js-lingui-id: tfDRzk
 #: src/modules/activities/notes/components/NoteQuickComposer.tsx
+#: src/modules/object-record/record-field/ui/meta-types/input/components/MultiItemFieldSaveButton.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceUsageLimitModal.tsx
 #: src/modules/settings/components/SaveAndCancelButtons/SaveButton.tsx
 #: src/modules/settings/config-variables/components/ConfigVariableEdit.tsx
@@ -23598,11 +23598,6 @@ msgstr "Spara som utkast"
 #: src/modules/views/components/UpdateViewButtonGroup.tsx
 msgid "Save as new view"
 msgstr "Spara som ny vy"
-
-#. js-lingui-id: VenpPu
-#: src/modules/object-record/record-field/ui/meta-types/input/components/MultiItemFieldSaveButton.tsx
-msgid "Save item"
-msgstr "Spara objekt"
 
 #. js-lingui-id: 7byqGp
 #: src/modules/layout-customization/hooks/useEnterLayoutCustomizationMode.ts
@@ -27121,6 +27116,11 @@ msgstr "Namnet som mottagarna ser bredvid din adress i inkorgen, i stället för
 #: src/pages/settings/communications/SettingsWorkspaceCommunicationGroupChannelDetail.tsx
 msgid "The name recipients see next to your address. It is set when the channel is created."
 msgstr "Namnet som mottagarna ser bredvid din adress. Det anges när kanalen skapas."
+
+#. js-lingui-id: 8kMezl
+#: src/modules/object-record/record-field/ui/meta-types/input/components/PhonesFieldInput.tsx
+msgid "The number is not a valid phone number. Check the digits."
+msgstr "Numret är inte ett giltigt telefonnummer. Kontrollera siffrorna."
 
 #. js-lingui-id: ohrl9q
 #: src/modules/validation-rules/constants/ValidationRuleFunctionDescriptions.ts

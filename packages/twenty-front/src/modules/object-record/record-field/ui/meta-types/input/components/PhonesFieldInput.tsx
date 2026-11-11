@@ -231,14 +231,12 @@ export const PhonesFieldInput = () => {
     <MultiItemFieldInputRow
       spacing={inputSpacing}
       hasPadding={shouldShowInputInFooter && shouldShowItems}
-      rightComponent={
-        isNonEmptyArray(phones) ? (
-          <MultiItemFieldSaveButton
-            isAddingNewItem={!isDefined(editedItemIndex)}
-            onClick={handleInputEnter}
-          />
-        ) : undefined
+      errorMessage={
+        hasError
+          ? t`The number is not a valid phone number. Check the digits.`
+          : undefined
       }
+      rightComponent={<MultiItemFieldSaveButton onClick={handleInputEnter} />}
     >
       <PhonesFieldPhoneInput
         autoFocus
