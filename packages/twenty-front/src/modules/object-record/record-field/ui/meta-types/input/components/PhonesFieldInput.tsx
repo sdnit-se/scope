@@ -4,7 +4,6 @@ import { MultiItemFieldEditedItem } from '@/object-record/record-field/ui/meta-t
 import { MultiItemFieldAddButton } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldAddButton';
 import { MultiItemFieldInputRow } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldInputRow';
 import { MultiItemFieldList } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldList';
-import { MultiItemFieldSaveButton } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldSaveButton';
 import { PhonesFieldPhoneInput } from '@/object-record/record-field/ui/meta-types/input/components/PhonesFieldPhoneInput';
 import { PhonesFieldMenuItem } from '@/object-record/record-field/ui/meta-types/input/components/PhonesFieldMenuItem';
 import { MULTI_ITEM_FIELD_INPUT_DROPDOWN_ID_PREFIX } from '@/object-record/record-field/ui/meta-types/input/constants/MultiItemFieldInputDropdownClickOutsideId';
@@ -236,7 +235,7 @@ export const PhonesFieldInput = () => {
           ? t`The number is not a valid phone number. Check the digits.`
           : undefined
       }
-      rightComponent={<MultiItemFieldSaveButton onClick={handleInputEnter} />}
+      onSave={handleInputEnter}
     >
       <PhonesFieldPhoneInput
         autoFocus

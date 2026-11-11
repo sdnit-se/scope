@@ -6,7 +6,6 @@ import { FilesFieldMenuItem } from '@/object-record/record-field/ui/meta-types/i
 import { MultiItemFieldAddButton } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldAddButton';
 import { MultiItemFieldEditedItem } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldEditedItem';
 import { MultiItemFieldInputRow } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldInputRow';
-import { MultiItemFieldSaveButton } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldSaveButton';
 import { useMultiItemInput } from '@/object-record/record-field/ui/meta-types/input/hooks/useMultiItemInput';
 import { uploadMultipleFiles } from '@/object-record/record-field/ui/meta-types/utils/uploadMultipleFiles';
 import { type FieldFilesValue } from '@/object-record/record-field/ui/types/FieldMetadata';
@@ -189,9 +188,7 @@ export const RecordFormFilesFieldInput = ({
               >
                 <MultiItemFieldInputRow
                   spacing="compact"
-                  rightComponent={
-                    <MultiItemFieldSaveButton onClick={saveInputValue} />
-                  }
+                  onSave={saveInputValue}
                 >
                   <FilesFieldLabelInput
                     file={file}

@@ -1,6 +1,5 @@
 import { MultiItemFieldEditedItem } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldEditedItem';
 import { MultiItemFieldInputRow } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldInputRow';
-import { MultiItemFieldSaveButton } from '@/object-record/record-field/ui/meta-types/input/components/MultiItemFieldSaveButton';
 import { PhonesFieldMenuItem } from '@/object-record/record-field/ui/meta-types/input/components/PhonesFieldMenuItem';
 import { PhonesFieldPhoneInput } from '@/object-record/record-field/ui/meta-types/input/components/PhonesFieldPhoneInput';
 import { useMultiItemInput } from '@/object-record/record-field/ui/meta-types/input/hooks/useMultiItemInput';
@@ -253,11 +252,7 @@ export const RecordFormPhonesFieldInput = ({
     <MultiItemFieldInputRow
       spacing={inputSpacing}
       hasPadding={shouldShowItems && shouldShowInputInFooter}
-      rightComponent={
-        isSingleItemMode ? undefined : (
-          <MultiItemFieldSaveButton onClick={handleEnter} />
-        )
-      }
+      onSave={isSingleItemMode ? undefined : handleEnter}
     >
       <PhonesFieldPhoneInput
         ref={inputRef}
@@ -318,7 +313,7 @@ export const RecordFormPhonesFieldInput = ({
       </RecordFormMultiItemList>
       {isInputValueInvalid ? (
         <Field.Error match role="alert">
-          {t`Enter a valid phone number`}
+          {t`The number is not a valid phone number. Check the digits.`}
         </Field.Error>
       ) : null}
     </FormFieldInputContainer>

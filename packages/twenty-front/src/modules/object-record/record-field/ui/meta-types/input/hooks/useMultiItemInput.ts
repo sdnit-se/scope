@@ -8,6 +8,7 @@ export const useMultiItemInput = <TItem>({
   getItemText,
   isInputInitiallyOpen,
   initialEditedItemIndex = null,
+  sanitizeInput,
   validateInput,
   onHasErrorChange,
 }: {
@@ -15,6 +16,7 @@ export const useMultiItemInput = <TItem>({
   getItemText: (item: TItem) => string;
   isInputInitiallyOpen: boolean;
   initialEditedItemIndex?: number | null;
+  sanitizeInput?: (input: string) => string;
   validateInput?: (input: string) => { isValid: boolean; errorMessage: string };
   onHasErrorChange?: (hasError: boolean) => void;
 }) => {
@@ -79,6 +81,7 @@ export const useMultiItemInput = <TItem>({
     const { sanitizedInput, isValid } = sanitizeAndValidateInput(
       inputValue,
       validateInput,
+      sanitizeInput,
     );
 
     if (!isValid) {

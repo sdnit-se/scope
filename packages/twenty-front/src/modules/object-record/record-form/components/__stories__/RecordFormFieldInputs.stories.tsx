@@ -413,7 +413,7 @@ export const InvalidEmail: Story = {
       additionalEmails: [],
     });
     await expect(canvas.getByRole('alert')).toHaveTextContent(
-      'Enter a valid email',
+      'It is not a valid email address. Check the spelling.',
     );
 
     await userEvent.type(input, 'northwind.io');
@@ -438,7 +438,7 @@ export const InvalidEmailLeftUnsubmitted: Story = {
     await userEvent.tab();
 
     await expect(canvas.getByRole('alert')).toHaveTextContent(
-      'Enter a valid email',
+      'It is not a valid email address. Check the spelling.',
     );
 
     await userEvent.click(input);
@@ -608,7 +608,7 @@ export const InvalidPhone: Story = {
       additionalPhones: [],
     });
     await expect(canvas.getByRole('alert')).toHaveTextContent(
-      'Enter a valid phone number',
+      'The number is not a valid phone number. Check the digits.',
     );
   },
 };
@@ -665,7 +665,7 @@ export const InvalidLink: Story = {
     await userEvent.tab();
 
     await expect(canvas.getByRole('alert')).toHaveTextContent(
-      'Enter a valid URL',
+      'It is not a valid web address. Check the spelling.',
     );
   },
 };

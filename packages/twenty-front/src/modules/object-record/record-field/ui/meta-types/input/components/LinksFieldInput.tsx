@@ -254,15 +254,16 @@ export const LinksFieldInput = () => {
   const inputSpacing: MultiItemFieldInputSpacing =
     isNonEmptyArray(links) && !isSingleItemMode ? 'compact' : 'default';
 
-  const saveButton = isNonEmptyArray(links) ? (
-    <MultiItemFieldSaveButton onClick={handleInputEnter} />
-  ) : undefined;
-
   const itemInput = (
     <MultiItemFieldInputRow
       spacing={inputSpacing}
       hasPadding={shouldShowInputInFooter && shouldShowItems}
-      rightComponent={saveButton}
+      onSave={handleInputEnter}
+      errorMessage={
+        hasError
+          ? t`It is not a valid web address. Check the spelling.`
+          : undefined
+      }
     >
       {isDomainField && <LinksFieldDomainFavicon domain={inputValue} />}
       <MultiItemFieldTextInput
@@ -284,7 +285,7 @@ export const LinksFieldInput = () => {
       <LinksFieldEditPreview
         url={inputValue}
         label={getLinkLabelFromDraft(labelDraft)}
-        saveButton={saveButton}
+        saveButton={<MultiItemFieldSaveButton onClick={handleInputEnter} />}
       />
       <MultiItemFieldItemSeparator />
       <LinksFieldEditInputs
