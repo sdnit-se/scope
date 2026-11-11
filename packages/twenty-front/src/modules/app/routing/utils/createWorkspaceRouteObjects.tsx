@@ -7,6 +7,8 @@ import {
   SettingsRouteOutlet,
 } from '@/app/components/SettingsRoutes';
 import { type WorkspaceRouteObject } from '@/app/routing/types/WorkspaceRouteObject';
+import { HostedPage } from '@/hosted-page/components/HostedPage';
+import { HOSTED_PAGE_ROUTE_PREFIX } from '@/hosted-page/constants/HostedPageRoutePrefix';
 import { RecordIndexSkeletonLoader } from '@/object-record/record-index/components/RecordIndexSkeletonLoader';
 
 const AgentCoreIndexPage = lazy(() =>
@@ -145,6 +147,7 @@ export const createWorkspaceRouteObjects = ({
         </LazyRoute>
       ),
     },
+    { path: `${HOSTED_PAGE_ROUTE_PREFIX}*`, element: <HostedPage /> },
     {
       path: AppPath.AiChat,
       element: (

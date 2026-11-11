@@ -1,0 +1,1 @@
+export const HOSTED_PAGE_READY_TIMEOUT_MS = 10_000;
