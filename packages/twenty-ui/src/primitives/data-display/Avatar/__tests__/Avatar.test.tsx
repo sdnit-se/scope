@@ -519,6 +519,30 @@ describe('Avatar company logo', () => {
     );
   });
 
+  it('asks the second source without a referrer whatever policy the caller gave', async () => {
+    pictureWidths.set(google('afry.se'), 64);
+    render(
+      <ThemeProvider colorScheme="light">
+        <Avatar
+          name="AFRY"
+          src={twentyIcons('afry.se')}
+          imageProps={{ alt: 'AFRY', referrerPolicy: 'unsafe-url' }}
+        />
+      </ThemeProvider>,
+    );
+
+    await expectPicture('AFRY', google('afry.se'));
+    expect(requests).toContain(`unsafe-url ${twentyIcons('afry.se')}`);
+    expect(
+      requests.filter((request) => request.endsWith(google('afry.se'))),
+    ).toEqual(expect.arrayContaining([`no-referrer ${google('afry.se')}`]));
+    expect(requests).not.toContain(`unsafe-url ${google('afry.se')}`);
+    expect(screen.getByRole('img', { name: 'AFRY' })).toHaveAttribute(
+      'referrerpolicy',
+      'no-referrer',
+    );
+  });
+
   it.each([
     ['answers its 16-pixel placeholder', 'westcode.se', 16],
     ['fails too', 'nowhere.example', 0],
