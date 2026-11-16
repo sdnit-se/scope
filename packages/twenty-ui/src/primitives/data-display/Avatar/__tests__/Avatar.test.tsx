@@ -1,8 +1,22 @@
 import { runComponentConformance } from '@test-utilities/conformance/runComponentConformance';
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef, type ReactNode } from 'react';
-import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  expectTypeOf,
+  it,
+  vi,
+} from 'vitest';
 
 import { ThemeProvider } from '@ui/theme';
 
@@ -430,5 +444,109 @@ describe('Avatar composition', () => {
     expect(image).toHaveAttribute('data-error');
     expect(image).toHaveAttribute('aria-hidden', 'true');
     expect(screen.getByRole('img', { name: 'Jane' })).toHaveTextContent('J');
+  });
+});
+
+describe('Avatar company logo', () => {
+  const twentyIcons = (domain: string) => `https://twenty-icons.com/${domain}`;
+  const google = (domain: string) =>
+    `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
+  const pictureWidths = new Map<string, number>();
+  const requests: string[] = [];
+
+  beforeEach(() => {
+    requests.length = 0;
+    vi.stubGlobal(
+      'Image',
+      class {
+        onload: (() => void) | null = null;
+        onerror: (() => void) | null = null;
+        naturalWidth = 0;
+        complete = false;
+        referrerPolicy = '';
+        crossOrigin: string | null = null;
+
+        set src(url: string) {
+          requests.push(`${this.referrerPolicy || 'referrer'} ${url}`);
+          queueMicrotask(() => {
+            this.naturalWidth = pictureWidths.get(url) ?? 0;
+            this.complete = true;
+            (this.naturalWidth > 0 ? this.onload : this.onerror)?.();
+          });
+        }
+      },
+    );
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  const renderLogo = (name: string, domain: string) =>
+    render(
+      <ThemeProvider colorScheme="light">
+        <Avatar
+          name={name}
+          src={twentyIcons(domain)}
+          imageProps={{ alt: name }}
+        />
+      </ThemeProvider>,
+    );
+
+  const expectPicture = (name: string, url: string) =>
+    waitFor(() =>
+      expect(screen.getByRole('img', { name })).toHaveAttribute('src', url),
+    );
+
+  it('shows the logo from Twenty and never asks the second source', async () => {
+    pictureWidths.set(twentyIcons('volvo.com'), 64);
+    renderLogo('Volvo', 'volvo.com');
+
+    await expectPicture('Volvo', twentyIcons('volvo.com'));
+    expect(requests).toEqual([`referrer ${twentyIcons('volvo.com')}`]);
+  });
+
+  it('shows the second logo, asked without a referrer, when Twenty has none', async () => {
+    pictureWidths.set(google('ericsson.com'), 64);
+    renderLogo('Ericsson', 'ericsson.com');
+
+    await expectPicture('Ericsson', google('ericsson.com'));
+    expect(new Set(requests)).toEqual(
+      new Set([
+        `referrer ${twentyIcons('ericsson.com')}`,
+        `no-referrer ${google('ericsson.com')}`,
+      ]),
+    );
+  });
+
+  it.each([
+    ['answers its 16-pixel placeholder', 'westcode.se', 16],
+    ['fails too', 'nowhere.example', 0],
+  ])('keeps the letter when the second source %s', async (_, domain, width) => {
+    pictureWidths.set(google(domain), width);
+    renderLogo('Westcode', domain);
+
+    await waitFor(() =>
+      expect(requests).toContain(`no-referrer ${google(domain)}`),
+    );
+    await act(async () => {});
+
+    const avatar = screen.getByRole('img', { name: 'Westcode' });
+
+    expect(avatar).toHaveTextContent('W');
+    expect(avatar).not.toHaveAttribute('src');
+  });
+
+  it('starts the next avatar of the same company with the second logo', async () => {
+    pictureWidths.set(google('sca.se'), 64);
+    const { unmount } = renderLogo('SCA', 'sca.se');
+    await expectPicture('SCA', google('sca.se'));
+    unmount();
+    requests.length = 0;
+
+    renderLogo('SCA', 'sca.se');
+
+    await expectPicture('SCA', google('sca.se'));
+    expect(requests).toEqual([`no-referrer ${google('sca.se')}`]);
   });
 });
