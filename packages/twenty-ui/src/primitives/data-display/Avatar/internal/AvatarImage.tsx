@@ -32,8 +32,8 @@ export const AvatarImage = ({ className, ...props }: AvatarImageProps) => {
 
   return (
     <AvatarPrimitive.Image
-      referrerPolicy={shownSrc === src ? undefined : 'no-referrer'}
       {...props}
+      referrerPolicy={shownSrc === src ? props.referrerPolicy : 'no-referrer'}
       src={shownSrc}
       onLoadingStatusChange={(status) => {
         onLoadingStatusChange?.(status);
