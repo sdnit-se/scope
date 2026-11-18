@@ -62,3 +62,41 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: ./.github/actions/scope-setup
       - run: mise run test:${{ matrix.package }} ${{ matrix.shard }}
+
+  integration:
+    if: github.repository == 'sdnit-se/scope'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1/4, 2/4, 3/4, 4/4]
+    services:
+      postgres:
+        image: docker.io/library/postgres:16@sha256:485935f94cc7165afa896978809c37b592dc07f0a37d2c8f645f12412d0212c8
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: --health-cmd pg_isready --health-interval 5s --health-retries 20
+      redis:
+        image: docker.io/library/redis:7.4@sha256:e2debfb7956fa12c7ddc79d7e645c8cf26b30c99a6e9161ea9bf4171e1668a5f
+        ports: ["6379:6379"]
+      clickhouse:
+        image: docker.io/clickhouse/clickhouse-server:25.8.8@sha256:36eac5608fa3c9cdf00799266918f274201319f99e6252425cf81894cf74b34f
+        env:
+          CLICKHOUSE_PASSWORD: clickhousePassword
+        ports: ["8123:8123"]
+        options: --health-cmd "clickhouse-client --password=clickhousePassword --query='SELECT 1'" --health-interval 5s --health-retries 20
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: ./.github/actions/scope-setup
+      - run: mise run test:server-integration ${{ matrix.shard }}
+
+  image:
+    if: github.repository == 'sdnit-se/scope'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - run: docker build --target twenty --file packages/twenty-docker/twenty/Dockerfile --tag scope-twenty .
+      - run: docker image ls scope-twenty
