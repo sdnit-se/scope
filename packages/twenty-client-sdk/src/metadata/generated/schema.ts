@@ -1097,7 +1097,6 @@ export interface ClientConfig {
     isAttachmentPreviewEnabled: Scalars['Boolean']
     isBookCallOnboardingStepEnabled: Scalars['Boolean']
     isClickHouseConfigured: Scalars['Boolean']
-    isCloudflareIntegrationEnabled: Scalars['Boolean']
     isCompanyEnrichmentEnabled: Scalars['Boolean']
     isConfigVariablesInDbEnabled: Scalars['Boolean']
     isCookieSessionEnabled: Scalars['Boolean']
@@ -1271,23 +1270,6 @@ export interface DevelopmentApplication {
     id: Scalars['String']
     universalIdentifier: Scalars['String']
     __typename: 'DevelopmentApplication'
-}
-
-export interface DomainRecord {
-    key: Scalars['String']
-    status: Scalars['String']
-    type: Scalars['String']
-    validationType: Scalars['String']
-    value: Scalars['String']
-    __typename: 'DomainRecord'
-}
-
-export interface DomainValidRecords {
-    domain: Scalars['String']
-    id: Scalars['UUID']
-    isCustomDomainEnabled?: Scalars['Boolean']
-    records: DomainRecord[]
-    __typename: 'DomainValidRecords'
 }
 
 export interface DuplicatedDashboard {
@@ -2075,8 +2057,6 @@ export interface Mutation {
     cancelSwitchBillingInterval: BillingUpdate
     cancelSwitchBillingPlan: BillingUpdate
     cancelSwitchResourceCreditPrice: BillingUpdate
-    checkCustomDomainValidRecords?: DomainValidRecords
-    checkPublicDomainValidRecords?: DomainValidRecords
     checkoutSession: BillingSession
     claimApplicationRegistrationOwnership: ApplicationRegistration
     completeAppTarballUpload: ApplicationRegistration
@@ -2118,7 +2098,6 @@ export interface Mutation {
     createPageLayout: PageLayout
     createPageLayoutTab: PageLayoutTab
     createPageLayoutWidget: PageLayoutWidget
-    createPublicDomain: PublicDomain
     createRelatedRecordPath: RelatedRecordPath
     createSAMLIdentityProvider: SetupSso
     createSkill: Skill
@@ -2153,7 +2132,6 @@ export interface Mutation {
     deleteOneLogicFunction: LogicFunction
     deleteOneObject: Object
     deleteOneRole: Scalars['String']
-    deletePublicDomain: Scalars['Boolean']
     deleteQueuedChatMessage: Scalars['Boolean']
     deleteRelatedRecordPath: RelatedRecordPath
     deleteSSOIdentityProvider: DeleteSso
@@ -2729,15 +2707,6 @@ export interface PublicConnectionParametersOutput {
     __typename: 'PublicConnectionParametersOutput'
 }
 
-export interface PublicDomain {
-    applicationId?: Scalars['UUID']
-    createdAt: Scalars['DateTime']
-    domain: Scalars['String']
-    id: Scalars['UUID']
-    isValidated: Scalars['Boolean']
-    __typename: 'PublicDomain'
-}
-
 export interface PublicFeatureFlag {
     key: FeatureFlagKey
     metadata: PublicFeatureFlagMetadata
@@ -2830,7 +2799,6 @@ export interface Query {
     findManyApplications: Application[]
     findManyLogicFunctions: LogicFunction[]
     findManyMarketplaceApps: MarketplaceApp[]
-    findManyPublicDomains: PublicDomain[]
     findMarketplaceAppDetail: MarketplaceAppDetail
     findOneAgent: Agent
     findOneApplication: Application
@@ -5149,7 +5117,6 @@ export interface ClientConfigGenqlSelection{
     isAttachmentPreviewEnabled?: boolean | number
     isBookCallOnboardingStepEnabled?: boolean | number
     isClickHouseConfigured?: boolean | number
-    isCloudflareIntegrationEnabled?: boolean | number
     isCompanyEnrichmentEnabled?: boolean | number
     isConfigVariablesInDbEnabled?: boolean | number
     isCookieSessionEnabled?: boolean | number
@@ -5481,25 +5448,6 @@ id: Scalars['UUID']}
 export interface DevelopmentApplicationGenqlSelection{
     id?: boolean | number
     universalIdentifier?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface DomainRecordGenqlSelection{
-    key?: boolean | number
-    status?: boolean | number
-    type?: boolean | number
-    validationType?: boolean | number
-    value?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface DomainValidRecordsGenqlSelection{
-    domain?: boolean | number
-    id?: boolean | number
-    isCustomDomainEnabled?: boolean | number
-    records?: DomainRecordGenqlSelection
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -6343,8 +6291,6 @@ export interface MutationGenqlSelection{
     cancelSwitchBillingInterval?: BillingUpdateGenqlSelection
     cancelSwitchBillingPlan?: BillingUpdateGenqlSelection
     cancelSwitchResourceCreditPrice?: BillingUpdateGenqlSelection
-    checkCustomDomainValidRecords?: DomainValidRecordsGenqlSelection
-    checkPublicDomainValidRecords?: (DomainValidRecordsGenqlSelection & { __args: {domain: Scalars['String']} })
     checkoutSession?: (BillingSessionGenqlSelection & { __args: {plan: BillingPlanKey, recurringInterval: SubscriptionInterval, requirePaymentMethod: Scalars['Boolean'], successUrlPath?: (Scalars['String'] | null)} })
     claimApplicationRegistrationOwnership?: (ApplicationRegistrationGenqlSelection & { __args: {applicationRegistrationId: Scalars['String']} })
     completeAppTarballUpload?: (ApplicationRegistrationGenqlSelection & { __args: {fileId: Scalars['UUID']} })
@@ -6386,7 +6332,6 @@ export interface MutationGenqlSelection{
     createPageLayout?: (PageLayoutGenqlSelection & { __args: {input: CreatePageLayoutInput} })
     createPageLayoutTab?: (PageLayoutTabGenqlSelection & { __args: {input: CreatePageLayoutTabInput} })
     createPageLayoutWidget?: (PageLayoutWidgetGenqlSelection & { __args: {input: CreatePageLayoutWidgetInput} })
-    createPublicDomain?: (PublicDomainGenqlSelection & { __args: {applicationId: Scalars['String'], domain: Scalars['String']} })
     createRelatedRecordPath?: (RelatedRecordPathGenqlSelection & { __args: {input: CreateRelatedRecordPathInput} })
     createSAMLIdentityProvider?: (SetupSsoGenqlSelection & { __args: {input: SetupSAMLSsoInput} })
     createSkill?: (SkillGenqlSelection & { __args: {input: CreateSkillInput} })
@@ -6421,7 +6366,6 @@ export interface MutationGenqlSelection{
     deleteOneLogicFunction?: (LogicFunctionGenqlSelection & { __args: {input: LogicFunctionIdInput} })
     deleteOneObject?: (ObjectGenqlSelection & { __args: {input: DeleteOneObjectInput} })
     deleteOneRole?: { __args: {roleId: Scalars['UUID']} }
-    deletePublicDomain?: { __args: {domain: Scalars['String']} }
     deleteQueuedChatMessage?: { __args: {messageId: Scalars['UUID']} }
     deleteRelatedRecordPath?: (RelatedRecordPathGenqlSelection & { __args: {id: Scalars['UUID']} })
     deleteSSOIdentityProvider?: (DeleteSsoGenqlSelection & { __args: {input: DeleteSsoInput} })
@@ -7024,16 +6968,6 @@ export interface PublicConnectionParametersOutputGenqlSelection{
     __scalar?: boolean | number
 }
 
-export interface PublicDomainGenqlSelection{
-    applicationId?: boolean | number
-    createdAt?: boolean | number
-    domain?: boolean | number
-    id?: boolean | number
-    isValidated?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
 export interface PublicFeatureFlagGenqlSelection{
     key?: boolean | number
     metadata?: PublicFeatureFlagMetadataGenqlSelection
@@ -7137,7 +7071,6 @@ export interface QueryGenqlSelection{
     findManyApplications?: ApplicationGenqlSelection
     findManyLogicFunctions?: LogicFunctionGenqlSelection
     findManyMarketplaceApps?: (MarketplaceAppGenqlSelection & { __args?: {universalIdentifiers?: (Scalars['String'][] | null)} })
-    findManyPublicDomains?: PublicDomainGenqlSelection
     findMarketplaceAppDetail?: (MarketplaceAppDetailGenqlSelection & { __args: {universalIdentifier: Scalars['String']} })
     findOneAgent?: (AgentGenqlSelection & { __args: {input: AgentIdInput} })
     findOneApplication?: (ApplicationGenqlSelection & { __args?: {id?: (Scalars['UUID'] | null), universalIdentifier?: (Scalars['UUID'] | null)} })
@@ -7976,7 +7909,7 @@ export interface UpdateWebhookInputUpdates {description?: (Scalars['String'] | n
 
 export interface UpdateWorkspaceAllowedIframeOriginsInput {operation: Scalars['String'],origin: Scalars['String']}
 
-export interface UpdateWorkspaceInput {aiAdditionalInstructions?: (Scalars['String'] | null),aiAgentModelTier?: (AiModelTier | null),aiChatModelTier?: (AiModelTier | null),aiEvaluationModelId?: (Scalars['String'] | null),aiModelIdByTier?: (Scalars['JSON'] | null),allowImpersonation?: (Scalars['Boolean'] | null),customDomain?: (Scalars['String'] | null),defaultRoleId?: (Scalars['UUID'] | null),displayName?: (Scalars['String'] | null),editableProfileFields?: (Scalars['String'][] | null),inviteHash?: (Scalars['String'] | null),isAutoModelSelectionEnabled?: (Scalars['Boolean'] | null),isGoogleAuthBypassEnabled?: (Scalars['Boolean'] | null),isGoogleAuthEnabled?: (Scalars['Boolean'] | null),isInternalMessagesImportEnabled?: (Scalars['Boolean'] | null),isMicrosoftAuthBypassEnabled?: (Scalars['Boolean'] | null),isMicrosoftAuthEnabled?: (Scalars['Boolean'] | null),isPasswordAuthBypassEnabled?: (Scalars['Boolean'] | null),isPasswordAuthEnabled?: (Scalars['Boolean'] | null),isPublicInviteLinkEnabled?: (Scalars['Boolean'] | null),isTwoFactorAuthenticationEnforced?: (Scalars['Boolean'] | null),logo?: (Scalars['String'] | null),subdomain?: (Scalars['String'] | null),trashRetentionDays?: (Scalars['Float'] | null),workspaceDiscoverability?: (WorkspaceDiscoverability | null)}
+export interface UpdateWorkspaceInput {aiAdditionalInstructions?: (Scalars['String'] | null),aiAgentModelTier?: (AiModelTier | null),aiChatModelTier?: (AiModelTier | null),aiEvaluationModelId?: (Scalars['String'] | null),aiModelIdByTier?: (Scalars['JSON'] | null),allowImpersonation?: (Scalars['Boolean'] | null),defaultRoleId?: (Scalars['UUID'] | null),displayName?: (Scalars['String'] | null),editableProfileFields?: (Scalars['String'][] | null),inviteHash?: (Scalars['String'] | null),isAutoModelSelectionEnabled?: (Scalars['Boolean'] | null),isGoogleAuthBypassEnabled?: (Scalars['Boolean'] | null),isGoogleAuthEnabled?: (Scalars['Boolean'] | null),isInternalMessagesImportEnabled?: (Scalars['Boolean'] | null),isMicrosoftAuthBypassEnabled?: (Scalars['Boolean'] | null),isMicrosoftAuthEnabled?: (Scalars['Boolean'] | null),isPasswordAuthBypassEnabled?: (Scalars['Boolean'] | null),isPasswordAuthEnabled?: (Scalars['Boolean'] | null),isPublicInviteLinkEnabled?: (Scalars['Boolean'] | null),isTwoFactorAuthenticationEnforced?: (Scalars['Boolean'] | null),logo?: (Scalars['String'] | null),subdomain?: (Scalars['String'] | null),trashRetentionDays?: (Scalars['Float'] | null),workspaceDiscoverability?: (WorkspaceDiscoverability | null)}
 
 export interface UpdateWorkspaceMemberSettingsInput {update: Scalars['JSON'],workspaceMemberId: Scalars['UUID']}
 
@@ -9581,22 +9514,6 @@ export interface WorkspaceUrlsAndIdGenqlSelection{
     
 
 
-    const DomainRecord_possibleTypes: string[] = ['DomainRecord']
-    export const isDomainRecord = (obj?: { __typename?: any } | null): obj is DomainRecord => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isDomainRecord"')
-      return DomainRecord_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
-    const DomainValidRecords_possibleTypes: string[] = ['DomainValidRecords']
-    export const isDomainValidRecords = (obj?: { __typename?: any } | null): obj is DomainValidRecords => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isDomainValidRecords"')
-      return DomainValidRecords_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
     const DuplicatedDashboard_possibleTypes: string[] = ['DuplicatedDashboard']
     export const isDuplicatedDashboard = (obj?: { __typename?: any } | null): obj is DuplicatedDashboard => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isDuplicatedDashboard"')
@@ -10417,14 +10334,6 @@ export interface WorkspaceUrlsAndIdGenqlSelection{
     export const isPublicConnectionParametersOutput = (obj?: { __typename?: any } | null): obj is PublicConnectionParametersOutput => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isPublicConnectionParametersOutput"')
       return PublicConnectionParametersOutput_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
-    const PublicDomain_possibleTypes: string[] = ['PublicDomain']
-    export const isPublicDomain = (obj?: { __typename?: any } | null): obj is PublicDomain => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isPublicDomain"')
-      return PublicDomain_possibleTypes.includes(obj.__typename)
     }
     
 

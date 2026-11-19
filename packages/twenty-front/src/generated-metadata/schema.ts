@@ -1333,7 +1333,6 @@ export type ClientConfig = {
   isAttachmentPreviewEnabled: Scalars['Boolean']['output'];
   isBookCallOnboardingStepEnabled: Scalars['Boolean']['output'];
   isClickHouseConfigured: Scalars['Boolean']['output'];
-  isCloudflareIntegrationEnabled: Scalars['Boolean']['output'];
   isCompanyEnrichmentEnabled: Scalars['Boolean']['output'];
   isConfigVariablesInDbEnabled: Scalars['Boolean']['output'];
   isCookieSessionEnabled: Scalars['Boolean']['output'];
@@ -1992,23 +1991,6 @@ export type DevelopmentApplication = {
   __typename?: 'DevelopmentApplication';
   id: Scalars['String']['output'];
   universalIdentifier: Scalars['String']['output'];
-};
-
-export type DomainRecord = {
-  __typename?: 'DomainRecord';
-  key: Scalars['String']['output'];
-  status: Scalars['String']['output'];
-  type: Scalars['String']['output'];
-  validationType: Scalars['String']['output'];
-  value: Scalars['String']['output'];
-};
-
-export type DomainValidRecords = {
-  __typename?: 'DomainValidRecords';
-  domain: Scalars['String']['output'];
-  id: Scalars['UUID']['output'];
-  isCustomDomainEnabled?: Maybe<Scalars['Boolean']['output']>;
-  records: Array<DomainRecord>;
 };
 
 export type DuplicatedDashboard = {
@@ -3176,8 +3158,6 @@ export type Mutation = {
   cancelSwitchBillingInterval: BillingUpdate;
   cancelSwitchBillingPlan: BillingUpdate;
   cancelSwitchResourceCreditPrice: BillingUpdate;
-  checkCustomDomainValidRecords?: Maybe<DomainValidRecords>;
-  checkPublicDomainValidRecords?: Maybe<DomainValidRecords>;
   checkoutSession: BillingSession;
   claimApplicationRegistrationOwnership: ApplicationRegistration;
   completeAppTarballUpload: ApplicationRegistration;
@@ -3219,7 +3199,6 @@ export type Mutation = {
   createPageLayout: PageLayout;
   createPageLayoutTab: PageLayoutTab;
   createPageLayoutWidget: PageLayoutWidget;
-  createPublicDomain: PublicDomain;
   createRelatedRecordPath: RelatedRecordPath;
   createSAMLIdentityProvider: SetupSso;
   createSkill: Skill;
@@ -3254,7 +3233,6 @@ export type Mutation = {
   deleteOneLogicFunction: LogicFunction;
   deleteOneObject: Object;
   deleteOneRole: Scalars['String']['output'];
-  deletePublicDomain: Scalars['Boolean']['output'];
   deleteQueuedChatMessage: Scalars['Boolean']['output'];
   deleteRelatedRecordPath: RelatedRecordPath;
   deleteSSOIdentityProvider: DeleteSso;
@@ -3511,11 +3489,6 @@ export type MutationAuthorizeAppArgs = {
 };
 
 
-export type MutationCheckPublicDomainValidRecordsArgs = {
-  domain: Scalars['String']['input'];
-};
-
-
 export type MutationCheckoutSessionArgs = {
   plan: BillingPlanKey;
   recurringInterval: SubscriptionInterval;
@@ -3733,12 +3706,6 @@ export type MutationCreatePageLayoutWidgetArgs = {
 };
 
 
-export type MutationCreatePublicDomainArgs = {
-  applicationId: Scalars['String']['input'];
-  domain: Scalars['String']['input'];
-};
-
-
 export type MutationCreateRelatedRecordPathArgs = {
   input: CreateRelatedRecordPathInput;
 };
@@ -3907,11 +3874,6 @@ export type MutationDeleteOneObjectArgs = {
 
 export type MutationDeleteOneRoleArgs = {
   roleId: Scalars['UUID']['input'];
-};
-
-
-export type MutationDeletePublicDomainArgs = {
-  domain: Scalars['String']['input'];
 };
 
 
@@ -5371,15 +5333,6 @@ export type PublicConnectionParametersOutput = {
   username?: Maybe<Scalars['String']['output']>;
 };
 
-export type PublicDomain = {
-  __typename?: 'PublicDomain';
-  applicationId?: Maybe<Scalars['UUID']['output']>;
-  createdAt: Scalars['DateTime']['output'];
-  domain: Scalars['String']['output'];
-  id: Scalars['UUID']['output'];
-  isValidated: Scalars['Boolean']['output'];
-};
-
 export type PublicFeatureFlag = {
   __typename?: 'PublicFeatureFlag';
   key: FeatureFlagKey;
@@ -5473,7 +5426,6 @@ export type Query = {
   findManyApplications: Array<Application>;
   findManyLogicFunctions: Array<LogicFunction>;
   findManyMarketplaceApps: Array<MarketplaceApp>;
-  findManyPublicDomains: Array<PublicDomain>;
   findMarketplaceAppDetail: MarketplaceAppDetail;
   findOneAgent: Agent;
   findOneApplication: Application;
@@ -7331,7 +7283,6 @@ export type UpdateWorkspaceInput = {
   aiEvaluationModelId?: InputMaybe<Scalars['String']['input']>;
   aiModelIdByTier?: InputMaybe<Scalars['JSON']['input']>;
   allowImpersonation?: InputMaybe<Scalars['Boolean']['input']>;
-  customDomain?: InputMaybe<Scalars['String']['input']>;
   defaultRoleId?: InputMaybe<Scalars['UUID']['input']>;
   displayName?: InputMaybe<Scalars['String']['input']>;
   editableProfileFields?: InputMaybe<Array<Scalars['String']['input']>>;

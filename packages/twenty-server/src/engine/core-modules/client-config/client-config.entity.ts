@@ -429,9 +429,6 @@ export class ClientConfig {
   isCompanyEnrichmentEnabled: boolean;
 
   @Field(() => Boolean)
-  isCloudflareIntegrationEnabled: boolean;
-
-  @Field(() => Boolean)
   isClickHouseConfigured: boolean;
 
   @Field(() => Boolean)

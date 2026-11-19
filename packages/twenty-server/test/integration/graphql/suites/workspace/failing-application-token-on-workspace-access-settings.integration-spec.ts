@@ -167,14 +167,6 @@ const fieldTestCases: EachTestingContext<FieldTestContext>[] = [
       }),
     },
   },
-  {
-    title: 'customDomain',
-    context: {
-      update: () => ({
-        customDomain: `probe-${randomUUID().slice(0, 8)}.example.com`,
-      }),
-    },
-  },
 ];
 
 const readWorkspaceAccessSettings =

@@ -155,9 +155,7 @@ export const SettingsApplicationDetailGeneralTab = ({
         />
       )}
       {applicationHasHttpTriggeredFunctions(application) && (
-        <SettingsApplicationFunctionDomainSection
-          applicationId={application.id}
-        />
+        <SettingsApplicationFunctionDomainSection />
       )}
       <SettingsApplicationConnectionsSection applicationId={application.id} />
     </>

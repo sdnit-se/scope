@@ -7,8 +7,6 @@ import { ApplicationManifestModule } from 'src/engine/core-modules/application/a
 import { PreInstalledAppsModule } from 'src/engine/core-modules/application/pre-installed-apps/pre-installed-apps.module';
 import { BillingModule } from 'src/engine/core-modules/billing/billing.module';
 import { CompanyEnrichmentModule } from 'src/engine/core-modules/company-enrichment/company-enrichment.module';
-import { DnsManagerModule } from 'src/engine/core-modules/dns-manager/dns-manager.module';
-import { CustomDomainManagerModule } from 'src/engine/core-modules/domain/custom-domain-manager/custom-domain-manager.module';
 import { SubdomainManagerModule } from 'src/engine/core-modules/domain/subdomain-manager/subdomain-manager.module';
 import { WorkspaceDomainsModule } from 'src/engine/core-modules/domain/workspace-domains/workspace-domains.module';
 import { EnterpriseModule } from 'src/engine/core-modules/enterprise/enterprise.module';
@@ -19,8 +17,6 @@ import { SdkClientModule } from 'src/engine/core-modules/sdk-client/sdk-client.m
 import { UserWorkspaceEntity } from 'src/engine/core-modules/user-workspace/user-workspace.entity';
 import { UserWorkspaceModule } from 'src/engine/core-modules/user-workspace/user-workspace.module';
 import { UserEntity } from 'src/engine/core-modules/user/user.entity';
-import { CheckCustomDomainValidRecordsCronCommand } from 'src/engine/core-modules/workspace/crons/commands/check-custom-domain-valid-records.cron.command';
-import { CheckCustomDomainValidRecordsCronJob } from 'src/engine/core-modules/workspace/crons/jobs/check-custom-domain-valid-records.cron.job';
 import { UpgradeModule } from 'src/engine/core-modules/upgrade/upgrade.module';
 import { CoreEntityCacheModule } from 'src/engine/core-entity-cache/core-entity-cache.module';
 import { WorkspaceEntityCacheProviderService } from 'src/engine/core-modules/workspace/services/workspace-entity-cache-provider.service';
@@ -62,10 +58,8 @@ import { StandardObjectsPrefillModule } from 'src/engine/workspace-manager/stand
     RoleModule,
     RoleAssignmentValidationModule,
     AiAgentModule,
-    DnsManagerModule,
     WorkspaceDomainsModule,
     SubdomainManagerModule,
-    CustomDomainManagerModule,
     ViewModule,
     WorkspaceManyOrAllFlatEntityMapsCacheModule,
     ApplicationModule,
@@ -78,15 +72,13 @@ import { StandardObjectsPrefillModule } from 'src/engine/workspace-manager/stand
     SdkClientModule,
     CompanyEnrichmentModule,
   ],
-  exports: [WorkspaceService, CheckCustomDomainValidRecordsCronCommand],
+  exports: [WorkspaceService],
   providers: [
     WorkspaceResolver,
     WorkspaceService,
     WorkspaceGaugeService,
     WorkspaceEntityCacheProviderService,
     BillingDisabledGuard,
-    CheckCustomDomainValidRecordsCronCommand,
-    CheckCustomDomainValidRecordsCronJob,
   ],
 })
 export class WorkspaceModule {}
