@@ -34,7 +34,7 @@ export class SentMessageRecordLinkService {
       return;
     }
 
-    // The link is written in a system context, so the caller's own access to this record, row-level rules included, gates it
+    // The link is written in a system context, so the caller's own access to this record gates it
     const permissionsByRecordId =
       await this.recordPermissionsService.getPermissionsForRecords({
         authContext,

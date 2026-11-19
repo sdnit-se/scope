@@ -107,16 +107,6 @@ export const ALL_METADATA_REQUIRED_METADATA_FOR_VALIDATION = {
     fieldMetadata: true,
     commandMenuItem: true,
   },
-  rowLevelPermissionPredicate: {
-    fieldMetadata: true,
-    objectMetadata: true,
-    role: true,
-    rowLevelPermissionPredicateGroup: true,
-  },
-  rowLevelPermissionPredicateGroup: {
-    role: true,
-    objectMetadata: true,
-  },
   frontComponent: {
     objectMetadata: true,
   },

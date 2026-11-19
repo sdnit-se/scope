@@ -24,7 +24,6 @@ import { UserSessionRevokedReason } from 'src/engine/core-modules/user-session/t
 import { hashUserSessionToken } from 'src/engine/core-modules/user-session/utils/hash-user-session-token.util';
 import { isUserSessionToken } from 'src/engine/core-modules/user-session/utils/is-user-session-token.util';
 import { AuthProviderEnum } from 'src/engine/core-modules/workspace/types/workspace.type';
-import { upsertRowLevelPermissionPredicates } from 'test/integration/metadata/suites/row-level-permission-predicate/utils/upsert-row-level-permission-predicates.util';
 import { createClient } from 'graphql-sse';
 import { setTimeout } from 'node:timers/promises';
 import { Readable } from 'node:stream';
@@ -32,7 +31,6 @@ import request from 'supertest';
 import { createManyOperation } from 'test/integration/graphql/utils/create-many-operation.util';
 import { destroyManyOperationFactory } from 'test/integration/graphql/utils/destroy-many-operation-factory.util';
 import { makeGraphqlApiRequest } from 'test/integration/graphql/utils/make-graphql-api-request.util';
-import { upsertContainsRlsPredicate } from 'test/integration/graphql/utils/upsert-contains-rls-predicate.util';
 import { findManyObjectMetadata } from 'test/integration/metadata/suites/object-metadata/utils/find-many-object-metadata.util';
 import { upsertObjectPermissions } from 'test/integration/metadata/suites/object-permission/utils/upsert-object-permissions.util';
 import { createOneRole } from 'test/integration/metadata/suites/role/utils/create-one-role.util';
@@ -325,14 +323,6 @@ describe('record export lifecycle (integration)', () => {
       await setApplicationRole(null);
     }
     if (isDefined(roleId)) {
-      await upsertRowLevelPermissionPredicates({
-        input: {
-          roleId,
-          objectMetadataId: input.objectMetadataId,
-          predicates: [],
-          predicateGroups: [],
-        },
-      });
       await changeRole({
         canAccessAllTools: true,
         canReadAllObjectRecords: true,
@@ -417,16 +407,13 @@ describe('record export lifecycle (integration)', () => {
     await download(recordExport).expect(404);
   });
 
-  it('exports with API key row permissions and only allows the requesting key to download', async () => {
+  it('exports with an API key and only allows the requesting key to download', async () => {
     const requester = await createApiKey();
     const otherKey = await createApiKey();
-    await upsertContainsRlsPredicate({
-      roleId,
-      objectNameSingular: 'company',
-      fieldName: 'name',
-      value: companies[0].name,
-    });
-    const ready = await exportToCompletion(input, requester.token);
+    const ready = await exportToCompletion(
+      { ...input, filter: { id: { eq: companies[0].id } } },
+      requester.token,
+    );
     expect(await authorization(ready)).toMatchObject({
       apiKeyId: requester.id,
     });
@@ -468,21 +455,6 @@ describe('record export lifecycle (integration)', () => {
       ).toThrow('This export belongs to another session');
     }
     await download(ready, APPLE_JANE_ADMIN_ACCESS_TOKEN).expect(403);
-    const response = await download(ready).expect(200);
-    expect(response.text.replace(/^\uFEFF/, '')).toBe(
-      `Id,Name\n${companies[0].id},${companies[0].name}\n`,
-    );
-  });
-
-  it('preserves application row permissions in the export worker', async () => {
-    await setApplicationRole(roleId);
-    await upsertContainsRlsPredicate({
-      roleId,
-      objectNameSingular: 'company',
-      fieldName: 'name',
-      value: companies[0].name,
-    });
-    const ready = await exportToCompletion(input, cliToken);
     const response = await download(ready).expect(200);
     expect(response.text.replace(/^\uFEFF/, '')).toBe(
       `Id,Name\n${companies[0].id},${companies[0].name}\n`,
@@ -1074,7 +1046,7 @@ describe('record export lifecycle (integration)', () => {
     }
   });
 
-  it.each(['export', 'row', 'application'])(
+  it.each(['export', 'application'])(
     'stops generation when %s permission changes between pages',
     async (permission) => {
       const readPage = reader.readPage.bind(reader);
@@ -1104,15 +1076,8 @@ describe('record export lifecycle (integration)', () => {
         await pageStarted;
         if (permission === 'export') {
           await changeRole({ canAccessAllTools: false });
-        } else if (permission === 'application') {
-          await setApplicationRole(roleId);
         } else {
-          await upsertContainsRlsPredicate({
-            roleId,
-            objectNameSingular: 'company',
-            fieldName: 'name',
-            value: companies[0].name,
-          });
+          await setApplicationRole(roleId);
         }
         releasePage();
         while (!isDefined(recordExport.errorMessage)) {
@@ -1125,24 +1090,6 @@ describe('record export lifecycle (integration)', () => {
       }
     },
   );
-
-  it('applies row permissions to both the count and the exported records', async () => {
-    await upsertContainsRlsPredicate({
-      roleId,
-      objectNameSingular: 'company',
-      fieldName: 'name',
-      value: companies[0].name,
-    });
-    const recordExport = await exportToCompletion(
-      input,
-      APPLE_JONY_MEMBER_ACCESS_TOKEN,
-    );
-    expect(recordExport.progress).toBe(100);
-    const response = await download(recordExport).expect(200);
-    expect(response.text.replace(/^\uFEFF/, '')).toBe(
-      `Id,Name\n${companies[0].id},${companies[0].name}\n`,
-    );
-  });
 
   it('removes a partial file when generation fails', async () => {
     let partialFilePath: string | undefined;
@@ -1308,7 +1255,7 @@ describe('record export lifecycle (integration)', () => {
     ['before-download', true],
     ['during-storage-open', true],
   ] as const)(
-    'invalidates the file when row permissions change %s, cleanup fails: %s',
+    'invalidates the file when access permissions change %s, cleanup fails: %s',
     async (when, cleanupFails) => {
       const recordExport = await exportToCompletion(
         {
@@ -1319,23 +1266,17 @@ describe('record export lifecycle (integration)', () => {
       );
       const stored = await getExport(recordExport.id);
       expect(recordExport.progress).toBe(100);
-      const restrictRows = () =>
-        upsertContainsRlsPredicate({
-          roleId,
-          objectNameSingular: 'company',
-          fieldName: 'name',
-          value: companies[0].name,
-        });
+      const revokeRead = () => changeRole({ canReadAllObjectRecords: false });
       if (when === 'during-storage-open') {
         const readFile = storage.readFile.bind(storage);
         jest
           .spyOn(storage, 'readFile')
           .mockImplementationOnce(async (resource) => {
-            await restrictRows();
+            await revokeRead();
             return readFile(resource);
           });
       } else {
-        await restrictRows();
+        await revokeRead();
       }
       if (cleanupFails) {
         jest
@@ -1364,7 +1305,7 @@ describe('record export lifecycle (integration)', () => {
   );
 
   it.each(['access-check', 'token-signing'])(
-    'rejects download path issuance when row permissions change during %s',
+    'rejects download path issuance when access permissions change during %s',
     async (when) => {
       const ready = await exportToCompletion(
         input,
@@ -1372,20 +1313,14 @@ describe('record export lifecycle (integration)', () => {
       );
       const stored = await getExport(ready.id);
       const claims = await authorization(ready);
-      const restrictRows = () =>
-        upsertContainsRlsPredicate({
-          roleId,
-          objectNameSingular: 'company',
-          fieldName: 'name',
-          value: companies[0].name,
-        });
+      const revokeRead = () => changeRole({ canReadAllObjectRecords: false });
       if (when === 'access-check') {
         const resolveRequester = query.resolveRequester.bind(query);
         jest
           .spyOn(query, 'resolveRequester')
           .mockImplementationOnce(async (args) => {
             const result = await resolveRequester(args);
-            await restrictRows();
+            await revokeRead();
             return result;
           });
       } else {
@@ -1396,7 +1331,7 @@ describe('record export lifecycle (integration)', () => {
           .spyOn(jwt, 'signAsyncOrThrow')
           .mockImplementationOnce(async (...args) => {
             const result = await sign(...args);
-            await restrictRows();
+            await revokeRead();
             return result;
           });
       }

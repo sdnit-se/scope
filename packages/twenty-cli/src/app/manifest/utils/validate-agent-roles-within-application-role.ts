@@ -95,8 +95,6 @@ const describeGrant = ({
       return `${OBJECT_ACTION_LABELS[grant.action]} ${describeObject(grant.objectUniversalIdentifier)} records`;
     case 'FIELD_VALUE':
       return `${grant.action === 'canReadFieldValue' ? 'read' : 'update'} field ${grant.fieldUniversalIdentifier} of ${describeObject(grant.objectUniversalIdentifier)}`;
-    case 'ROW_LEVEL_RESTRICTION':
-      return `${describeObject(grant.objectUniversalIdentifier)} records without the row-level restriction`;
   }
 };
 

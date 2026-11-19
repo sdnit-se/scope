@@ -111,10 +111,6 @@ export class WorkspaceDataSourceService
       flatObjectMetadataMaps: workspaceContext.flatObjectMetadataMaps,
       flatFieldMetadataMaps: workspaceContext.flatFieldMetadataMaps,
       flatIndexMaps: workspaceContext.flatIndexMaps,
-      flatRowLevelPermissionPredicateMaps:
-        workspaceContext.flatRowLevelPermissionPredicateMaps,
-      flatRowLevelPermissionPredicateGroupMaps:
-        workspaceContext.flatRowLevelPermissionPredicateGroupMaps,
       objectIdByNameSingular: workspaceContext.objectIdByNameSingular,
       featureFlagsMap: workspaceContext.featureFlagsMap,
       userWorkspaceRoleMap: workspaceContext.userWorkspaceRoleMap,

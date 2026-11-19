@@ -5,25 +5,11 @@ import {
   getEffectiveObjectPermissionsFromRoleManifest,
   ROLE_LEVEL_FLAG_BY_OBJECT_PERMISSION_ACTION,
 } from '@/application/utils/getEffectiveObjectPermissionsFromRoleManifest';
-import { getRowLevelRestrictionSignature } from '@/application/utils/getRowLevelRestrictionSignature';
 import { SystemPermissionFlag } from '@/constants/SystemPermissionFlag';
 import { TOOL_PERMISSION_FLAGS } from '@/constants/ToolPermissionFlags';
 
 const SYSTEM_TOOL_PERMISSION_FLAG_UNIVERSAL_IDENTIFIERS =
   TOOL_PERMISSION_FLAGS.map((flag) => SystemPermissionFlag[flag]);
-
-const haveSameRowLevelRestriction = ({
-  roleSignature,
-  supersetSignature,
-}: {
-  roleSignature: string[];
-  supersetSignature: string[];
-}): boolean =>
-  roleSignature.length === supersetSignature.length &&
-  roleSignature.every(
-    (predicateSignature, index) =>
-      predicateSignature === supersetSignature[index],
-  );
 
 const getRoleLevelGrantsNotCoveredBy = ({
   role,
@@ -96,9 +82,6 @@ const getObjectGrantsNotCoveredBy = ({
       ...(role.objectPermissions ?? []),
       ...(superset.objectPermissions ?? []),
     ].map((permission) => permission.objectUniversalIdentifier),
-    ...(superset.rowLevelPermissionPredicates ?? []).map(
-      (predicate) => predicate.objectUniversalIdentifier,
-    ),
   ]);
 
   return [...objectUniversalIdentifiers].flatMap(
@@ -114,7 +97,7 @@ const getObjectGrantsNotCoveredBy = ({
           objectUniversalIdentifier,
         });
 
-      const objectRecordGrants = OBJECT_PERMISSION_ACTIONS.filter(
+      return OBJECT_PERMISSION_ACTIONS.filter(
         (action) =>
           roleEffectivePermissions[action] &&
           !supersetEffectivePermissions[action],
@@ -123,30 +106,6 @@ const getObjectGrantsNotCoveredBy = ({
         objectUniversalIdentifier,
         action,
       }));
-
-      const roleReachesObject = OBJECT_PERMISSION_ACTIONS.some(
-        (action) => roleEffectivePermissions[action],
-      );
-      const supersetSignature = getRowLevelRestrictionSignature({
-        role: superset,
-        objectUniversalIdentifier,
-      });
-      const roleSignature = getRowLevelRestrictionSignature({
-        role,
-        objectUniversalIdentifier,
-      });
-
-      const escapesRowLevelRestriction =
-        roleReachesObject &&
-        supersetSignature.length > 0 &&
-        !haveSameRowLevelRestriction({ roleSignature, supersetSignature });
-
-      return escapesRowLevelRestriction
-        ? [
-            ...objectRecordGrants,
-            { type: 'ROW_LEVEL_RESTRICTION', objectUniversalIdentifier },
-          ]
-        : objectRecordGrants;
     },
   );
 };

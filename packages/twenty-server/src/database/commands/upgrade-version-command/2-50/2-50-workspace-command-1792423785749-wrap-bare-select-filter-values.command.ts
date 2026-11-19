@@ -162,7 +162,6 @@ export class WrapBareSelectFilterValuesCommand extends ProvisionedWorkspaceComma
     ) {
       await this.workspaceCacheService.invalidateAndRecompute(workspaceId, [
         'flatViewFilterMaps',
-        'flatRowLevelPermissionPredicateMaps',
         'flatPageLayoutWidgetMaps',
         'flatWorkflowVersionMaps',
       ]);

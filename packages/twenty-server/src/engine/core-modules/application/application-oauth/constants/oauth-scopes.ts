@@ -1,6 +1,6 @@
 // Scopes are a thin consent boundary shown to the user during OAuth authorization.
 // Actual permissions are enforced by the role assigned to the application at the
-// workspace level (object, field, and row-level permissions).
+// workspace level (object and field permissions).
 export const OAUTH_SCOPES = {
   API: 'api',
   PROFILE: 'profile',

@@ -7,14 +7,12 @@ import {
   ObjectRecord,
   type ObjectsPermissions,
   type ObjectsPermissionsByRoleId,
-  type RecordGqlOperationSignature,
 } from 'twenty-shared/types';
 import { isDefined, isRecordGqlOperationSignature } from 'twenty-shared/utils';
 import { FindOptionsRelations, ObjectLiteral } from 'typeorm';
 
 import { ProcessNestedRelationsHelper } from 'src/engine/api/common/common-nested-relations-processor/process-nested-relations.helper';
 import { CommonSelectFieldsBuilder } from 'src/engine/api/common/common-select-fields/common-select-fields-builder';
-import { DatabaseEventAction } from 'src/engine/api/graphql/graphql-query-runner/enums/database-event-action';
 import { GraphqlQueryParser } from 'src/engine/api/graphql/graphql-query-runner/graphql-query-parsers/graphql-query.parser';
 import { type FlatApplicationCacheMaps } from 'src/engine/core-modules/application/types/flat-application-cache-maps.type';
 import { findActiveFlatApplicationById } from 'src/engine/core-modules/application/utils/find-active-flat-application-by-id.util';
@@ -25,6 +23,10 @@ import { type FlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/typ
 import { type FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
 import { type FlatObjectMetadata } from 'src/engine/metadata-modules/flat-object-metadata/types/flat-object-metadata.type';
 import { UserWorkspaceRoleMap } from 'src/engine/metadata-modules/role-target/types/user-workspace-role-map.type';
+import {
+  buildFilterFieldsByKey,
+  isEventOutsideQueryFilter,
+} from 'src/engine/subscriptions/object-record-event/utils/is-event-outside-query-filter.util';
 import { omitRestrictedFieldsFromEvent } from 'src/engine/metadata-modules/permissions/utils/omit-restricted-fields-from-event.util';
 import { EventStreamService } from 'src/engine/subscriptions/event-stream.service';
 import { SubscriptionService } from 'src/engine/subscriptions/subscription.service';
@@ -39,7 +41,6 @@ import {
   RoleIdsBySource,
 } from 'src/engine/twenty-orm/types/role-permission-config.type';
 import { computePermissionIntersection } from 'src/engine/twenty-orm/utils/compute-permission-intersection.util';
-import { isRecordMatchingRLSRowLevelPermissionPredicate } from 'src/engine/twenty-orm/utils/is-record-matching-rls-row-level-permission-predicate.util';
 import { buildUserRoleIdsBySource } from 'src/engine/twenty-orm/utils/build-user-role-ids-by-source.util';
 import { getRoleIdsToIntersect } from 'src/engine/twenty-orm/utils/get-role-ids-to-intersect.util';
 import { buildRowAccessPolicy } from 'src/engine/twenty-orm/utils/build-row-access-policy.util';
@@ -162,6 +163,11 @@ export class ObjectRecordEventPublisher {
       objectRecordEvent: ObjectRecordSubscriptionEvent;
     }[] = [];
 
+    const fieldsByKey = buildFilterFieldsByKey({
+      objectMetadata: workspaceEventBatch.objectMetadata,
+      flatFieldMetadataMaps: permissionsContext.flatFieldMetadataMaps,
+    });
+
     // The role decides for every record of the object alike
     if (
       buildRowAccessPolicy({
@@ -211,8 +217,7 @@ export class ObjectRecordEventPublisher {
       const matchedQueryIds = this.getMatchingObjectRecordQueryIds({
         queries: streamData.queries,
         event: filteredEvent,
-        objectMetadata: workspaceEventBatch.objectMetadata,
-        flatFieldMetadataMaps: permissionsContext.flatFieldMetadataMaps,
+        fieldsByKey,
       });
 
       if (matchedQueryIds.length === 0) {
@@ -397,86 +402,33 @@ export class ObjectRecordEventPublisher {
   private getMatchingObjectRecordQueryIds({
     queries,
     event,
-    objectMetadata,
-    flatFieldMetadataMaps,
+    fieldsByKey,
   }: {
     queries: Record<string, RecordOrMetadataGqlOperationSignature>;
     event: ObjectRecordSubscriptionEvent;
-    objectMetadata: FlatObjectMetadata;
-    flatFieldMetadataMaps: FlatEntityMaps<FlatFieldMetadata>;
+    fieldsByKey: ReturnType<typeof buildFilterFieldsByKey>;
   }): string[] {
-    const matchedQueryIds: string[] = [];
-
-    for (const [queryId, operationSignature] of Object.entries(queries)) {
-      if (!isRecordGqlOperationSignature(operationSignature)) {
-        continue;
-      }
-
-      if (
-        this.isQueryMatchingObjectRecordEvent({
-          operationSignature,
-          event,
-          objectMetadata,
-          flatFieldMetadataMaps,
-        })
-      ) {
-        matchedQueryIds.push(queryId);
-      }
-    }
-
-    return matchedQueryIds;
-  }
-
-  private isQueryMatchingObjectRecordEvent({
-    operationSignature,
-    event,
-    objectMetadata,
-    flatFieldMetadataMaps,
-  }: {
-    operationSignature: RecordGqlOperationSignature;
-    event: ObjectRecordSubscriptionEvent;
-    objectMetadata: FlatObjectMetadata;
-    flatFieldMetadataMaps: FlatEntityMaps<FlatFieldMetadata>;
-  }): boolean {
-    if (operationSignature.objectNameSingular !== event.objectNameSingular) {
-      return false;
-    }
-
     const properties = event.properties as {
       after?: object;
       before?: object;
     };
 
-    const deliveredRecord = properties?.after ?? properties?.before;
-
-    if (!isDefined(deliveredRecord)) {
-      return false;
+    if (!isDefined(properties?.after ?? properties?.before)) {
+      return [];
     }
 
-    const shouldIgnoreSoftDeleteDefaultFilter =
-      event.action === DatabaseEventAction.DELETED ||
-      event.action === DatabaseEventAction.RESTORED;
-
-    const queryFilter = operationSignature.variables?.filter ?? {};
-
-    if (Object.keys(queryFilter).length === 0) {
-      return true;
-    }
-
-    const candidateRecords =
-      event.action === DatabaseEventAction.UPDATED
-        ? [properties?.after, properties?.before].filter(isDefined)
-        : [deliveredRecord];
-
-    return candidateRecords.some((record) =>
-      isRecordMatchingRLSRowLevelPermissionPredicate({
-        record,
-        filter: queryFilter,
-        flatObjectMetadata: objectMetadata,
-        flatFieldMetadataMaps,
-        shouldIgnoreSoftDeleteDefaultFilter,
-      }),
-    );
+    return Object.entries(queries)
+      .filter(
+        ([, operationSignature]) =>
+          isRecordGqlOperationSignature(operationSignature) &&
+          operationSignature.objectNameSingular === event.objectNameSingular &&
+          !isEventOutsideQueryFilter({
+            properties,
+            filter: operationSignature.variables?.filter,
+            fieldsByKey,
+          }),
+      )
+      .map(([queryId]) => queryId);
   }
 
   private async fetchPermissionsContext(

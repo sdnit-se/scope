@@ -27,7 +27,6 @@ import { WorkspaceSchemaTableManagerService } from 'src/engine/twenty-orm/worksp
 import { generateColumnDefinitions } from 'src/engine/workspace-manager/workspace-migration/workspace-migration-runner/utils/generate-column-definitions.util';
 import { computeTwentyStandardApplicationAllFlatEntityMaps } from 'src/engine/workspace-manager/twenty-standard-application/utils/twenty-standard-application-all-flat-entity-maps.constant';
 import { buildObjectIdByNameMaps } from 'src/engine/metadata-modules/flat-object-metadata/utils/build-object-id-by-name-maps.util';
-import { createEmptyFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/constant/create-empty-flat-entity-maps.constant';
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
 import { AgentHistoryRepository } from 'src/engine/metadata-modules/ai/ai-history/repositories/agent-history-repository';
 import { AgentChatThreadWorkspaceEntity } from 'src/engine/metadata-modules/ai/ai-history/standard-objects/agent-chat-thread.workspace-entity';
@@ -101,8 +100,6 @@ const SCHEMA = getWorkspaceSchemaName(WORKSPACE_ID);
         flatObjectMetadataMaps: metadata.flatObjectMetadataMaps,
         flatFieldMetadataMaps: metadata.flatFieldMetadataMaps,
         flatIndexMaps: metadata.flatIndexMaps,
-        flatRowLevelPermissionPredicateMaps: createEmptyFlatEntityMaps(),
-        flatRowLevelPermissionPredicateGroupMaps: createEmptyFlatEntityMaps(),
         objectIdByNameSingular: buildObjectIdByNameMaps(
           metadata.flatObjectMetadataMaps,
         ).idByNameSingular,

@@ -3,9 +3,6 @@ import { type Equal, type Expect } from 'twenty-shared/testing';
 import { type ApplicationRegistrationEntity } from 'src/engine/core-modules/application/application-registration/application-registration.entity';
 import { type ApplicationRegistrationVariableEntity } from 'src/engine/core-modules/application/application-registration-variable/application-registration-variable.entity';
 import { type ApplicationRegistrationVersionEntity } from 'src/engine/core-modules/application/application-registration-version/application-registration-version.entity';
-import { type BillingPriceEntity } from 'src/engine/core-modules/billing/entities/billing-price.entity';
-import { type BillingProductEntity } from 'src/engine/core-modules/billing/entities/billing-product.entity';
-import { type BillingSubscriptionItemEntity } from 'src/engine/core-modules/billing/entities/billing-subscription-item.entity';
 import { type SigningKeyEntity } from 'src/engine/core-modules/jwt/entities/signing-key.entity';
 import { type KeyValuePairEntity } from 'src/engine/core-modules/key-value-pair/key-value-pair.entity';
 import { type TwoFactorAuthenticationMethodEntity } from 'src/engine/core-modules/two-factor-authentication/entities/two-factor-authentication-method.entity';
@@ -22,9 +19,6 @@ export type AllNonWorkspaceRelatedEntity =
   | ApplicationRegistrationEntity
   | ApplicationRegistrationVariableEntity
   | ApplicationRegistrationVersionEntity
-  | BillingPriceEntity
-  | BillingProductEntity
-  | BillingSubscriptionItemEntity
   | KeyValuePairEntity
   | SigningKeyEntity
   | TwoFactorAuthenticationMethodEntity

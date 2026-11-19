@@ -25,8 +25,4 @@ export type RoleManifestGrant =
       objectUniversalIdentifier: string;
       fieldUniversalIdentifier: string;
       action: 'canReadFieldValue' | 'canUpdateFieldValue';
-    }
-  | {
-      type: 'ROW_LEVEL_RESTRICTION';
-      objectUniversalIdentifier: string;
     };

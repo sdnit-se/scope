@@ -26,10 +26,6 @@ import {
   PermissionsException,
   PermissionsExceptionCode,
 } from 'src/engine/metadata-modules/permissions/permissions.exception';
-import {
-  RowLevelPermissionPredicateException,
-  RowLevelPermissionPredicateExceptionCode,
-} from 'src/engine/metadata-modules/row-level-permission-predicate/exceptions/row-level-permission-predicate.exception';
 import { ViewFieldException } from 'src/engine/metadata-modules/view-field/exceptions/view-field.exception';
 import { ViewFilterException } from 'src/engine/metadata-modules/view-filter/exceptions/view-filter.exception';
 import { ViewSortException } from 'src/engine/metadata-modules/view-sort/exceptions/view-sort.exception';
@@ -165,13 +161,6 @@ export const isUserFacingToolExecutionError = (error: unknown): boolean => {
 
   if (error instanceof PermissionsException) {
     return USER_FACING_PERMISSIONS_EXCEPTION_CODES.includes(error.code);
-  }
-
-  if (error instanceof RowLevelPermissionPredicateException) {
-    return (
-      error.code !==
-      RowLevelPermissionPredicateExceptionCode.INTERNAL_SERVER_ERROR
-    );
   }
 
   if (error instanceof AuthException) {

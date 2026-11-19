@@ -23,8 +23,6 @@ export const ALL_JSONB_PROPERTIES_WITH_SERIALIZED_RELATION_BY_METADATA_NAME = {
   index: {},
   role: {},
   roleTarget: {},
-  rowLevelPermissionPredicate: {},
-  rowLevelPermissionPredicateGroup: {},
   logicFunction: {},
   webhook: {},
   mcpServer: {},

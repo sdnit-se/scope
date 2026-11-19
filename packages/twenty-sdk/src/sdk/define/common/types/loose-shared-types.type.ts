@@ -59,10 +59,6 @@ export type PageLayoutWidgetVerticalListPosition =
 export type PermissionFlagConfig = LooseEnumValues<StrictPermissionFlagConfig>;
 export type PermissionFlagManifest =
   LooseEnumValues<SharedApplication.PermissionFlagManifest>;
-export type RowLevelPermissionPredicateGroupManifest =
-  LooseEnumValues<SharedApplication.RowLevelPermissionPredicateGroupManifest>;
-export type RowLevelPermissionPredicateManifest =
-  LooseEnumValues<SharedApplication.RowLevelPermissionPredicateManifest>;
 export type SendInboxMessageInput =
   LooseEnumValues<SharedApplication.SendInboxMessageInput>;
 export type SettingsFrontComponentConfig =

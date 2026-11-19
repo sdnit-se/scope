@@ -19,8 +19,6 @@ export type ChildMetadataName = Extract<
   | 'objectPermission'
   | 'fieldPermission'
   | 'rolePermissionFlag'
-  | 'rowLevelPermissionPredicate'
-  | 'rowLevelPermissionPredicateGroup'
 >;
 
 export type ParentMetadataName = Extract<

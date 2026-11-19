@@ -29,14 +29,6 @@ const FLAT_ROLE_ROWS_REQUIREMENT = {
     columns: ['id', 'universalIdentifier'],
     groupBy: ['roleId'],
   },
-  rowLevelPermissionPredicate: {
-    columns: ['id', 'universalIdentifier'],
-    groupBy: ['roleId'],
-  },
-  rowLevelPermissionPredicateGroup: {
-    columns: ['id', 'universalIdentifier'],
-    groupBy: ['roleId'],
-  },
   agentChatChannelRole: {
     columns: ['id', 'universalIdentifier'],
     groupBy: ['roleId'],
@@ -60,8 +52,6 @@ export class WorkspaceFlatRoleMapCacheService extends MetadataFlatEntityMapsCach
       objectPermission: objectPermissions,
       rolePermissionFlag: rolePermissionFlags,
       fieldPermission: fieldPermissions,
-      rowLevelPermissionPredicate: rowLevelPermissionPredicates,
-      rowLevelPermissionPredicateGroup: rowLevelPermissionPredicateGroups,
       agentChatChannelRole: agentChatChannelRoles,
     } = rows;
 
@@ -80,10 +70,6 @@ export class WorkspaceFlatRoleMapCacheService extends MetadataFlatEntityMapsCach
           rolePermissionFlags:
             rolePermissionFlags.byRoleId.get(roleEntity.id) || [],
           fieldPermissions: fieldPermissions.byRoleId.get(roleEntity.id) || [],
-          rowLevelPermissionPredicates:
-            rowLevelPermissionPredicates.byRoleId.get(roleEntity.id) || [],
-          rowLevelPermissionPredicateGroups:
-            rowLevelPermissionPredicateGroups.byRoleId.get(roleEntity.id) || [],
           agentChatChannelRoles:
             agentChatChannelRoles.byRoleId.get(roleEntity.id) || [],
         },

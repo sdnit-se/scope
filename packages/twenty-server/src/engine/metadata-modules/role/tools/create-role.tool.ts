@@ -27,7 +27,7 @@ const createRoleInputSchema = rolePermissionsSchema.extend({
   description: `Create a new role in this workspace.
 
 Global record permissions (canReadAllObjectRecords, canUpdateAllObjectRecords, ...) and settings access default to false; assignability to users, agents and API keys defaults to true.
-After creating the role, use upsert_object_permissions to set per-object overrides and upsert_row_level_permission_rules to restrict which records are visible.
+After creating the role, use upsert_object_permissions to set per-object overrides.
 Granting write access on an object without read access is invalid.`,
 })
 export class CreateRoleTool extends BaseTool<typeof createRoleInputSchema> {

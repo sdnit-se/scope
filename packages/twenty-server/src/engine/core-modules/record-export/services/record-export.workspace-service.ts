@@ -74,8 +74,6 @@ const RECORD_EXPORT_PERMISSION_CACHE_KEYS: WorkspaceCacheOrDerivedCacheKeyName[]
     'userWorkspaceRoleMap',
     'apiKeyRoleMap',
     'flatRoleMaps',
-    'flatRowLevelPermissionPredicateMaps',
-    'flatRowLevelPermissionPredicateGroupMaps',
     'flatWorkspaceMemberMaps',
     'flatObjectMetadataMaps',
     'flatFieldMetadataMaps',

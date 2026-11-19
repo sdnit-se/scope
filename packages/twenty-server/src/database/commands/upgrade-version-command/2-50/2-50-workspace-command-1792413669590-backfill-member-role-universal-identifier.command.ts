@@ -23,8 +23,6 @@ const FLAT_MAPS_REFERENCING_ROLE_UNIVERSAL_IDENTIFIER = (
     'rolePermissionFlag',
     'objectPermission',
     'fieldPermission',
-    'rowLevelPermissionPredicate',
-    'rowLevelPermissionPredicateGroup',
   ] as const
 ).map(getMetadataFlatEntityMapsKey);
 

@@ -31,10 +31,6 @@ import {
   PermissionsExceptionMessage,
 } from 'src/engine/metadata-modules/permissions/permissions.exception';
 import {
-  RowLevelPermissionPredicateException,
-  RowLevelPermissionPredicateExceptionCode,
-} from 'src/engine/metadata-modules/row-level-permission-predicate/exceptions/row-level-permission-predicate.exception';
-import {
   ViewException,
   ViewExceptionCode,
 } from 'src/engine/metadata-modules/view/exceptions/view.exception';
@@ -200,22 +196,6 @@ describe('isUserFacingToolExecutionError', () => {
       new PermissionsException(
         PermissionsExceptionMessage.DEFAULT_ROLE_NOT_FOUND,
         PermissionsExceptionCode.DEFAULT_ROLE_NOT_FOUND,
-      ),
-      false,
-    ],
-    [
-      'a row-level rule owned by another role',
-      new RowLevelPermissionPredicateException(
-        'Predicate belongs to a different role or object',
-        RowLevelPermissionPredicateExceptionCode.UNAUTHORIZED_ROLE_MODIFICATION,
-      ),
-      true,
-    ],
-    [
-      'a row-level rule internal failure',
-      new RowLevelPermissionPredicateException(
-        'Unexpected failure',
-        RowLevelPermissionPredicateExceptionCode.INTERNAL_SERVER_ERROR,
       ),
       false,
     ],
