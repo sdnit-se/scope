@@ -1772,16 +1772,6 @@ export class ConfigVariables {
   @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.ADVANCED_SETTINGS,
     description:
-      'Days the current JWT signing key stays valid before the rotation cron issues a new one. Leave unset to disable auto-rotation.',
-    type: ConfigVariableType.NUMBER,
-  })
-  @CastToPositiveNumber()
-  @IsOptional()
-  SIGNING_KEY_ROTATION_DAYS?: number;
-
-  @ConfigVariablesMetadata({
-    group: ConfigVariablesGroup.ADVANCED_SETTINGS,
-    description:
       'Register the cron job that syncs the marketplace catalog from the npm registry. Disable to stop the automatic catalog import.',
     type: ConfigVariableType.BOOLEAN,
   })
