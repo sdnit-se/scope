@@ -76,7 +76,6 @@ export const optimisticallyApplyUpdateActionOnAllFlatEntityMaps = ({
     case 'agentChatChannel':
     case 'agentChatChannelRole':
     case 'settingsMenuItem':
-    case 'relatedRecordPath':
     case 'validationRule':
     case 'searchFieldMetadata': {
       const flatEntityMapsKey = getMetadataFlatEntityMapsKey(

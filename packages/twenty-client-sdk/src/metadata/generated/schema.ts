@@ -263,7 +263,7 @@ export interface AiSystemPromptSection {
     __typename: 'AiSystemPromptSection'
 }
 
-export type AllMetadataName = 'agent' | 'agentChatChannel' | 'agentChatChannelRole' | 'applicationVariable' | 'commandMenuItem' | 'connectionProvider' | 'fieldMetadata' | 'fieldPermission' | 'frontComponent' | 'index' | 'logicFunction' | 'mcpServer' | 'messagingProvider' | 'navigationMenuItem' | 'objectMetadata' | 'objectPermission' | 'pageLayout' | 'pageLayoutTab' | 'pageLayoutWidget' | 'permissionFlag' | 'relatedRecordPath' | 'role' | 'rolePermissionFlag' | 'roleTarget' | 'rowLevelPermissionPredicate' | 'rowLevelPermissionPredicateGroup' | 'searchFieldMetadata' | 'settingsMenuItem' | 'skill' | 'timelineActivityType' | 'validationRule' | 'view' | 'viewField' | 'viewFieldGroup' | 'viewFilter' | 'viewFilterGroup' | 'viewGroup' | 'viewSort' | 'webhook' | 'workflow' | 'workflowVersion'
+export type AllMetadataName = 'agent' | 'agentChatChannel' | 'agentChatChannelRole' | 'applicationVariable' | 'commandMenuItem' | 'connectionProvider' | 'fieldMetadata' | 'fieldPermission' | 'frontComponent' | 'index' | 'logicFunction' | 'mcpServer' | 'messagingProvider' | 'navigationMenuItem' | 'objectMetadata' | 'objectPermission' | 'pageLayout' | 'pageLayoutTab' | 'pageLayoutWidget' | 'permissionFlag' | 'role' | 'rolePermissionFlag' | 'roleTarget' | 'rowLevelPermissionPredicate' | 'rowLevelPermissionPredicateGroup' | 'searchFieldMetadata' | 'settingsMenuItem' | 'skill' | 'timelineActivityType' | 'validationRule' | 'view' | 'viewField' | 'viewFieldGroup' | 'viewFilter' | 'viewFilterGroup' | 'viewGroup' | 'viewSort' | 'webhook' | 'workflow' | 'workflowVersion'
 
 export interface Analytics {
     /** Boolean that confirms query was dispatched */
@@ -2098,7 +2098,6 @@ export interface Mutation {
     createPageLayout: PageLayout
     createPageLayoutTab: PageLayoutTab
     createPageLayoutWidget: PageLayoutWidget
-    createRelatedRecordPath: RelatedRecordPath
     createSAMLIdentityProvider: SetupSso
     createSkill: Skill
     createSubscriptionPaymentIntent: BillingPaymentIntent
@@ -2133,7 +2132,6 @@ export interface Mutation {
     deleteOneObject: Object
     deleteOneRole: Scalars['String']
     deleteQueuedChatMessage: Scalars['Boolean']
-    deleteRelatedRecordPath: RelatedRecordPath
     deleteSSOIdentityProvider: DeleteSso
     deleteSkill: Skill
     deleteTwoFactorAuthenticationMethod: DeleteTwoFactorAuthenticationMethod
@@ -2878,7 +2876,6 @@ export interface Query {
     publicMarketplaceApps: MarketplaceApp[]
     recordPermissions: RecordPermissionsResult[]
     recordSharing: RecordSharingDTO
-    relatedRecordPaths: RelatedRecordPath[]
     skill?: Skill
     skills: Skill[]
     timelineActivityTypes: TimelineActivityType[]
@@ -2977,15 +2974,6 @@ export interface RecordTableConfiguration {
     recordLimit?: Scalars['Int']
     viewId?: Scalars['String']
     __typename: 'RecordTableConfiguration'
-}
-
-export interface RelatedRecordPath {
-    firstFieldMetadataId: Scalars['UUID']
-    id: Scalars['UUID']
-    objectMetadataId: Scalars['UUID']
-    secondFieldMetadataId?: Scalars['UUID']
-    thirdFieldMetadataId?: Scalars['UUID']
-    __typename: 'RelatedRecordPath'
 }
 
 export interface Relation {
@@ -5319,8 +5307,6 @@ export interface CreatePageLayoutWidgetInput {configuration: Scalars['JSON'],obj
 
 export interface CreateRecordExportInput {fieldMetadataIds: Scalars['UUID'][],filter?: (Scalars['JSON'] | null),objectMetadataId: Scalars['UUID'],orderBy?: (Scalars['JSON'] | null)}
 
-export interface CreateRelatedRecordPathInput {firstFieldMetadataId?: (Scalars['UUID'] | null),objectMetadataId?: (Scalars['UUID'] | null),secondFieldMetadataId?: (Scalars['UUID'] | null),thirdFieldMetadataId?: (Scalars['UUID'] | null)}
-
 export interface CreateRoleInput {canAccessAllAgentChatChannels?: (Scalars['Boolean'] | null),canAccessAllTools?: (Scalars['Boolean'] | null),canBeAssignedToAgents?: (Scalars['Boolean'] | null),canBeAssignedToApiKeys?: (Scalars['Boolean'] | null),canBeAssignedToUsers?: (Scalars['Boolean'] | null),canDestroyAllObjectRecords?: (Scalars['Boolean'] | null),canReadAllObjectRecords?: (Scalars['Boolean'] | null),canSoftDeleteAllObjectRecords?: (Scalars['Boolean'] | null),canUpdateAllObjectRecords?: (Scalars['Boolean'] | null),canUpdateAllSettings?: (Scalars['Boolean'] | null),description?: (Scalars['String'] | null),icon?: (Scalars['String'] | null),id?: (Scalars['String'] | null),label: Scalars['String']}
 
 export interface CreateSkillInput {content: Scalars['String'],description?: (Scalars['String'] | null),icon?: (Scalars['String'] | null),id?: (Scalars['UUID'] | null),label: Scalars['String'],name: Scalars['String']}
@@ -6332,7 +6318,6 @@ export interface MutationGenqlSelection{
     createPageLayout?: (PageLayoutGenqlSelection & { __args: {input: CreatePageLayoutInput} })
     createPageLayoutTab?: (PageLayoutTabGenqlSelection & { __args: {input: CreatePageLayoutTabInput} })
     createPageLayoutWidget?: (PageLayoutWidgetGenqlSelection & { __args: {input: CreatePageLayoutWidgetInput} })
-    createRelatedRecordPath?: (RelatedRecordPathGenqlSelection & { __args: {input: CreateRelatedRecordPathInput} })
     createSAMLIdentityProvider?: (SetupSsoGenqlSelection & { __args: {input: SetupSAMLSsoInput} })
     createSkill?: (SkillGenqlSelection & { __args: {input: CreateSkillInput} })
     createSubscriptionPaymentIntent?: (BillingPaymentIntentGenqlSelection & { __args: {idempotencyKey: Scalars['String'], plan: BillingPlanKey, recurringInterval: SubscriptionInterval, requirePaymentMethod: Scalars['Boolean'], successUrlPath?: (Scalars['String'] | null)} })
@@ -6367,7 +6352,6 @@ export interface MutationGenqlSelection{
     deleteOneObject?: (ObjectGenqlSelection & { __args: {input: DeleteOneObjectInput} })
     deleteOneRole?: { __args: {roleId: Scalars['UUID']} }
     deleteQueuedChatMessage?: { __args: {messageId: Scalars['UUID']} }
-    deleteRelatedRecordPath?: (RelatedRecordPathGenqlSelection & { __args: {id: Scalars['UUID']} })
     deleteSSOIdentityProvider?: (DeleteSsoGenqlSelection & { __args: {input: DeleteSsoInput} })
     deleteSkill?: (SkillGenqlSelection & { __args: {id: Scalars['UUID']} })
     deleteTwoFactorAuthenticationMethod?: (DeleteTwoFactorAuthenticationMethodGenqlSelection & { __args: {twoFactorAuthenticationMethodId: Scalars['UUID']} })
@@ -7156,7 +7140,6 @@ export interface QueryGenqlSelection{
     publicMarketplaceApps?: MarketplaceAppGenqlSelection
     recordPermissions?: (RecordPermissionsResultGenqlSelection & { __args: {targets: RecordTargetInput[]} })
     recordSharing?: (RecordSharingDTOGenqlSelection & { __args: {target: RecordTargetInput} })
-    relatedRecordPaths?: RelatedRecordPathGenqlSelection
     skill?: (SkillGenqlSelection & { __args: {id: Scalars['UUID']} })
     skills?: SkillGenqlSelection
     timelineActivityTypes?: TimelineActivityTypeGenqlSelection
@@ -7260,16 +7243,6 @@ export interface RecordTableConfigurationGenqlSelection{
 }
 
 export interface RecordTargetInput {objectMetadataId: Scalars['UUID'],recordId: Scalars['UUID']}
-
-export interface RelatedRecordPathGenqlSelection{
-    firstFieldMetadataId?: boolean | number
-    id?: boolean | number
-    objectMetadataId?: boolean | number
-    secondFieldMetadataId?: boolean | number
-    thirdFieldMetadataId?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
 
 export interface RelationGenqlSelection{
     sourceFieldMetadata?: FieldGenqlSelection
@@ -10458,14 +10431,6 @@ export interface WorkspaceUrlsAndIdGenqlSelection{
     
 
 
-    const RelatedRecordPath_possibleTypes: string[] = ['RelatedRecordPath']
-    export const isRelatedRecordPath = (obj?: { __typename?: any } | null): obj is RelatedRecordPath => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isRelatedRecordPath"')
-      return RelatedRecordPath_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
     const Relation_possibleTypes: string[] = ['Relation']
     export const isRelation = (obj?: { __typename?: any } | null): obj is Relation => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isRelation"')
@@ -11282,7 +11247,6 @@ export const enumAllMetadataName = {
    pageLayoutTab: 'pageLayoutTab' as const,
    pageLayoutWidget: 'pageLayoutWidget' as const,
    permissionFlag: 'permissionFlag' as const,
-   relatedRecordPath: 'relatedRecordPath' as const,
    role: 'role' as const,
    rolePermissionFlag: 'rolePermissionFlag' as const,
    roleTarget: 'roleTarget' as const,
