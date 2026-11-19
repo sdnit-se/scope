@@ -32,7 +32,6 @@ import { EnterpriseModule } from 'src/engine/core-modules/enterprise/enterprise.
 import { FeatureFlagModule } from 'src/engine/core-modules/feature-flag/feature-flag.module';
 import { FileModule } from 'src/engine/core-modules/file/file.module';
 import { PendingWakeUpModule } from 'src/engine/core-modules/pending-wake-up/pending-wake-up.module';
-import { PublicDomainModule } from 'src/engine/core-modules/public-domain/public-domain.module';
 import { TwentyConfigModule } from 'src/engine/core-modules/twenty-config/twenty-config.module';
 import { UserSessionModule } from 'src/engine/core-modules/user-session/user-session.module';
 import { UpgradeStatusCommand } from 'src/engine/core-modules/upgrade/commands/upgrade-status.command';
@@ -90,7 +89,6 @@ import { AutomatedTriggerModule } from 'src/modules/workflow/workflow-trigger/au
     BillingReminderModule,
     ApplicationRecurringChargeModule,
     CodeInterpreterSessionCleanupModule,
-    PublicDomainModule,
     EnterpriseModule,
     TwentyConfigModule,
     MarketplaceModule,

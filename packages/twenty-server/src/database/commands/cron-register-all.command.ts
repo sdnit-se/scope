@@ -12,10 +12,8 @@ import { WorkspaceDataExportCleanupCronCommand } from 'src/engine/core-modules/w
 import { CronTriggerCronCommand } from 'src/engine/core-modules/logic-function/logic-function-trigger/triggers/cron/cron-trigger.cron.command';
 import { PendingWakeUpSweepCronCommand } from 'src/engine/core-modules/pending-wake-up/crons/commands/pending-wake-up-sweep.cron.command';
 import { AgentCronTriggerCronCommand } from 'src/engine/metadata-modules/ai/ai-agent-trigger/crons/agent-cron-trigger.cron.command';
-import { CheckPublicDomainsValidRecordsCronCommand } from 'src/engine/core-modules/public-domain/crons/commands/check-public-domains-valid-records.cron.command';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
 import { UserSessionCleanupCronCommand } from 'src/engine/core-modules/user-session/crons/commands/user-session-cleanup.cron.command';
-import { CheckCustomDomainValidRecordsCronCommand } from 'src/engine/core-modules/workspace/crons/commands/check-custom-domain-valid-records.cron.command';
 import { WebhookSubscriptionRenewalCronCommand } from 'src/modules/connected-account/webhook-subscription-manager/crons/commands/webhook-subscription-renewal.cron.command';
 import { TrashCleanupCronCommand } from 'src/engine/trash-cleanup/commands/trash-cleanup.cron.command';
 import { DeferredWorkspaceMigrationActionRecoveryCronCommand } from 'src/engine/workspace-manager/workspace-migration/workspace-migration-runner/crons/commands/deferred-workspace-migration-action-recovery.cron.command';
@@ -60,8 +58,6 @@ export class CronRegisterAllCommand extends CommandRunner {
     private readonly workflowCleanWorkflowRunsCronCommand: WorkflowCleanWorkflowRunsCronCommand,
     private readonly pendingWakeUpSweepCronCommand: PendingWakeUpSweepCronCommand,
 
-    private readonly checkCustomDomainValidRecordsCronCommand: CheckCustomDomainValidRecordsCronCommand,
-    private readonly checkPublicDomainsValidRecordsCronCommand: CheckPublicDomainsValidRecordsCronCommand,
     private readonly cronTriggerCronCommand: CronTriggerCronCommand,
     private readonly agentCronTriggerCronCommand: AgentCronTriggerCronCommand,
     private readonly cleanSuspendedWorkspacesCronCommand: CleanSuspendedWorkspacesCronCommand,
@@ -126,14 +122,6 @@ export class CronRegisterAllCommand extends CommandRunner {
       {
         name: 'WebhookSubscriptionRenewal',
         command: this.webhookSubscriptionRenewalCronCommand,
-      },
-      {
-        name: 'CheckCustomDomainValidRecords',
-        command: this.checkCustomDomainValidRecordsCronCommand,
-      },
-      {
-        name: 'CheckPublicDomainsValidRecords',
-        command: this.checkPublicDomainsValidRecordsCronCommand,
       },
       {
         name: 'WorkflowCronTrigger',

@@ -464,24 +464,6 @@ export const ADMINISTRATION_OPERATION_QUERY_FACTORIES = {
     `,
     variables: { input: { id: PLACEHOLDER_ID } },
   }),
-  createPublicDomain: () => ({
-    query: gql`
-      mutation CreatePublicDomain($domain: String!, $applicationId: String!) {
-        createPublicDomain(domain: $domain, applicationId: $applicationId) {
-          __typename
-        }
-      }
-    `,
-    variables: { domain: PLACEHOLDER_TEXT, applicationId: PLACEHOLDER_TEXT },
-  }),
-  deletePublicDomain: () => ({
-    query: gql`
-      mutation DeletePublicDomain($domain: String!) {
-        deletePublicDomain(domain: $domain)
-      }
-    `,
-    variables: { domain: PLACEHOLDER_TEXT },
-  }),
   billingPortalSession: () => ({
     query: gql`
       query BillingPortalSession {

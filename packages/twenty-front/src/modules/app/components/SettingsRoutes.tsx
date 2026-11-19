@@ -18,7 +18,6 @@ import { SETTINGS_AI_TABS } from '@/settings/ai/constants/SettingsAiTabs';
 import { SettingsLegacyAccountsRedirect } from '@/settings/app-preferences/components/SettingsLegacyAccountsRedirect';
 import { SettingsProtectedRouteWrapper } from '@/settings/components/SettingsProtectedRouteWrapper';
 import { SettingsSkeletonLoader } from '@/settings/components/SettingsSkeletonLoader';
-import { SettingPublicDomain } from '@/settings/domains/components/SettingPublicDomain';
 import { SettingsPath } from 'twenty-shared/types';
 import { getSettingsPath } from 'twenty-shared/utils';
 import {
@@ -886,14 +885,6 @@ const createSettingsRouteElements = ({
       <Route
         path={SettingsPath.Subdomain}
         element={<SettingsSubdomainPage />}
-      />
-      <Route
-        path={SettingsPath.ApplicationPublicDomainNew}
-        element={<SettingPublicDomain />}
-      />
-      <Route
-        path={SettingsPath.ApplicationPublicDomainDetail}
-        element={<SettingPublicDomain />}
       />
       <Route path={SettingsPath.LegalDpa} element={<SettingsLegalDpa />} />
       <Route

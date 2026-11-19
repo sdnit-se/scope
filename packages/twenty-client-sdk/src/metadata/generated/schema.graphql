@@ -1228,7 +1228,6 @@ type ClientConfig {
   isAttachmentPreviewEnabled: Boolean!
   isBookCallOnboardingStepEnabled: Boolean!
   isClickHouseConfigured: Boolean!
-  isCloudflareIntegrationEnabled: Boolean!
   isCompanyEnrichmentEnabled: Boolean!
   isConfigVariablesInDbEnabled: Boolean!
   isCookieSessionEnabled: Boolean!
@@ -1885,21 +1884,6 @@ input DestroyViewSortInput {
 type DevelopmentApplication {
   id: String!
   universalIdentifier: String!
-}
-
-type DomainRecord {
-  key: String!
-  status: String!
-  type: String!
-  validationType: String!
-  value: String!
-}
-
-type DomainValidRecords {
-  domain: String!
-  id: UUID!
-  isCustomDomainEnabled: Boolean
-  records: [DomainRecord!]!
 }
 
 type DuplicatedDashboard {
@@ -3014,8 +2998,6 @@ type Mutation {
   cancelSwitchBillingInterval: BillingUpdate!
   cancelSwitchBillingPlan: BillingUpdate!
   cancelSwitchResourceCreditPrice: BillingUpdate!
-  checkCustomDomainValidRecords: DomainValidRecords
-  checkPublicDomainValidRecords(domain: String!): DomainValidRecords
   checkoutSession(plan: BillingPlanKey!, recurringInterval: SubscriptionInterval!, requirePaymentMethod: Boolean! = true, successUrlPath: String): BillingSession!
   claimApplicationRegistrationOwnership(applicationRegistrationId: String!): ApplicationRegistration!
   completeAppTarballUpload(fileId: UUID!): ApplicationRegistration!
@@ -3057,7 +3039,6 @@ type Mutation {
   createPageLayout(input: CreatePageLayoutInput!): PageLayout!
   createPageLayoutTab(input: CreatePageLayoutTabInput!): PageLayoutTab!
   createPageLayoutWidget(input: CreatePageLayoutWidgetInput!): PageLayoutWidget!
-  createPublicDomain(applicationId: String!, domain: String!): PublicDomain!
   createRelatedRecordPath(input: CreateRelatedRecordPathInput!): RelatedRecordPath!
   createSAMLIdentityProvider(input: SetupSAMLSsoInput!): SetupSso!
   createSkill(input: CreateSkillInput!): Skill!
@@ -3092,7 +3073,6 @@ type Mutation {
   deleteOneLogicFunction(input: LogicFunctionIdInput!): LogicFunction!
   deleteOneObject(input: DeleteOneObjectInput!): Object!
   deleteOneRole(roleId: UUID!): String!
-  deletePublicDomain(domain: String!): Boolean!
   deleteQueuedChatMessage(messageId: UUID!): Boolean!
   deleteRelatedRecordPath(id: UUID!): RelatedRecordPath!
   deleteSSOIdentityProvider(input: DeleteSsoInput!): DeleteSso!
@@ -3744,14 +3724,6 @@ type PublicConnectionParametersOutput {
   username: String
 }
 
-type PublicDomain {
-  applicationId: UUID
-  createdAt: DateTime!
-  domain: String!
-  id: UUID!
-  isValidated: Boolean!
-}
-
 type PublicFeatureFlag {
   key: FeatureFlagKey!
   metadata: PublicFeatureFlagMetadata!
@@ -3848,7 +3820,6 @@ type Query {
   findManyApplications: [Application!]!
   findManyLogicFunctions: [LogicFunction!]!
   findManyMarketplaceApps(universalIdentifiers: [String!]): [MarketplaceApp!]!
-  findManyPublicDomains: [PublicDomain!]!
   findMarketplaceAppDetail(universalIdentifier: String!): MarketplaceAppDetail!
   findOneAgent(input: AgentIdInput!): Agent!
   findOneApplication(id: UUID, universalIdentifier: UUID): Application!
@@ -5146,7 +5117,6 @@ input UpdateWorkspaceInput {
   aiEvaluationModelId: String
   aiModelIdByTier: JSON
   allowImpersonation: Boolean
-  customDomain: String
   defaultRoleId: UUID
   displayName: String
   editableProfileFields: [String!]
