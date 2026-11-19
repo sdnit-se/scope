@@ -885,200 +885,6 @@ export type BarChartSeries = {
   label: Scalars['String']['output'];
 };
 
-export type BillingCustomer = {
-  __typename?: 'BillingCustomer';
-  hasPaymentMethod?: Maybe<Scalars['Boolean']['output']>;
-  id: Scalars['UUID']['output'];
-  userCreditsFallback: UserCreditsFallback;
-};
-
-export type BillingEndTrialPeriod = {
-  __typename?: 'BillingEndTrialPeriod';
-  /** Billing portal URL for payment method update (returned when no payment method exists) */
-  billingPortalUrl?: Maybe<Scalars['String']['output']>;
-  /** All billing subscriptions */
-  billingSubscriptions?: Maybe<Array<BillingSubscription>>;
-  /** Updated current billing subscription */
-  currentBillingSubscription?: Maybe<BillingSubscription>;
-  /** Boolean that confirms if a payment method was found */
-  hasPaymentMethod: Scalars['Boolean']['output'];
-  /** Updated subscription status */
-  status?: Maybe<SubscriptionStatus>;
-};
-
-export type BillingLicensedProduct = BillingProductDto & {
-  __typename?: 'BillingLicensedProduct';
-  description: Scalars['String']['output'];
-  images?: Maybe<Array<Scalars['String']['output']>>;
-  metadata: BillingProductMetadata;
-  name: Scalars['String']['output'];
-  prices?: Maybe<Array<BillingPriceLicensed>>;
-};
-
-export type BillingMeteredProduct = BillingProductDto & {
-  __typename?: 'BillingMeteredProduct';
-  description: Scalars['String']['output'];
-  images?: Maybe<Array<Scalars['String']['output']>>;
-  metadata: BillingProductMetadata;
-  name: Scalars['String']['output'];
-  prices?: Maybe<Array<BillingPriceMetered>>;
-};
-
-export type BillingPaymentIntent = {
-  __typename?: 'BillingPaymentIntent';
-  clientSecret: Scalars['String']['output'];
-  paymentIntentType: Scalars['String']['output'];
-};
-
-export type BillingPlan = {
-  __typename?: 'BillingPlan';
-  baseProducts: Array<BillingLicensedProduct>;
-  downgradePlanKeys: Array<BillingPlanKey>;
-  isCheckoutDefault: Scalars['Boolean']['output'];
-  isSellable: Scalars['Boolean']['output'];
-  meteredProducts: Array<BillingMeteredProduct>;
-  planKey: BillingPlanKey;
-  resourceCreditProducts: Array<BillingLicensedProduct>;
-  upgradePlanKeys: Array<BillingPlanKey>;
-};
-
-/** The different billing plans available */
-export enum BillingPlanKey {
-  ENTERPRISE = 'ENTERPRISE',
-  ORGANIZATION_V2 = 'ORGANIZATION_V2',
-  PRO = 'PRO',
-  PRO_V2 = 'PRO_V2'
-}
-
-export type BillingPriceLicensed = {
-  __typename?: 'BillingPriceLicensed';
-  creditAmount?: Maybe<Scalars['Float']['output']>;
-  isSellable: Scalars['Boolean']['output'];
-  priceUsageType: BillingUsageType;
-  recurringInterval: SubscriptionInterval;
-  stripePriceId: Scalars['String']['output'];
-  unitAmount: Scalars['Float']['output'];
-};
-
-export type BillingPriceMetered = {
-  __typename?: 'BillingPriceMetered';
-  priceUsageType: BillingUsageType;
-  recurringInterval: SubscriptionInterval;
-  stripePriceId: Scalars['String']['output'];
-  tiers: Array<BillingPriceTier>;
-};
-
-export type BillingPriceTier = {
-  __typename?: 'BillingPriceTier';
-  flatAmount?: Maybe<Scalars['Float']['output']>;
-  unitAmount?: Maybe<Scalars['Float']['output']>;
-  upTo?: Maybe<Scalars['Float']['output']>;
-};
-
-export type BillingProduct = {
-  __typename?: 'BillingProduct';
-  description: Scalars['String']['output'];
-  images?: Maybe<Array<Scalars['String']['output']>>;
-  metadata: BillingProductMetadata;
-  name: Scalars['String']['output'];
-};
-
-export type BillingProductDto = {
-  description: Scalars['String']['output'];
-  images?: Maybe<Array<Scalars['String']['output']>>;
-  metadata: BillingProductMetadata;
-  name: Scalars['String']['output'];
-};
-
-/** The different billing products available */
-export enum BillingProductKey {
-  BASE_PRODUCT = 'BASE_PRODUCT',
-  RESOURCE_CREDIT = 'RESOURCE_CREDIT'
-}
-
-export type BillingProductMetadata = {
-  __typename?: 'BillingProductMetadata';
-  isLegacy?: Maybe<Scalars['String']['output']>;
-  planKey: BillingPlanKey;
-  priceUsageBased: BillingUsageType;
-  productKey: BillingProductKey;
-};
-
-export type BillingResourceCreditUsage = {
-  __typename?: 'BillingResourceCreditUsage';
-  periodEnd: Scalars['DateTime']['output'];
-  periodStart: Scalars['DateTime']['output'];
-  productKey: BillingProductKey;
-  unitPriceCents: Scalars['Float']['output'];
-  userCreditsUsed: Scalars['Float']['output'];
-  workspaceCreditsExtraGranted: Scalars['Float']['output'];
-  workspaceCreditsGranted: Scalars['Float']['output'];
-  workspaceCreditsGrantedForSeats: Scalars['Float']['output'];
-  workspaceCreditsSeats: Scalars['Int']['output'];
-  workspaceCreditsTotalGranted: Scalars['Float']['output'];
-  workspaceCreditsUsed: Scalars['Float']['output'];
-};
-
-export type BillingSession = {
-  __typename?: 'BillingSession';
-  url?: Maybe<Scalars['String']['output']>;
-};
-
-export type BillingSubscription = {
-  __typename?: 'BillingSubscription';
-  billingSubscriptionItems?: Maybe<Array<BillingSubscriptionItem>>;
-  cancelAt?: Maybe<Scalars['DateTime']['output']>;
-  collectionMethod?: Maybe<BillingSubscriptionCollectionMethod>;
-  currentPeriodEnd?: Maybe<Scalars['DateTime']['output']>;
-  id: Scalars['UUID']['output'];
-  interval?: Maybe<SubscriptionInterval>;
-  metadata: Scalars['JSON']['output'];
-  phases: Array<BillingSubscriptionSchedulePhase>;
-  status: SubscriptionStatus;
-};
-
-export enum BillingSubscriptionCollectionMethod {
-  CHARGE_AUTOMATICALLY = 'CHARGE_AUTOMATICALLY',
-  SEND_INVOICE = 'SEND_INVOICE'
-}
-
-export type BillingSubscriptionItem = {
-  __typename?: 'BillingSubscriptionItem';
-  billingProduct: BillingProductDto;
-  creditAmount?: Maybe<Scalars['Float']['output']>;
-  hasReachedCurrentPeriodCap: Scalars['Boolean']['output'];
-  id: Scalars['UUID']['output'];
-  quantity?: Maybe<Scalars['Float']['output']>;
-  stripePriceId: Scalars['String']['output'];
-  unitAmount?: Maybe<Scalars['Float']['output']>;
-};
-
-export type BillingSubscriptionSchedulePhase = {
-  __typename?: 'BillingSubscriptionSchedulePhase';
-  end_date: Scalars['Float']['output'];
-  items: Array<BillingSubscriptionSchedulePhaseItem>;
-  start_date: Scalars['Float']['output'];
-};
-
-export type BillingSubscriptionSchedulePhaseItem = {
-  __typename?: 'BillingSubscriptionSchedulePhaseItem';
-  price: Scalars['String']['output'];
-  quantity?: Maybe<Scalars['Float']['output']>;
-};
-
-export type BillingUpdate = {
-  __typename?: 'BillingUpdate';
-  /** All billing subscriptions */
-  billingSubscriptions: Array<BillingSubscription>;
-  /** Current billing subscription */
-  currentBillingSubscription: BillingSubscription;
-};
-
-export enum BillingUsageType {
-  LICENSED = 'LICENSED',
-  METERED = 'METERED'
-}
-
 export type BooleanFieldComparison = {
   is?: InputMaybe<Scalars['Boolean']['input']>;
   isNot?: InputMaybe<Scalars['Boolean']['input']>;
@@ -2065,24 +1871,6 @@ export type EnqueueJobsResult = {
   logicFunctionUniversalIdentifier: Scalars['String']['output'];
 };
 
-export type EnterpriseLicenseInfoDto = {
-  __typename?: 'EnterpriseLicenseInfoDTO';
-  expiresAt?: Maybe<Scalars['DateTime']['output']>;
-  isValid: Scalars['Boolean']['output'];
-  licensee?: Maybe<Scalars['String']['output']>;
-  subscriptionId?: Maybe<Scalars['String']['output']>;
-};
-
-export type EnterpriseSubscriptionStatusDto = {
-  __typename?: 'EnterpriseSubscriptionStatusDTO';
-  cancelAt?: Maybe<Scalars['DateTime']['output']>;
-  currentPeriodEnd?: Maybe<Scalars['DateTime']['output']>;
-  expiresAt?: Maybe<Scalars['DateTime']['output']>;
-  isCancellationScheduled: Scalars['Boolean']['output'];
-  licensee?: Maybe<Scalars['String']['output']>;
-  status: Scalars['String']['output'];
-};
-
 export type EventSubscription = {
   __typename?: 'EventSubscription';
   eventStreamId: Scalars['String']['output'];
@@ -3010,10 +2798,6 @@ export type Mutation = {
   assignRoleToApiKey: Scalars['Boolean']['output'];
   attachRecordToInboxThread: Scalars['Boolean']['output'];
   authorizeApp: AuthorizeApp;
-  cancelSwitchBillingInterval: BillingUpdate;
-  cancelSwitchBillingPlan: BillingUpdate;
-  cancelSwitchResourceCreditPrice: BillingUpdate;
-  checkoutSession: BillingSession;
   claimApplicationRegistrationOwnership: ApplicationRegistration;
   completeAppTarballUpload: ApplicationRegistration;
   completeApplicationFileUploads: CompleteApplicationFileUploadsResult;
@@ -3028,7 +2812,6 @@ export type Mutation = {
   createApplicationFileUploads: CreateApplicationFileUploadsResult;
   createApplicationRegistration: CreateApplicationRegistration;
   createApprovedAccessDomain: ApprovedAccessDomain;
-  createBillingPaymentMethodSetupIntent: BillingPaymentIntent;
   createCalendarEvent: CreateCalendarEventOutput;
   createChatThread: AgentChatThread;
   createCommandMenuItem: CommandMenuItem;
@@ -3054,7 +2837,6 @@ export type Mutation = {
   createPageLayoutTab: PageLayoutTab;
   createPageLayoutWidget: PageLayoutWidget;
   createSkill: Skill;
-  createSubscriptionPaymentIntent: BillingPaymentIntent;
   createView: View;
   createViewField: ViewField;
   createViewFieldGroup: ViewFieldGroup;
@@ -3112,7 +2894,6 @@ export type Mutation = {
   duplicateDashboard: DuplicatedDashboard;
   duplicateMessageList: DuplicatedMessageList;
   emailPasswordResetLink: EmailPasswordResetLink;
-  endSubscriptionTrialPeriod: BillingEndTrialPeriod;
   /** @deprecated Use enqueueJobs instead. */
   enqueueJob: EnqueueJobResult;
   enqueueJobs: EnqueueJobsResult;
@@ -3139,11 +2920,8 @@ export type Mutation = {
   installMarketplaceApp: Scalars['Boolean']['output'];
   markAgentChatThreadAsDoneInChannel: Scalars['Boolean']['output'];
   moveAgentChatThreadToChannel: Scalars['Boolean']['output'];
-  refreshEnterpriseValidityToken: Scalars['Boolean']['output'];
-  releaseEnterpriseServerBinding: EnterpriseLicenseInfoDto;
   removeAgentChatMessageReaction: Array<AgentMessageReactionSummary>;
   removeQueryFromEventStream: Scalars['Boolean']['output'];
-  removeRecordShare: RecordSharingDto;
   removeRoleFromAgent: Scalars['Boolean']['output'];
   renewApplicationToken: ApplicationTokenPair;
   renewToken: AuthTokens;
@@ -3172,10 +2950,6 @@ export type Mutation = {
   sendInboxMessage: SendInboxMessageResult;
   sendInvitations: SendInvitations;
   setAppKeyValue: AppKeyValue;
-  setEnterpriseKey: EnterpriseLicenseInfoDto;
-  setRecordGeneralAccess: RecordSharingDto;
-  setRecordShare: RecordSharingDto;
-  setResourceCreditSubscriptionPrice: BillingUpdate;
   signIn: AvailableWorkspacesAndAccessTokens;
   signOut: Scalars['Boolean']['output'];
   signUp: AvailableWorkspacesAndAccessTokens;
@@ -3187,8 +2961,6 @@ export type Mutation = {
   startWorkspaceSetupChat: StartWorkspaceSetupChatResult;
   stopAgentChatStream: Scalars['Boolean']['output'];
   stopImpersonation: StopImpersonation;
-  switchBillingPlan: BillingUpdate;
-  switchSubscriptionInterval: BillingUpdate;
   syncAppMessageFolders: Array<MessageFolder>;
   syncApplication: WorkspaceMigration;
   syncMarketplaceCatalog: Scalars['Boolean']['output'];
@@ -3237,7 +3009,6 @@ export type Mutation = {
   updatePasswordViaResetToken: InvalidatePassword;
   updateSkill: Skill;
   updateTimelineActivityType: TimelineActivityType;
-  updateUserCreditsFallback: BillingCustomer;
   updateUserEmail: Scalars['Boolean']['output'];
   updateView: View;
   updateViewField: ViewField;
@@ -3268,7 +3039,6 @@ export type Mutation = {
   upsertFieldsWidget: View;
   upsertObjectPermissions: Array<ObjectPermission>;
   upsertPermissionFlags: Array<RolePermissionFlag>;
-  upsertRowLevelPermissionPredicates: UpsertRowLevelPermissionPredicatesResult;
   upsertViewWidget: View;
   validateApprovedAccessDomain: ApprovedAccessDomain;
   verifyEmailAndGetLoginToken: VerifyEmailAndGetLoginToken;
@@ -3328,14 +3098,6 @@ export type MutationAuthorizeAppArgs = {
   redirectUrl: Scalars['String']['input'];
   scope?: InputMaybe<Scalars['String']['input']>;
   state?: InputMaybe<Scalars['String']['input']>;
-};
-
-
-export type MutationCheckoutSessionArgs = {
-  plan: BillingPlanKey;
-  recurringInterval: SubscriptionInterval;
-  requirePaymentMethod?: Scalars['Boolean']['input'];
-  successUrlPath?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -3545,15 +3307,6 @@ export type MutationCreatePageLayoutWidgetArgs = {
 
 export type MutationCreateSkillArgs = {
   input: CreateSkillInput;
-};
-
-
-export type MutationCreateSubscriptionPaymentIntentArgs = {
-  idempotencyKey: Scalars['String']['input'];
-  plan: BillingPlanKey;
-  recurringInterval: SubscriptionInterval;
-  requirePaymentMethod?: Scalars['Boolean']['input'];
-  successUrlPath?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -3961,12 +3714,6 @@ export type MutationRemoveQueryFromEventStreamArgs = {
 };
 
 
-export type MutationRemoveRecordShareArgs = {
-  principal: RecordSharePrincipalInput;
-  target: RecordTargetInput;
-};
-
-
 export type MutationRemoveRoleFromAgentArgs = {
   agentId: Scalars['UUID']['input'];
 };
@@ -4115,29 +3862,6 @@ export type MutationSetAppKeyValueArgs = {
 };
 
 
-export type MutationSetEnterpriseKeyArgs = {
-  enterpriseKey: Scalars['String']['input'];
-};
-
-
-export type MutationSetRecordGeneralAccessArgs = {
-  accessLevel: RecordShareAccessLevel;
-  target: RecordTargetInput;
-};
-
-
-export type MutationSetRecordShareArgs = {
-  accessLevel: RecordShareAccessLevel;
-  principal: RecordSharePrincipalInput;
-  target: RecordTargetInput;
-};
-
-
-export type MutationSetResourceCreditSubscriptionPriceArgs = {
-  priceId: Scalars['String']['input'];
-};
-
-
 export type MutationSignInArgs = {
   captchaToken?: InputMaybe<Scalars['String']['input']>;
   email: Scalars['String']['input'];
@@ -4202,11 +3926,6 @@ export type MutationStartWorkspaceSetupChatArgs = {
 
 export type MutationStopAgentChatStreamArgs = {
   threadId: Scalars['UUID']['input'];
-};
-
-
-export type MutationSwitchBillingPlanArgs = {
-  plan?: InputMaybe<BillingPlanKey>;
 };
 
 
@@ -4454,11 +4173,6 @@ export type MutationUpdateTimelineActivityTypeArgs = {
 };
 
 
-export type MutationUpdateUserCreditsFallbackArgs = {
-  userCreditsFallback: UserCreditsFallback;
-};
-
-
 export type MutationUpdateUserEmailArgs = {
   newEmail: Scalars['String']['input'];
   verifyEmailRedirectPath?: InputMaybe<Scalars['String']['input']>;
@@ -4586,11 +4300,6 @@ export type MutationUpsertObjectPermissionsArgs = {
 
 export type MutationUpsertPermissionFlagsArgs = {
   upsertPermissionFlagsInput: UpsertPermissionFlagsInput;
-};
-
-
-export type MutationUpsertRowLevelPermissionPredicatesArgs = {
-  input: UpsertRowLevelPermissionPredicatesInput;
 };
 
 
@@ -4785,8 +4494,6 @@ export type ObjectPermission = {
   canUpdateObjectRecords?: Maybe<Scalars['Boolean']['output']>;
   objectMetadataId: Scalars['UUID']['output'];
   restrictedFields?: Maybe<Scalars['JSON']['output']>;
-  rowLevelPermissionPredicateGroups?: Maybe<Array<RowLevelPermissionPredicateGroup>>;
-  rowLevelPermissionPredicates?: Maybe<Array<RowLevelPermissionPredicate>>;
 };
 
 export type ObjectPermissionInput = {
@@ -5168,8 +4875,6 @@ export type Query = {
   applicationRegistrationTarballUrl?: Maybe<Scalars['String']['output']>;
   applicationSdkClientChecksums?: Maybe<SdkClientChecksums>;
   barChartData: BarChartData;
-  billingPlans: Array<BillingPlan>;
-  billingPortalSession: BillingSession;
   callRecordingIdForCalendarEvent?: Maybe<Scalars['UUID']['output']>;
   chatMessages: Array<AgentMessage>;
   chatStreamCatchupChunks: ChatStreamCatchupChunks;
@@ -5183,9 +4888,6 @@ export type Query = {
   currentUserApplicationAuthorizations: Array<ApplicationAuthorization>;
   currentUserSessions: Array<UserSession>;
   currentWorkspace: Workspace;
-  enterpriseCheckoutSession?: Maybe<Scalars['String']['output']>;
-  enterprisePortalSession?: Maybe<Scalars['String']['output']>;
-  enterpriseSubscriptionStatus?: Maybe<EnterpriseSubscriptionStatusDto>;
   exportApplication: ApplicationExport;
   field: Field;
   fields: FieldConnection;
@@ -5231,7 +4933,6 @@ export type Query = {
   getPermissionFlags: Array<PermissionFlag>;
   getPublicWorkspaceDataByDomain: PublicWorkspaceData;
   getPublicWorkspaceDataById: PublicWorkspaceDataSummary;
-  getResourceCreditUsage: Array<BillingResourceCreditUsage>;
   getRole: Role;
   getRoles: Array<Role>;
   getToolIndex: Array<ToolIndexEntry>;
@@ -5254,8 +4955,6 @@ export type Query = {
   githubClaimAuthorizationUrl: Scalars['String']['output'];
   isApplicationStopped: Scalars['Boolean']['output'];
   lineChartData: LineChartData;
-  /** @deprecated Use billingPlans instead. */
-  listPlans: Array<BillingPlan>;
   mcpServer?: Maybe<McpServer>;
   mcpServers: Array<McpServer>;
   metadataTranslations: Array<MetadataTranslation>;
@@ -5276,7 +4975,6 @@ export type Query = {
   publicMarketplaceAppDetail: MarketplaceAppDetail;
   publicMarketplaceApps: Array<MarketplaceApp>;
   recordPermissions: Array<RecordPermissionsResult>;
-  recordSharing: RecordSharingDto;
   skill?: Maybe<Skill>;
   skills: Array<Skill>;
   timelineActivityTypes: Array<TimelineActivityType>;
@@ -5364,12 +5062,6 @@ export type QueryBarChartDataArgs = {
 };
 
 
-export type QueryBillingPortalSessionArgs = {
-  forPaymentMethodUpdate?: InputMaybe<Scalars['Boolean']['input']>;
-  returnUrlPath?: InputMaybe<Scalars['String']['input']>;
-};
-
-
 export type QueryCallRecordingIdForCalendarEventArgs = {
   calendarEventId: Scalars['UUID']['input'];
 };
@@ -5408,16 +5100,6 @@ export type QueryCheckWorkspaceSubdomainAvailabilityArgs = {
 
 export type QueryCommandMenuItemArgs = {
   id: Scalars['UUID']['input'];
-};
-
-
-export type QueryEnterpriseCheckoutSessionArgs = {
-  billingInterval?: InputMaybe<Scalars['String']['input']>;
-};
-
-
-export type QueryEnterprisePortalSessionArgs = {
-  returnUrlPath?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -5755,11 +5437,6 @@ export type QueryRecordPermissionsArgs = {
 };
 
 
-export type QueryRecordSharingArgs = {
-  target: RecordTargetInput;
-};
-
-
 export type QuerySkillArgs = {
   id: Scalars['UUID']['input'];
 };
@@ -5814,69 +5491,6 @@ export type RecordPermissionsResult = {
   objectMetadataId: Scalars['UUID']['output'];
   permissions: RecordPermissionsDto;
   recordId: Scalars['UUID']['output'];
-};
-
-export enum RecordShareAccessLevel {
-  FULL = 'FULL',
-  NONE = 'NONE',
-  READ = 'READ',
-  READ_WRITE = 'READ_WRITE'
-}
-
-export type RecordSharePrincipalInput = {
-  roleId?: InputMaybe<Scalars['UUID']['input']>;
-  workspaceMemberId?: InputMaybe<Scalars['UUID']['input']>;
-};
-
-export enum RecordSharePrincipalType {
-  EVERYONE = 'EVERYONE',
-  ROLE = 'ROLE',
-  WORKSPACE_MEMBER = 'WORKSPACE_MEMBER'
-}
-
-export enum RecordShareRowCause {
-  APPLICATION = 'APPLICATION',
-  MANUAL = 'MANUAL',
-  OWNER = 'OWNER',
-  RULE = 'RULE'
-}
-
-export type RecordSharingDto = {
-  __typename?: 'RecordSharingDTO';
-  canManageSharing: Scalars['Boolean']['output'];
-  defaultGeneralAccessLevel?: Maybe<RecordShareAccessLevel>;
-  generalAccessLevel?: Maybe<RecordShareAccessLevel>;
-  hasManagedGeneralAccess: Scalars['Boolean']['output'];
-  permissions: RecordPermissionsDto;
-  roles: Array<RecordSharingRoleDto>;
-  shares: Array<RecordSharingGrantDto>;
-  sharingMode: RecordSharingMode;
-};
-
-export type RecordSharingGrantDto = {
-  __typename?: 'RecordSharingGrantDTO';
-  accessLevel: RecordShareAccessLevel;
-  id: Scalars['ID']['output'];
-  principalId: Scalars['UUID']['output'];
-  principalRoleId?: Maybe<Scalars['UUID']['output']>;
-  principalType: RecordSharePrincipalType;
-  rowCause: RecordShareRowCause;
-};
-
-/** How records of an object are shared: only through roles, private until shared, readable through linked records, or open by default with per-record exceptions */
-export enum RecordSharingMode {
-  INHERITED = 'INHERITED',
-  OPEN_BY_DEFAULT = 'OPEN_BY_DEFAULT',
-  PRIVATE = 'PRIVATE',
-  ROLE_ONLY = 'ROLE_ONLY'
-}
-
-export type RecordSharingRoleDto = {
-  __typename?: 'RecordSharingRoleDTO';
-  canRead?: Maybe<Scalars['Boolean']['output']>;
-  canUpdate?: Maybe<Scalars['Boolean']['output']>;
-  id: Scalars['UUID']['output'];
-  label: Scalars['String']['output'];
 };
 
 export type RecordTableConfiguration = {
@@ -5957,8 +5571,6 @@ export type Role = {
   label: Scalars['String']['output'];
   objectPermissions?: Maybe<Array<ObjectPermission>>;
   permissionFlags?: Maybe<Array<RolePermissionFlag>>;
-  rowLevelPermissionPredicateGroups?: Maybe<Array<RowLevelPermissionPredicateGroup>>;
-  rowLevelPermissionPredicates?: Maybe<Array<RowLevelPermissionPredicate>>;
   universalIdentifier?: Maybe<Scalars['UUID']['output']>;
   workspaceMembers: Array<WorkspaceMember>;
 };
@@ -5974,75 +5586,6 @@ export type RotateClientSecret = {
   __typename?: 'RotateClientSecret';
   clientSecret: Scalars['String']['output'];
 };
-
-export type RowLevelPermissionPredicate = {
-  __typename?: 'RowLevelPermissionPredicate';
-  fieldMetadataId: Scalars['String']['output'];
-  id: Scalars['String']['output'];
-  objectMetadataId: Scalars['String']['output'];
-  operand: RowLevelPermissionPredicateOperand;
-  positionInRowLevelPermissionPredicateGroup?: Maybe<Scalars['Float']['output']>;
-  roleId: Scalars['String']['output'];
-  rowLevelPermissionPredicateGroupId?: Maybe<Scalars['String']['output']>;
-  subFieldName?: Maybe<Scalars['String']['output']>;
-  value?: Maybe<Scalars['JSON']['output']>;
-  workspaceMemberFieldMetadataId?: Maybe<Scalars['String']['output']>;
-  workspaceMemberSubFieldName?: Maybe<Scalars['String']['output']>;
-};
-
-export type RowLevelPermissionPredicateGroup = {
-  __typename?: 'RowLevelPermissionPredicateGroup';
-  id: Scalars['String']['output'];
-  logicalOperator: RowLevelPermissionPredicateGroupLogicalOperator;
-  objectMetadataId: Scalars['String']['output'];
-  parentRowLevelPermissionPredicateGroupId?: Maybe<Scalars['String']['output']>;
-  positionInRowLevelPermissionPredicateGroup?: Maybe<Scalars['Float']['output']>;
-  roleId: Scalars['String']['output'];
-};
-
-export type RowLevelPermissionPredicateGroupInput = {
-  id?: InputMaybe<Scalars['UUID']['input']>;
-  logicalOperator: RowLevelPermissionPredicateGroupLogicalOperator;
-  objectMetadataId: Scalars['UUID']['input'];
-  parentRowLevelPermissionPredicateGroupId?: InputMaybe<Scalars['UUID']['input']>;
-  positionInRowLevelPermissionPredicateGroup?: InputMaybe<Scalars['Float']['input']>;
-};
-
-export enum RowLevelPermissionPredicateGroupLogicalOperator {
-  AND = 'AND',
-  OR = 'OR'
-}
-
-export type RowLevelPermissionPredicateInput = {
-  fieldMetadataId: Scalars['UUID']['input'];
-  id?: InputMaybe<Scalars['UUID']['input']>;
-  operand: RowLevelPermissionPredicateOperand;
-  positionInRowLevelPermissionPredicateGroup?: InputMaybe<Scalars['Float']['input']>;
-  rowLevelPermissionPredicateGroupId?: InputMaybe<Scalars['UUID']['input']>;
-  subFieldName?: InputMaybe<Scalars['String']['input']>;
-  value?: InputMaybe<Scalars['JSON']['input']>;
-  workspaceMemberFieldMetadataId?: InputMaybe<Scalars['String']['input']>;
-  workspaceMemberSubFieldName?: InputMaybe<Scalars['String']['input']>;
-};
-
-export enum RowLevelPermissionPredicateOperand {
-  CONTAINS = 'CONTAINS',
-  DOES_NOT_CONTAIN = 'DOES_NOT_CONTAIN',
-  GREATER_THAN_OR_EQUAL = 'GREATER_THAN_OR_EQUAL',
-  IS = 'IS',
-  IS_AFTER = 'IS_AFTER',
-  IS_BEFORE = 'IS_BEFORE',
-  IS_EMPTY = 'IS_EMPTY',
-  IS_IN_FUTURE = 'IS_IN_FUTURE',
-  IS_IN_PAST = 'IS_IN_PAST',
-  IS_NOT = 'IS_NOT',
-  IS_NOT_EMPTY = 'IS_NOT_EMPTY',
-  IS_NOT_NULL = 'IS_NOT_NULL',
-  IS_RELATIVE = 'IS_RELATIVE',
-  IS_TODAY = 'IS_TODAY',
-  LESS_THAN_OR_EQUAL = 'LESS_THAN_OR_EQUAL',
-  VECTOR_SEARCH = 'VECTOR_SEARCH'
-}
 
 export type RunAgentInput = {
   additionalInstructions?: InputMaybe<Scalars['String']['input']>;
@@ -6289,22 +5832,6 @@ export type SubscriptionOnAgentChatEventArgs = {
 export type SubscriptionOnEventSubscriptionArgs = {
   eventStreamId: Scalars['String']['input'];
 };
-
-export enum SubscriptionInterval {
-  Month = 'Month',
-  Year = 'Year'
-}
-
-export enum SubscriptionStatus {
-  Active = 'Active',
-  Canceled = 'Canceled',
-  Incomplete = 'Incomplete',
-  IncompleteExpired = 'IncompleteExpired',
-  PastDue = 'PastDue',
-  Paused = 'Paused',
-  Trialing = 'Trialing',
-  Unpaid = 'Unpaid'
-}
 
 export type Support = {
   __typename?: 'Support';
@@ -7020,19 +6547,6 @@ export type UpsertPermissionFlagsInput = {
   roleId: Scalars['UUID']['input'];
 };
 
-export type UpsertRowLevelPermissionPredicatesInput = {
-  objectMetadataId: Scalars['UUID']['input'];
-  predicateGroups: Array<RowLevelPermissionPredicateGroupInput>;
-  predicates: Array<RowLevelPermissionPredicateInput>;
-  roleId: Scalars['UUID']['input'];
-};
-
-export type UpsertRowLevelPermissionPredicatesResult = {
-  __typename?: 'UpsertRowLevelPermissionPredicatesResult';
-  predicateGroups: Array<RowLevelPermissionPredicateGroup>;
-  predicates: Array<RowLevelPermissionPredicate>;
-};
-
 export type UpsertViewWidgetInput = {
   /** View-level settings (layout type, group by, kanban and calendar settings) to apply to the widget view. */
   view?: InputMaybe<UpsertViewWidgetViewSettingsInput>;
@@ -7140,11 +6654,6 @@ export type UserApplicationVariableValue = {
   type: Scalars['String']['output'];
   value: Scalars['String']['output'];
 };
-
-export enum UserCreditsFallback {
-  STOP = 'STOP',
-  WORKSPACE_CREDITS = 'WORKSPACE_CREDITS'
-}
 
 export type UserSession = {
   __typename?: 'UserSession';

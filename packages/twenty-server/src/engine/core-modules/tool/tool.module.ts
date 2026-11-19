@@ -6,7 +6,6 @@ import { TokenModule } from 'src/engine/core-modules/auth/token/token.module';
 import { FeatureFlagModule } from 'src/engine/core-modules/feature-flag/feature-flag.module';
 import { FileEntity } from 'src/engine/core-modules/file/entities/file.entity';
 import { FileModule } from 'src/engine/core-modules/file/file.module';
-import { RecordShareModule } from 'src/engine/core-modules/record-share/record-share.module';
 import { SecureHttpClientModule } from 'src/engine/core-modules/secure-http-client/secure-http-client.module';
 import { CreateCalendarEventTool } from 'src/engine/core-modules/tool/tools/calendar-tool/create-calendar-event-tool';
 import { CodeInterpreterTool } from 'src/engine/core-modules/tool/tools/code-interpreter-tool/code-interpreter-tool';
@@ -20,7 +19,6 @@ import { HttpTool } from 'src/engine/core-modules/tool/tools/http-tool/http-tool
 import { ExtractJsonPathsTool } from 'src/engine/core-modules/tool/tools/output-navigation-tool/extract-json-paths-tool';
 import { SearchOutputTool } from 'src/engine/core-modules/tool/tools/output-navigation-tool/search-output-tool';
 import { SearchHelpCenterTool } from 'src/engine/core-modules/tool/tools/search-help-center-tool/search-help-center-tool';
-import { ShareRecordTool } from 'src/engine/core-modules/tool/tools/share-record-tool/share-record-tool';
 import { ToolOutputSpillService } from 'src/engine/core-modules/tool/services/tool-output-spill.service';
 import { ConnectedAccountMetadataModule } from 'src/engine/metadata-modules/connected-account/connected-account-metadata.module';
 import { ConnectedAccountEntity } from 'src/engine/metadata-modules/connected-account/entities/connected-account.entity';
@@ -38,7 +36,6 @@ import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache
     FeatureFlagModule,
     FileModule,
     TokenModule,
-    RecordShareModule,
     SecureHttpClientModule,
     WorkspaceCacheModule,
   ],
@@ -55,7 +52,6 @@ import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache
     CodeInterpreterTool,
     ExtractJsonPathsTool,
     SearchOutputTool,
-    ShareRecordTool,
     ToolOutputSpillService,
     provideWorkspaceScopedRepository(FileEntity),
   ],
@@ -72,7 +68,6 @@ import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache
     CodeInterpreterTool,
     ExtractJsonPathsTool,
     SearchOutputTool,
-    ShareRecordTool,
     ToolOutputSpillService,
   ],
 })

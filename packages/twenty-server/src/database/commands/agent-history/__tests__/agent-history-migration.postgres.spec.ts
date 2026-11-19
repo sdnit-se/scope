@@ -1,7 +1,5 @@
-import { backfillWorkspaceChatThreadOwnerGrants } from 'src/engine/metadata-modules/ai/ai-chat/utils/backfill-workspace-chat-thread-owner-grants.util';
 import { LinkChatMessageSendersToWorkspaceMembersCommand } from 'src/database/commands/upgrade-version-command/2-44/2-44-workspace-command-1790605326331-link-chat-message-senders-to-workspace-members.command';
 import { AgentHistoryWorkspaceStorageService } from 'src/engine/metadata-modules/ai/ai-history/services/agent-history-workspace-storage.service';
-import { STANDARD_OBJECTS } from 'twenty-shared/metadata';
 import { withWorkspaceContext } from 'src/engine/twenty-orm/storage/orm-workspace-context.storage';
 import { AgentChatService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat.service';
 import { AgentChatQueueService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-queue.service';
@@ -214,7 +212,6 @@ const SCHEMA = getWorkspaceSchemaName(WORKSPACE_ID);
           updatedAt: new Date(),
         }),
       } as never,
-      {} as never,
       {} as never,
     );
     const conversationWriter = new AgentConversationWriterService(
@@ -740,61 +737,6 @@ const SCHEMA = getWorkspaceSchemaName(WORKSPACE_ID);
         }),
       ).toBe(1);
       expect(emitDatabaseBatchEvent).not.toHaveBeenCalled();
-    });
-
-    it('grants ownership from the native member relation without the legacy owner column', async () => {
-      await migration.migrate({
-        workspaceId: WORKSPACE_ID,
-        target: 'workspace',
-      });
-      await dataSource.query(
-        `UPDATE "${SCHEMA}"."agentChatThread" SET "workspaceMemberId" = $1 WHERE id = $2`,
-        [MEMBER_ID, THREAD_ID],
-      );
-      await dataSource.query(
-        `ALTER TABLE "${SCHEMA}"."agentChatThread" DROP COLUMN "userWorkspaceId"`,
-      );
-      await dataSource.query(
-        'CREATE TABLE core."objectMetadata" (id uuid, "workspaceId" uuid, "universalIdentifier" uuid)',
-      );
-      await dataSource.query(
-        'INSERT INTO core."objectMetadata" VALUES ($1, $2, $3)',
-        [
-          TURN_ID,
-          WORKSPACE_ID,
-          STANDARD_OBJECTS.agentChatThread.universalIdentifier,
-        ],
-      );
-      await dataSource.query(
-        `CREATE TABLE "${SCHEMA}"."recordShare" (id uuid DEFAULT public.uuid_generate_v4(), "objectMetadataId" uuid, "recordId" uuid, "principalId" uuid, "principalType" text, "accessLevel" text, "rowCause" text, "sourceId" uuid, UNIQUE ("recordId", "principalId"))`,
-      );
-      const args = {
-        manager: dataSource.manager,
-        workspaceId: WORKSPACE_ID,
-        threadTableExpression: `"${SCHEMA}"."agentChatThread"`,
-        recordIds: [THREAD_ID],
-      };
-      await expect(backfillWorkspaceChatThreadOwnerGrants(args)).resolves.toBe(
-        1,
-      );
-      await expect(backfillWorkspaceChatThreadOwnerGrants(args)).resolves.toBe(
-        0,
-      );
-      expect(
-        await dataSource.query(
-          `SELECT "recordId", "principalId", "rowCause" FROM "${SCHEMA}"."recordShare"`,
-        ),
-      ).toEqual([
-        { recordId: THREAD_ID, principalId: MEMBER_ID, rowCause: 'OWNER' },
-      ]);
-      await dataSource.query(`DELETE FROM "${SCHEMA}"."recordShare"`);
-      await dataSource.query(
-        'UPDATE core."userWorkspace" SET "deletedAt" = NOW() WHERE id = $1',
-        [OWNER_ID],
-      );
-      await expect(backfillWorkspaceChatThreadOwnerGrants(args)).resolves.toBe(
-        0,
-      );
     });
 
     it('persists senders for normal and queued messages after schema expansion, and runs agent-opened turns as the owner', async () => {

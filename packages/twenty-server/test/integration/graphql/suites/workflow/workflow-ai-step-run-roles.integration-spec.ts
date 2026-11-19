@@ -22,10 +22,8 @@ import { deleteOneRole } from 'test/integration/metadata/suites/role/utils/delet
 import { findOneRoleByLabel } from 'test/integration/metadata/suites/role/utils/find-one-role-by-label.util';
 import { updateWorkspaceMemberRole } from 'test/integration/metadata/suites/role/utils/update-workspace-member-role.util';
 import { upsertPermissionFlags } from 'test/integration/metadata/suites/role-permission-flag/utils/upsert-permission-flags.util';
-import { upsertRowLevelPermissionPredicates } from 'test/integration/metadata/suites/row-level-permission-predicate/utils/upsert-row-level-permission-predicates.util';
 import { getAppProviderByClassName } from 'test/integration/utils/get-app-provider-by-class-name.util';
 import { createScriptedLanguageModel } from 'test/utils/create-scripted-language-model.util';
-import { RowLevelPermissionPredicateOperand } from 'twenty-shared/types';
 import { WorkflowActionType } from 'twenty-shared/workflow';
 import { PermissionFlagType } from 'twenty-shared/constants';
 
@@ -124,7 +122,6 @@ const mockModelCallingFindTool = ({
 
 describe('workflow AI step when a member runs a workspace-owned workflow (integration)', () => {
   let objectMetadataId: string;
-  let nameFieldMetadataId: string;
   let originalMemberRoleId: string;
   let memberRoleId: string;
   let agentRoleId: string;
@@ -145,21 +142,6 @@ describe('workflow AI step when a member runs a workspace-owned workflow (integr
             canDestroyObjectRecords: canReadObjectRecords,
           },
         ],
-      },
-    });
-
-  const setMemberRowRule = (predicates: { value: string }[]) =>
-    upsertRowLevelPermissionPredicates({
-      expectToFail: false,
-      input: {
-        roleId: memberRoleId,
-        objectMetadataId,
-        predicates: predicates.map(({ value }) => ({
-          fieldMetadataId: nameFieldMetadataId,
-          operand: RowLevelPermissionPredicateOperand.CONTAINS,
-          value,
-        })),
-        predicateGroups: [],
       },
     });
 
@@ -282,8 +264,6 @@ describe('workflow AI step when a member runs a workspace-owned workflow (integr
     });
 
     objectMetadataId = objectData.createOneObject.id;
-    nameFieldMetadataId =
-      objectData.createOneObject.labelIdentifierFieldMetadataId!;
 
     for (const name of [VISIBLE_RECORD_NAME, HIDDEN_RECORD_NAME]) {
       await makeGraphqlApiRequest(
@@ -345,7 +325,6 @@ describe('workflow AI step when a member runs a workspace-owned workflow (integr
 
   afterEach(async () => {
     jest.restoreAllMocks();
-    await setMemberRowRule([]);
     await setMemberObjectAccess(true);
   });
 
@@ -394,19 +373,6 @@ describe('workflow AI step when a member runs a workspace-owned workflow (integr
 
     expect(calls[0].offeredToolNames).not.toContain(FIND_TOOL_NAME);
     expect(calls[1].toolOutputs.join()).not.toContain(VISIBLE_RECORD_NAME);
-    expect(calls[1].toolOutputs.join()).not.toContain(HIDDEN_RECORD_NAME);
-  });
-
-  it('applies the row rules of its member to what the step reads', async () => {
-    await setMemberRowRule([{ value: 'Visible' }]);
-    const calls = mockModelCallingFindTool();
-
-    expect(await runAsMemberUntilDone(await createAgentStepWorkflow())).toBe(
-      'COMPLETED',
-    );
-
-    expect(calls[0].offeredToolNames).toContain(FIND_TOOL_NAME);
-    expect(calls[1].toolOutputs.join()).toContain(VISIBLE_RECORD_NAME);
     expect(calls[1].toolOutputs.join()).not.toContain(HIDDEN_RECORD_NAME);
   });
 

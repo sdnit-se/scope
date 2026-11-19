@@ -1,6 +1,6 @@
 import { createSubscriptionAuthorization } from 'src/engine/subscriptions/utils/create-subscription-authorization';
 import { aiGraphqlApiExceptionHandler } from 'src/engine/metadata-modules/ai/utils/ai-graphql-api-exception-handler.util';
-import { AgentChatSharingService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-sharing.service';
+import { AgentChatThreadAccessService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-thread-access.service';
 import { withAsyncIteratorAuthorization } from 'src/engine/subscriptions/utils/with-async-iterator-authorization';
 import { InjectAgentHistoryRepository } from 'src/engine/metadata-modules/ai/ai-history/repositories/inject-agent-history-repository.decorator';
 import { AgentHistoryRepository } from 'src/engine/metadata-modules/ai/ai-history/repositories/agent-history-repository';
@@ -44,7 +44,7 @@ export class AgentChatSubscriptionResolver {
   constructor(
     private readonly subscriptionService: SubscriptionService,
     private readonly streamRecoveryService: AgentChatStreamRecoveryService,
-    private readonly sharingService: AgentChatSharingService,
+    private readonly threadAccessService: AgentChatThreadAccessService,
     @InjectAgentHistoryRepository('agentChatThread')
     private readonly threadRepository: AgentHistoryRepository<AgentChatThreadWorkspaceEntity>,
   ) {}
@@ -65,7 +65,7 @@ export class AgentChatSubscriptionResolver {
   ) {
     const authorize = createSubscriptionAuthorization({
       check: () =>
-        this.sharingService
+        this.threadAccessService
           .getReadableThread({
             workspaceId: workspace.id,
             threadId,

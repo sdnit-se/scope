@@ -4,7 +4,7 @@ import { isDefined } from 'twenty-shared/utils';
 import { getAppProviderByClassName } from 'test/integration/utils/get-app-provider-by-class-name.util';
 
 import { type AddChatMentionResolutionCommand } from 'src/database/commands/upgrade-version-command/2-54/2-54-workspace-command-1793350721809-add-chat-mention-resolution.command';
-import { type AgentChatSharingService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-sharing.service';
+import { type AgentChatThreadAccessService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-thread-access.service';
 import { AiExceptionCode } from 'src/engine/metadata-modules/ai/ai.exception';
 import { type WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
 import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
@@ -24,7 +24,7 @@ const MENTIONS_RESOLVED_AT_FIELD_UNIVERSAL_IDENTIFIER =
 describe('2-54 workspace command - add chat mention resolution (integration)', () => {
   let command: AddChatMentionResolutionCommand;
   let workspaceCacheService: WorkspaceCacheService;
-  let sharingService: AgentChatSharingService;
+  let threadAccessService: AgentChatThreadAccessService;
 
   const findResolutionMetadata = async () => {
     const { flatFieldMetadataMaps } =
@@ -56,9 +56,10 @@ describe('2-54 workspace command - add chat mention resolution (integration)', (
     workspaceCacheService = getAppProviderByClassName<WorkspaceCacheService>(
       'WorkspaceCacheService',
     );
-    sharingService = getAppProviderByClassName<AgentChatSharingService>(
-      'AgentChatSharingService',
-    );
+    threadAccessService =
+      getAppProviderByClassName<AgentChatThreadAccessService>(
+        'AgentChatThreadAccessService',
+      );
   });
 
   afterAll(async () => {
@@ -73,7 +74,9 @@ describe('2-54 workspace command - add chat mention resolution (integration)', (
       hasColumn: false,
     });
     await expect(
-      sharingService.getParticipantObjectMetadataId(SEED_APPLE_WORKSPACE_ID),
+      threadAccessService.assertHasMentionResolutionOrThrow(
+        SEED_APPLE_WORKSPACE_ID,
+      ),
     ).rejects.toMatchObject({ code: AiExceptionCode.CHAT_UPGRADE_IN_PROGRESS });
   });
 
@@ -94,7 +97,9 @@ describe('2-54 workspace command - add chat mention resolution (integration)', (
       hasColumn: true,
     });
     await expect(
-      sharingService.getParticipantObjectMetadataId(SEED_APPLE_WORKSPACE_ID),
-    ).resolves.toEqual(expect.any(String));
+      threadAccessService.assertHasMentionResolutionOrThrow(
+        SEED_APPLE_WORKSPACE_ID,
+      ),
+    ).resolves.toBeUndefined();
   });
 });

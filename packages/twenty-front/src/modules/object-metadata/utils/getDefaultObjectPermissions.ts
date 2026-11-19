@@ -10,6 +10,4 @@ export const getDefaultObjectPermissions = (
   canSoftDeleteObjectRecords: true,
   canDestroyObjectRecords: true,
   restrictedFields: {},
-  rowLevelPermissionPredicates: [],
-  rowLevelPermissionPredicateGroups: [],
 });

@@ -689,7 +689,7 @@ describe('core workflow visibility (e2e)', () => {
       ).toEqual([workflowRunId]);
     });
 
-    it('hides them from another member once the workflow is private', async () => {
+    it('still lets another member read them once the workflow is private, as their role decides', async () => {
       const response = await setVisibility(
         runsCoreWorkflowId,
         WorkflowVisibility.PRIVATE,
@@ -698,7 +698,7 @@ describe('core workflow visibility (e2e)', () => {
       expect(response.body.errors).toBeUndefined();
       expect(
         await findRecordIds(asOtherMember, 'workflowRuns', workflowRunId),
-      ).toEqual([]);
+      ).toEqual([workflowRunId]);
     });
 
     it('keeps them readable by its creator while private', async () => {
@@ -711,12 +711,12 @@ describe('core workflow visibility (e2e)', () => {
       ).toEqual([workflowRunId]);
     });
 
-    it('keeps a run started while private to its creator', async () => {
+    it('lets another member read a run started while private', async () => {
       const privateRunId = await runWorkflow();
 
       expect(
         await findRecordIds(asOtherMember, 'workflowRuns', privateRunId),
-      ).toEqual([]);
+      ).toEqual([privateRunId]);
       expect(
         await findRecordIds(
           workflowGraphqlRequest,
@@ -739,7 +739,7 @@ describe('core workflow visibility (e2e)', () => {
     });
   });
 
-  // An agent step's conversation belongs to its recipient, or else the workflow's creator, whatever the workflow's visibility.
+  // An agent step's conversation is filed under its recipient, or else the workflow's creator; the role decides who may read it.
   describe('the conversation an agent step records on a run', () => {
     let conversationCoreWorkflowId: string;
     let workflowRunId: string;
@@ -860,11 +860,11 @@ describe('core workflow visibility (e2e)', () => {
       expect(archivedAt).not.toBeNull();
     });
 
-    it('keeps it private to its owner even when the workflow is visible', async () => {
+    it('lets another member whose role may read chats read it', async () => {
       const response = await readConversation(APPLE_JONY_MEMBER_ACCESS_TOKEN);
 
-      expect(response.body.data?.chatThread ?? null).toBeNull();
-      expect(response.body.errors).toBeDefined();
+      expect(response.body.errors).toBeUndefined();
+      expect(response.body.data.chatThread.title).toBe('Summarize the lead');
     });
   });
 
@@ -927,10 +927,10 @@ describe('core workflow visibility (e2e)', () => {
       }
     });
 
-    it('become readable to the workspace, as core now shows the workflow', async () => {
+    it('stay readable to the workspace while core forgets their creator', async () => {
       expect(
         await findRecordIds(asOtherMember, 'workflowRuns', orphanedRunId),
-      ).toEqual([]);
+      ).toEqual([orphanedRunId]);
 
       await getAppProviderByClassName<UserWorkspaceService>(
         'UserWorkspaceService',

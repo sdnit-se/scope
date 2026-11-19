@@ -7,8 +7,7 @@ import { AgentChatChannelMetadataService } from 'src/engine/metadata-modules/age
 import { type FlatAgentChatChannelWithRoleIds } from 'src/engine/metadata-modules/agent-chat-channel/types/flat-agent-chat-channel-with-role-ids.type';
 import { type AgentChatChannelRoleDTO } from 'src/engine/metadata-modules/ai/ai-chat/dtos/agent-chat-channel-role.dto';
 import { AgentChatChannelAccessService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-channel-access.service';
-import { AgentChatChannelGrantService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-channel-grant.service';
-import { AgentChatSharingService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-sharing.service';
+import { AgentChatThreadAccessService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-thread-access.service';
 import { assertAgentChatChannelExists } from 'src/engine/metadata-modules/ai/ai-chat/utils/assert-agent-chat-channel-exists.util';
 import { buildAgentChatChannelDeletionLockKey } from 'src/engine/metadata-modules/ai/ai-chat/utils/build-agent-chat-channel-deletion-lock-key.util';
 import { isAgentChatChannelOpenToRole } from 'src/engine/metadata-modules/ai/ai-chat/utils/is-agent-chat-channel-open-to-role.util';
@@ -41,8 +40,7 @@ export class AgentChatChannelService {
     private readonly threadRepository: AgentHistoryRepository<AgentChatThreadWorkspaceEntity>,
     private readonly channelMetadataService: AgentChatChannelMetadataService,
     private readonly channelAccessService: AgentChatChannelAccessService,
-    private readonly channelGrantService: AgentChatChannelGrantService,
-    private readonly sharingService: AgentChatSharingService,
+    private readonly threadAccessService: AgentChatThreadAccessService,
     private readonly threadRecordEventService: AgentChatThreadRecordEventService,
     private readonly workspaceCacheService: WorkspaceCacheService,
     private readonly postgresAdvisoryLockService: PostgresAdvisoryLockService,
@@ -86,7 +84,7 @@ export class AgentChatChannelService {
     color: string | null;
     roleIds: string[];
   }): Promise<FlatAgentChatChannelWithRoleIds> {
-    if (!(await this.sharingService.hasChannels(workspaceId))) {
+    if (!(await this.threadAccessService.hasChannels(workspaceId))) {
       throwAgentChatChannelsUnavailable();
     }
 
@@ -114,19 +112,6 @@ export class AgentChatChannelService {
       changes,
       roleIds,
     });
-
-    if (isDefined(roleIds)) {
-      await this.channelGrantService
-        .rewriteChannelGrants({ workspaceId, channelId })
-        .catch(async (error: unknown) => {
-          await this.channelGrantService.enqueueChannelGrantsRewrite({
-            workspaceId,
-            channelId,
-          });
-
-          throw error;
-        });
-    }
 
     return channel;
   }
@@ -276,13 +261,6 @@ export class AgentChatChannelService {
            SELECT * FROM moved_thread`,
           [threadsBefore.map(({ id }) => id), destinationChannelId],
         );
-
-        await this.channelGrantService.rewriteThreadGrantsInTransaction({
-          manager,
-          workspaceId,
-          threadIds: threadsAfter.map(({ id }) => id),
-          affectedChannelIds: [channelId, destinationChannelId],
-        });
 
         const threadBeforeById = new Map(
           threadsBefore.map((thread) => [thread.id, thread]),

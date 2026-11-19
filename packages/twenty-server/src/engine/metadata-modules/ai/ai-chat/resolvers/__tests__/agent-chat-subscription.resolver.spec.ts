@@ -38,7 +38,7 @@ const buildResolver = () => {
       return this;
     },
   };
-  const sharingService = {
+  const threadAccessService = {
     getReadableThread: jest.fn().mockResolvedValue({ id: THREAD_ID }),
   };
   const subscriptionService = {
@@ -48,12 +48,12 @@ const buildResolver = () => {
   const resolver = new AgentChatSubscriptionResolver(
     subscriptionService as never,
     {} as never,
-    sharingService as never,
+    threadAccessService as never,
     { findOne: jest.fn().mockResolvedValue(null) } as never,
   );
   return {
     resolver,
-    sharingService,
+    threadAccessService,
     subscriptionService,
     iterator,
     deliver: () => resolvePending({ done: false, value: payload }),
@@ -65,8 +65,9 @@ describe('Shared conversation subscriptions', () => {
   afterEach(() => jest.useRealTimers());
 
   it('refuses unauthorized subscriptions before opening a transport', async () => {
-    const { resolver, sharingService, subscriptionService } = buildResolver();
-    sharingService.getReadableThread.mockRejectedValue(denied());
+    const { resolver, threadAccessService, subscriptionService } =
+      buildResolver();
+    threadAccessService.getReadableThread.mockRejectedValue(denied());
     await expect(
       resolver.onAgentChatEvent(
         THREAD_ID,
@@ -88,7 +89,9 @@ describe('Shared conversation subscriptions', () => {
     const pending = subscription.next();
     context.deliver();
     await expect(pending).resolves.toEqual({ done: false, value: payload });
-    expect(context.sharingService.getReadableThread).toHaveBeenLastCalledWith({
+    expect(
+      context.threadAccessService.getReadableThread,
+    ).toHaveBeenLastCalledWith({
       workspaceId: WORKSPACE_ID,
       threadId: THREAD_ID,
       workspaceMemberId: VIEWER_ID,
@@ -107,7 +110,7 @@ describe('Shared conversation subscriptions', () => {
     );
     await subscription.next();
     const pending = subscription.next();
-    context.sharingService.getReadableThread.mockRejectedValue(denied());
+    context.threadAccessService.getReadableThread.mockRejectedValue(denied());
     jest.setSystemTime(Date.now() + AGENT_CHAT_KEEPALIVE_INTERVAL_MS);
     context.deliver();
     await expect(pending).rejects.toMatchObject({
@@ -130,7 +133,9 @@ describe('Shared conversation subscriptions', () => {
       context.deliver();
       await pending;
     }
-    expect(context.sharingService.getReadableThread).toHaveBeenCalledTimes(1);
+    expect(context.threadAccessService.getReadableThread).toHaveBeenCalledTimes(
+      1,
+    );
     await subscription.return?.();
   });
 
@@ -146,7 +151,7 @@ describe('Shared conversation subscriptions', () => {
     const rejection = expect(pending).rejects.toMatchObject({
       extensions: { code: 'NOT_FOUND' },
     });
-    context.sharingService.getReadableThread.mockRejectedValue(denied());
+    context.threadAccessService.getReadableThread.mockRejectedValue(denied());
     await jest.advanceTimersByTimeAsync(AGENT_CHAT_KEEPALIVE_INTERVAL_MS);
     await rejection;
     expect(

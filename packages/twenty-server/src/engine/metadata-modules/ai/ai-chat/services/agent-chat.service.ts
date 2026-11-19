@@ -1,6 +1,6 @@
 import { workspaceAuthContextStorage } from 'src/engine/core-modules/auth/storage/workspace-auth-context.storage';
 import { isUserAuthContext } from 'src/engine/core-modules/auth/guards/is-user-auth-context.guard';
-import { AgentChatSharingService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-sharing.service';
+import { AgentChatThreadAccessService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-thread-access.service';
 import { InjectAgentHistoryRepository } from 'src/engine/metadata-modules/ai/ai-history/repositories/inject-agent-history-repository.decorator';
 import { AgentHistoryRepository } from 'src/engine/metadata-modules/ai/ai-history/repositories/agent-history-repository';
 import { Injectable } from '@nestjs/common';
@@ -37,7 +37,7 @@ export class AgentChatService {
     @InjectAgentHistoryRepository('agentMessage')
     private readonly messageRepository: AgentHistoryRepository<AgentMessageWorkspaceEntity>,
     private readonly titleGenerationService: AgentTitleGenerationService,
-    private readonly sharingService: AgentChatSharingService,
+    private readonly threadAccessService: AgentChatThreadAccessService,
     private readonly threadRecordEventService: AgentChatThreadRecordEventService,
     private readonly conversationWriterService: AgentConversationWriterService,
     private readonly threadService: AgentChatThreadService,
@@ -240,7 +240,7 @@ export class AgentChatService {
     workspaceMemberId: string;
     workspaceId: string;
   }) {
-    await this.sharingService.getReadableThread({
+    await this.threadAccessService.getReadableThread({
       threadId,
       workspaceMemberId,
       workspaceId,

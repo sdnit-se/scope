@@ -12,23 +12,23 @@ import {
 } from 'twenty-shared/types';
 
 import { type AddRecordShareNoneAccessLevelCommand } from 'src/database/commands/upgrade-version-command/2-45/2-45-workspace-command-1790876639146-add-record-share-none-access-level.command';
-import { type RecordShareStorageService } from 'src/engine/core-modules/record-share/services/record-share-storage.service';
 import { type UpgradeCommandRegistryService } from 'src/engine/core-modules/upgrade/services/upgrade-command-registry.service';
 import { FieldMetadataEntity } from 'src/engine/metadata-modules/field-metadata/field-metadata.entity';
 import { type WorkspaceMigrationValidateBuildAndRunService } from 'src/engine/workspace-manager/workspace-migration/services/workspace-migration-validate-build-and-run-service';
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
 import { type WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { SEED_APPLE_WORKSPACE_ID } from 'src/engine/workspace-manager/dev-seeder/core/constants/seeder-workspaces.constant';
+import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
 
 const workspaceId = SEED_APPLE_WORKSPACE_ID;
 const authContext = buildSystemAuthContext(workspaceId);
 const RECORD_ID = randomUUID();
 const OBJECT_METADATA_ID = randomUUID();
+const RECORD_SHARE_TABLE = `"${getWorkspaceSchemaName(workspaceId)}"."recordShare"`;
 
 describe('2-45 workspace command 1790876639146 - AddRecordShareNoneAccessLevelCommand (integration)', () => {
   let command: AddRecordShareNoneAccessLevelCommand;
   let workspaceOrmManager: WorkspaceOrmManager;
-  let shares: RecordShareStorageService;
 
   const run = (
     direction: 'up' | 'down',
@@ -62,27 +62,30 @@ describe('2-45 workspace command 1790876639146 - AddRecordShareNoneAccessLevelCo
   };
 
   const insertRestriction = () =>
-    shares.insertMany({
-      workspaceId,
-      recordShares: [
-        {
-          objectMetadataId: OBJECT_METADATA_ID,
-          recordId: RECORD_ID,
-          principalId: EVERYONE_PRINCIPAL_ID,
-          principalType: RecordSharePrincipalType.EVERYONE,
-          accessLevel: RecordShareAccessLevel.NONE,
-          rowCause: RecordShareRowCause.MANUAL,
-          sourceId: RECORD_ID,
-        },
+    global.testDataSource.query(
+      `INSERT INTO ${RECORD_SHARE_TABLE} ("objectMetadataId", "recordId", "principalId", "principalType", "accessLevel", "rowCause", "sourceId")
+       VALUES ($1, $2, $3, $4, $5, $6, $2)`,
+      [
+        OBJECT_METADATA_ID,
+        RECORD_ID,
+        EVERYONE_PRINCIPAL_ID,
+        RecordSharePrincipalType.EVERYONE,
+        RecordShareAccessLevel.NONE,
+        RecordShareRowCause.MANUAL,
       ],
-    });
+    );
 
-  const findRestrictions = () =>
-    shares.findByRecordIds({
-      workspaceId,
-      objectMetadataId: OBJECT_METADATA_ID,
-      recordIds: [RECORD_ID],
-    });
+  const findRestrictions = (): Promise<{ accessLevel: string }[]> =>
+    global.testDataSource.query(
+      `SELECT "accessLevel" FROM ${RECORD_SHARE_TABLE} WHERE "objectMetadataId" = $1 AND "recordId" = $2 AND "deletedAt" IS NULL`,
+      [OBJECT_METADATA_ID, RECORD_ID],
+    );
+
+  const deleteRestrictions = () =>
+    global.testDataSource.query(
+      `DELETE FROM ${RECORD_SHARE_TABLE} WHERE "objectMetadataId" = $1 AND "recordId" = $2`,
+      [OBJECT_METADATA_ID, RECORD_ID],
+    );
 
   beforeAll(() => {
     command = getAppProviderByClassName<AddRecordShareNoneAccessLevelCommand>(
@@ -91,18 +94,11 @@ describe('2-45 workspace command 1790876639146 - AddRecordShareNoneAccessLevelCo
     workspaceOrmManager = getAppProviderByClassName<WorkspaceOrmManager>(
       'WorkspaceOrmManager',
     );
-    shares = getAppProviderByClassName<RecordShareStorageService>(
-      'RecordShareStorageService',
-    );
   });
 
   afterAll(async () => {
     await run('up');
-    await shares.deleteByRecordIds({
-      workspaceId,
-      objectMetadataId: OBJECT_METADATA_ID,
-      recordIds: [RECORD_ID],
-    });
+    await deleteRestrictions();
   });
 
   it('is registered in the 2.45 bundle', () => {
@@ -157,11 +153,7 @@ describe('2-45 workspace command 1790876639146 - AddRecordShareNoneAccessLevelCo
 
   it('puts restrictions back when the downgrade fails', async () => {
     await run('up');
-    await shares.deleteByRecordIds({
-      workspaceId,
-      objectMetadataId: OBJECT_METADATA_ID,
-      recordIds: [RECORD_ID],
-    });
+    await deleteRestrictions();
     await insertRestriction();
 
     const migrationSpy = jest

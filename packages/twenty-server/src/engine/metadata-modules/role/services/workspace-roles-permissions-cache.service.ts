@@ -1,7 +1,5 @@
 import { Injectable } from '@nestjs/common';
 
-import { IsNull } from 'typeorm';
-
 import {
   PermissionFlagType,
   SystemPermissionFlag,
@@ -39,16 +37,6 @@ const ROLES_PERMISSIONS_ROWS_REQUIREMENT = {
   rolePermissionFlag: { columns: true, groupBy: ['roleId'] },
   permissionFlag: true,
   fieldPermission: { columns: true, groupBy: ['roleId'] },
-  rowLevelPermissionPredicate: {
-    columns: true,
-    groupBy: ['roleId'],
-    where: { deletedAt: IsNull() },
-  },
-  rowLevelPermissionPredicateGroup: {
-    columns: true,
-    groupBy: ['roleId'],
-    where: { deletedAt: IsNull() },
-  },
   objectMetadata: [
     'id',
     'isSystem',
@@ -77,8 +65,6 @@ export class WorkspaceRolesPermissionsCacheService extends WorkspaceCacheProvide
       rolePermissionFlag: rolePermissionFlags,
       permissionFlag: permissionFlags,
       fieldPermission: fieldPermissions,
-      rowLevelPermissionPredicate: rowLevelPermissionPredicates,
-      rowLevelPermissionPredicateGroup: rowLevelPermissionPredicateGroups,
       objectMetadata: workspaceObjectMetadataCollection,
       fieldMetadata: morphRelationFieldMetadatas,
     } = rows;
@@ -117,11 +103,6 @@ export class WorkspaceRolesPermissionsCacheService extends WorkspaceCacheProvide
           SystemPermissionFlag[permissionFlag],
         );
       const roleFieldPermissions = fieldPermissions.byRoleId.get(role.id) ?? [];
-
-      const roleRowLevelPermissionPredicates =
-        rowLevelPermissionPredicates.byRoleId.get(role.id) ?? [];
-      const roleRowLevelPermissionPredicateGroups =
-        rowLevelPermissionPredicateGroups.byRoleId.get(role.id) ?? [];
 
       const objectRecordsPermissions: ObjectsPermissions = {};
 
@@ -246,16 +227,6 @@ export class WorkspaceRolesPermissionsCacheService extends WorkspaceCacheProvide
           canSoftDeleteObjectRecords: canSoftDelete,
           canDestroyObjectRecords: canDestroy,
           restrictedFields,
-          rowLevelPermissionPredicates: roleRowLevelPermissionPredicates.filter(
-            (rowLevelPermissionPredicate) =>
-              rowLevelPermissionPredicate.objectMetadataId === objectMetadataId,
-          ),
-          rowLevelPermissionPredicateGroups:
-            roleRowLevelPermissionPredicateGroups.filter(
-              (rowLevelPermissionPredicateGroup) =>
-                rowLevelPermissionPredicateGroup.objectMetadataId ===
-                objectMetadataId,
-            ),
         };
       }
 

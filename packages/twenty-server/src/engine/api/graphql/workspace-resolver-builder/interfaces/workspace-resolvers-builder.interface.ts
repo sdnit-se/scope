@@ -10,7 +10,6 @@ import {
   type ObjectRecordOrderBy,
 } from 'src/engine/api/graphql/workspace-query-builder/interfaces/object-record.interface';
 
-import { type ShareWithInput } from 'src/engine/core-modules/record-share/types/share-with-input.type';
 import { RESOLVER_METHOD_NAMES } from 'src/engine/api/graphql/workspace-resolver-builder/constants/resolver-method-names';
 import { type workspaceResolverBuilderMethodNames } from 'src/engine/api/graphql/workspace-resolver-builder/factories/factories';
 
@@ -48,7 +47,6 @@ export interface CreateOneResolverArgs<
 > {
   data: Data;
   upsert?: boolean;
-  shareWith?: ShareWithInput[];
 }
 
 export interface CreateManyResolverArgs<
@@ -56,7 +54,6 @@ export interface CreateManyResolverArgs<
 > {
   data: Data[];
   upsert?: boolean;
-  shareWith?: ShareWithInput[];
 }
 
 export interface GroupByResolverArgs<Filter = ObjectRecordFilter> {

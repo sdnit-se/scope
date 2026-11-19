@@ -14,7 +14,7 @@ import { AgentChatChannelAssignmentFilter } from 'src/engine/metadata-modules/ai
 import { AgentChatChannelThreadFilter } from 'src/engine/metadata-modules/ai/ai-chat/enums/agent-chat-channel-thread-filter.enum';
 import { AgentChatChannelThreadStatus } from 'src/engine/metadata-modules/ai/ai-chat/enums/agent-chat-channel-thread-status.enum';
 import { AgentChatChannelAccessService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-channel-access.service';
-import { AgentChatSharingService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-sharing.service';
+import { AgentChatThreadAccessService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-thread-access.service';
 import { type AgentChatThreadAccessArgs } from 'src/engine/metadata-modules/ai/ai-chat/types/agent-chat-thread-access-args.type';
 import { buildAgentChatChannelThreadCursorFilter } from 'src/engine/metadata-modules/ai/ai-chat/utils/build-agent-chat-channel-thread-cursor-filter.util';
 import { decodeAgentChatChannelThreadCursorOrThrow } from 'src/engine/metadata-modules/ai/ai-chat/utils/decode-agent-chat-channel-thread-cursor-or-throw.util';
@@ -60,7 +60,7 @@ const THREAD_FILTERS: Record<AgentChatChannelThreadFilter, string> = {
 @Injectable()
 export class AgentChatChannelThreadsService {
   constructor(
-    private readonly sharingService: AgentChatSharingService,
+    private readonly threadAccessService: AgentChatThreadAccessService,
     private readonly channelAccessService: AgentChatChannelAccessService,
     private readonly workspaceOrmManager: WorkspaceOrmManager,
   ) {}
@@ -89,7 +89,7 @@ export class AgentChatChannelThreadsService {
       ? decodeAgentChatChannelThreadCursorOrThrow(after)
       : null;
 
-    if (!(await this.sharingService.hasChannels(args.workspaceId))) {
+    if (!(await this.threadAccessService.hasChannels(args.workspaceId))) {
       throwAgentChatChannelsUnavailable();
     }
 
@@ -137,7 +137,7 @@ export class AgentChatChannelThreadsService {
   }
 
   async findSummaries(args: MemberArgs): Promise<AgentChatChannelSummaryDTO[]> {
-    if (!(await this.sharingService.hasChannels(args.workspaceId))) {
+    if (!(await this.threadAccessService.hasChannels(args.workspaceId))) {
       return [];
     }
 
@@ -209,7 +209,7 @@ export class AgentChatChannelThreadsService {
     buildQuery,
     ...args
   }: MemberArgs & { buildQuery: ReadableThreadsQuery }): Promise<TRow[]> {
-    const authContext = await this.sharingService.getAuthContext(args);
+    const authContext = await this.threadAccessService.getAuthContext(args);
     const schema = escapeIdentifier(getWorkspaceSchemaName(args.workspaceId));
 
     return this.workspaceOrmManager.executeInWorkspaceContext(async () => {
@@ -220,7 +220,7 @@ export class AgentChatChannelThreadsService {
       const readableThreadQueryBuilder = repository
         .createQueryBuilder('readableThread')
         .select('"readableThread"."id"', 'id')
-        .applyRowLevelPermissions();
+        .applyRowAccessPolicy();
 
       const { sql, parameters } = buildQuery({
         fromClause: `FROM ${schema}."agentChatThread" thread

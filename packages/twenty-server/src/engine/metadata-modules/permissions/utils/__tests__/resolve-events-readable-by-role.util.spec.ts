@@ -53,8 +53,6 @@ const FULL_ACCESS: ObjectPermissions = {
   canSoftDeleteObjectRecords: true,
   canDestroyObjectRecords: true,
   restrictedFields: {},
-  rowLevelPermissionPredicates: [],
-  rowLevelPermissionPredicateGroups: [],
 };
 
 const updateEvent: ObjectRecordUpdateEvent = {
@@ -70,37 +68,79 @@ const updateEvent: ObjectRecordUpdateEvent = {
   },
 };
 
-const resolveForApplication = (owningApplicationId: string) =>
+const resolveFor = ({
+  owningApplicationId = OTHER_APPLICATION_ID,
+  roleId = ROLE_ID,
+  objectPermissions = FULL_ACCESS,
+  events = [updateEvent],
+}: {
+  owningApplicationId?: string;
+  roleId?: string | null;
+  objectPermissions?: ObjectPermissions;
+  events?: ObjectRecordUpdateEvent[];
+} = {}) =>
   resolveEventsReadableByRole({
-    roleId: ROLE_ID,
+    roleId,
     owningApplicationId,
     workspaceEventBatch: {
       name: 'invoice.updated',
       workspaceId: 'workspace-id',
       objectMetadata: invoice,
-      events: [updateEvent],
+      events,
     },
-    eventRecordAccessGate: {
-      resolveAdmittedRecordIds: async () => new Set(['record-1']),
+    rolesPermissions: {
+      [ROLE_ID]: { [OBJECT_METADATA_ID]: objectPermissions },
     },
-    rolesPermissions: { [ROLE_ID]: { [OBJECT_METADATA_ID]: FULL_ACCESS } },
-    roleIdsWithAllRecordsAccess: [ROLE_ID],
-    flatRowLevelPermissionPredicateMaps: createEmptyFlatEntityMaps(),
-    flatRowLevelPermissionPredicateGroupMaps: createEmptyFlatEntityMaps(),
     flatFieldMetadataMaps,
     flatObjectMetadataMaps,
   });
 
 describe('resolveEventsReadableByRole', () => {
-  it('should omit a field whose read is disabled from another application event', async () => {
-    const [event] = await resolveForApplication(OTHER_APPLICATION_ID);
+  it('should send every change of an object the role may read', () => {
+    expect(
+      resolveFor({
+        events: [updateEvent, { ...updateEvent, recordId: 'record-2' }],
+      }).map(({ recordId }) => recordId),
+    ).toEqual(['record-1', 'record-2']);
+  });
+
+  it('should send nothing when the role may not read the object', () => {
+    expect(
+      resolveFor({
+        objectPermissions: { ...FULL_ACCESS, canReadObjectRecords: false },
+      }),
+    ).toEqual([]);
+  });
+
+  it('should send nothing without a role', () => {
+    expect(resolveFor({ roleId: null })).toEqual([]);
+  });
+
+  it('should omit a field whose read is disabled from another application event', () => {
+    const [event] = resolveFor();
 
     expect(event.properties.after).toEqual({ id: 'record-1', name: 'New' });
     expect(event.properties.updatedFields).toEqual(['name']);
   });
 
-  it('should keep the field for the application that owns it', async () => {
-    const [event] = await resolveForApplication(OWNING_APPLICATION_ID);
+  it('should drop an update that only changed fields the role may not read', () => {
+    expect(
+      resolveFor({
+        events: [
+          {
+            ...updateEvent,
+            properties: {
+              ...updateEvent.properties,
+              updatedFields: ['secret'],
+            },
+          },
+        ],
+      }),
+    ).toEqual([]);
+  });
+
+  it('should keep the field for the application that owns it', () => {
+    const [event] = resolveFor({ owningApplicationId: OWNING_APPLICATION_ID });
 
     expect(event.properties.after).toEqual({
       id: 'record-1',

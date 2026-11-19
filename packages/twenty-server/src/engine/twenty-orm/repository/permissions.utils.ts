@@ -1,7 +1,6 @@
 import { isNonEmptyString } from '@sniptt/guards';
 import isEmpty from 'lodash.isempty';
 import {
-  type FeatureFlagKey,
   type ObjectsPermissions,
   type RestrictedFieldsPermissions,
 } from 'twenty-shared/types';
@@ -18,7 +17,6 @@ import {
   PermissionsExceptionMessage,
 } from 'src/engine/metadata-modules/permissions/permissions.exception';
 import { isObjectOperationPermitted } from 'src/engine/twenty-orm/utils/is-object-operation-permitted.util';
-import { resolveObjectSharing } from 'src/engine/core-modules/record-share/utils/resolve-object-sharing.util';
 import { getColumnNameToFieldMetadataIdMap } from 'src/engine/twenty-orm/utils/get-column-name-to-field-metadata-id.util';
 
 export type OperationType =
@@ -38,7 +36,6 @@ type ValidateOperationIsPermittedOrThrowArgs = {
   objectIdByNameSingular: Record<string, string>;
   selectedColumns: string[];
   updatedColumns: string[];
-  featureFlagsMap?: Partial<Record<FeatureFlagKey, boolean>>;
 };
 
 export const validateOperationIsPermittedOrThrow = ({
@@ -50,7 +47,6 @@ export const validateOperationIsPermittedOrThrow = ({
   objectIdByNameSingular,
   selectedColumns,
   updatedColumns,
-  featureFlagsMap = {},
 }: ValidateOperationIsPermittedOrThrowArgs) => {
   const objectMetadataIdForEntity = objectIdByNameSingular[entityName];
 
@@ -80,19 +76,13 @@ export const validateOperationIsPermittedOrThrow = ({
 
   const permissionsForEntity = objectsPermissions[objectMetadataIdForEntity];
 
-  // Records shared by name stay reachable without the object permission; the
-  // row access policy then narrows the query to those records
   if (
-    (!isDefined(permissionsForEntity) ||
-      !isObjectOperationPermitted({
-        objectMetadata,
-        operationType,
-        objectsPermissions,
-      })) &&
-    !resolveObjectSharing({
-      flatObjectMetadata: objectMetadata,
-      featureFlagsMap,
-    }).operationTypesGrantedBeyondRole.includes(operationType)
+    !isDefined(permissionsForEntity) ||
+    !isObjectOperationPermitted({
+      objectMetadata,
+      operationType,
+      objectsPermissions,
+    })
   ) {
     throw new PermissionsException(
       PermissionsExceptionMessage.PERMISSION_DENIED,
@@ -116,37 +106,6 @@ export const validateOperationIsPermittedOrThrow = ({
       });
       break;
     case 'insert':
-      validateReadFieldPermissionOrThrow({
-        restrictedFields,
-        selectedColumns,
-        columnNameToFieldMetadataIdMap,
-        entityName,
-        flatFieldMetadataMaps,
-      });
-
-      if (updatedColumns.length > 0) {
-        const rlsFieldMetadataIds = new Set(
-          (permissionsForEntity?.rowLevelPermissionPredicates ?? []).map(
-            (predicate) => predicate.fieldMetadataId,
-          ),
-        );
-
-        const updatedColumnsWithoutRlsFields = updatedColumns.filter(
-          (column) =>
-            !rlsFieldMetadataIds.has(columnNameToFieldMetadataIdMap[column]),
-        );
-
-        if (updatedColumnsWithoutRlsFields.length > 0) {
-          validateUpdateFieldPermissionOrThrow({
-            restrictedFields,
-            updatedColumns: updatedColumnsWithoutRlsFields,
-            columnNameToFieldMetadataIdMap,
-            entityName,
-            flatFieldMetadataMaps,
-          });
-        }
-      }
-      break;
     case 'update':
       validateReadFieldPermissionOrThrow({
         restrictedFields,

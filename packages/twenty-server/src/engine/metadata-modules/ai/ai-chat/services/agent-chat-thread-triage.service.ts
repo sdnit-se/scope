@@ -12,7 +12,7 @@ import { type AgentChatThreadParticipantDTO } from 'src/engine/metadata-modules/
 import { AgentChatInboxAction } from 'src/engine/metadata-modules/ai/ai-chat/enums/agent-chat-inbox-action.enum';
 import { END_AGENT_CHAT_CHANNEL_SNOOZE_JOB_NAME } from 'src/engine/metadata-modules/ai/ai-chat/jobs/end-agent-chat-channel-snooze-job-name.constant';
 import { type EndAgentChatChannelSnoozeJobData } from 'src/engine/metadata-modules/ai/ai-chat/jobs/end-agent-chat-channel-snooze-job.types';
-import { AgentChatSharingService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-sharing.service';
+import { AgentChatThreadAccessService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-thread-access.service';
 import { AgentChatThreadParticipantService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-thread-participant.service';
 import { AgentChatThreadRecordEventService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-thread-record-event.service';
 import { type AgentChatThreadAccessArgs } from 'src/engine/metadata-modules/ai/ai-chat/types/agent-chat-thread-access-args.type';
@@ -35,7 +35,7 @@ export class AgentChatThreadTriageService {
   constructor(
     @InjectAgentHistoryRepository('agentChatThread')
     private readonly threadRepository: AgentHistoryRepository<AgentChatThreadWorkspaceEntity>,
-    private readonly sharingService: AgentChatSharingService,
+    private readonly threadAccessService: AgentChatThreadAccessService,
     private readonly participantService: AgentChatThreadParticipantService,
     private readonly threadRecordEventService: AgentChatThreadRecordEventService,
     @InjectMessageQueue(MessageQueue.delayedJobsQueue)
@@ -104,7 +104,7 @@ export class AgentChatThreadTriageService {
   }: AgentChatThreadAccessArgs & {
     change: AgentChatThreadTriageChange;
   }): Promise<void> {
-    const threadBefore = await this.sharingService.getThreadWithAccess({
+    const threadBefore = await this.threadAccessService.getThreadWithAccess({
       ...args,
       operationType: 'update',
     });
@@ -221,7 +221,7 @@ export class AgentChatThreadTriageService {
   }: Omit<AgentChatThreadAccessArgs, 'threadId'> & {
     threadIds: string[];
   }): Promise<AgentChatThreadWorkspaceEntity[]> {
-    if (!(await this.sharingService.hasChannels(workspaceId))) {
+    if (!(await this.threadAccessService.hasChannels(workspaceId))) {
       return [];
     }
 

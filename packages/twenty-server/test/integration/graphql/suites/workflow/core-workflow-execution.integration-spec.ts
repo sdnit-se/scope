@@ -1405,7 +1405,7 @@ describe('core workflow execution and queue compatibility (e2e)', () => {
           variables: { threadId },
         });
 
-      expect(readByAnotherMember.body.errors).toBeDefined();
+      expect(readByAnotherMember.body.errors).toBeUndefined();
     });
 
     it('keeps the conversation of a workflow without a member creator off every inbox', async () => {

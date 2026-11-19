@@ -24,8 +24,6 @@ const agentRolePermissions = {
     canSoftDeleteObjectRecords: false,
     canDestroyObjectRecords: false,
     restrictedFields: {},
-    rowLevelPermissionPredicates: [],
-    rowLevelPermissionPredicateGroups: [],
   },
 };
 
@@ -36,8 +34,6 @@ const defaultRolePermissions = {
     canSoftDeleteObjectRecords: false,
     canDestroyObjectRecords: false,
     restrictedFields: {},
-    rowLevelPermissionPredicates: [],
-    rowLevelPermissionPredicateGroups: [],
   },
 };
 

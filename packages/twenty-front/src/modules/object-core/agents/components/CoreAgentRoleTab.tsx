@@ -128,8 +128,6 @@ export const CoreAgentRoleTab = ({
           objectPermissions: [],
           fieldPermissions: [],
           permissionFlags: [],
-          rowLevelPermissionPredicateGroups: [],
-          rowLevelPermissionPredicates: [],
         });
       }
     } finally {

@@ -5,9 +5,6 @@ import type { ObjectRecordUpdateEvent } from 'twenty-shared/database-events';
 import {
   FieldMetadataType,
   MetadataReadability,
-  RecordShareAccessLevel,
-  RecordSharePrincipalType,
-  RecordShareRowCause,
   RelationType,
 } from 'twenty-shared/types';
 
@@ -20,8 +17,6 @@ import { createEmptyFlatEntityMaps } from 'src/engine/metadata-modules/flat-enti
 import { addFlatEntityToFlatEntityMapsOrThrow } from 'src/engine/metadata-modules/flat-entity/utils/add-flat-entity-to-flat-entity-maps-or-throw.util';
 import { getFlatFieldMetadataMock } from 'src/engine/metadata-modules/flat-field-metadata/__mocks__/get-flat-field-metadata.mock';
 import { getFlatObjectMetadataMock } from 'src/engine/metadata-modules/flat-object-metadata/__mocks__/get-flat-object-metadata.mock';
-import { RecordAccessPolicyService } from 'src/engine/core-modules/record-share/services/record-access-policy.service';
-import { RecordShareStorageService } from 'src/engine/core-modules/record-share/services/record-share-storage.service';
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
 import { type WorkspaceEventBatch } from 'src/engine/workspace-event-emitter/types/workspace-event-batch.type';
@@ -31,13 +26,30 @@ import { WorkflowTriggerJob } from 'src/modules/workflow/workflow-trigger/jobs/w
 
 const TWENTY_STANDARD_APPLICATION_ID = 'twenty-standard-application-id';
 const WORKSPACE_CUSTOM_APPLICATION_ID = 'workspace-custom-application-id';
+const STANDARD_ROLE_ID = 'standard-role-id';
+
+const readPermissions = (canReadObjectRecords = true) => ({
+  'test-object-metadata': {
+    canReadObjectRecords,
+    canUpdateObjectRecords: false,
+    canSoftDeleteObjectRecords: false,
+    canDestroyObjectRecords: false,
+    restrictedFields: {},
+  },
+});
+
+const STANDARD_APPLICATION = {
+  id: TWENTY_STANDARD_APPLICATION_ID,
+  universalIdentifier: TWENTY_STANDARD_APPLICATION_UNIVERSAL_IDENTIFIER,
+  defaultRoleId: STANDARD_ROLE_ID,
+  deletedAt: null,
+};
 
 describe('WorkflowDatabaseEventTriggerListener', () => {
   let listener: WorkflowDatabaseEventTriggerListener;
   let workspaceOrmManager: jest.Mocked<WorkspaceOrmManager>;
   let messageQueueService: jest.Mocked<MessageQueueService>;
   let workspaceCacheService: jest.Mocked<WorkspaceCacheService>;
-  let recordShareStorageService: jest.Mocked<RecordShareStorageService>;
   let workflowCommonWorkspaceService: {
     getWorkflowById: jest.Mock;
     getObjectMetadataInfo: jest.Mock;
@@ -67,53 +79,45 @@ describe('WorkflowDatabaseEventTriggerListener', () => {
       flatObjectMetadataMaps: { byUniversalIdentifier: {} },
       featureFlagsMap: {},
       flatApplicationMaps: {
-        byId: Object.fromEntries(
-          [
-            ...new Set([
-              'application-id',
-              ...Object.keys(applicationUniversalIdentifierById),
+        byId: {
+          ...Object.fromEntries(
+            [
+              ...new Set([
+                'application-id',
+                ...Object.keys(applicationUniversalIdentifierById),
+              ]),
+            ].map((applicationId) => [
+              applicationId,
+              {
+                id: applicationId,
+                universalIdentifier:
+                  applicationUniversalIdentifierById[applicationId],
+                version: applicationVersion,
+                defaultRoleId:
+                  applicationId === 'application-id' && applicationRole
+                    ? 'application-role-id'
+                    : null,
+              },
             ]),
-          ].map((applicationId) => [
-            applicationId,
-            {
-              id: applicationId,
-              universalIdentifier:
-                applicationUniversalIdentifierById[applicationId],
-              version: applicationVersion,
-              defaultRoleId:
-                applicationId === 'application-id' && applicationRole
-                  ? 'application-role-id'
-                  : null,
-            },
-          ]),
-        ),
-        idByUniversalIdentifier: {},
+          ),
+          [TWENTY_STANDARD_APPLICATION_ID]: STANDARD_APPLICATION,
+        },
+        idByUniversalIdentifier: {
+          [TWENTY_STANDARD_APPLICATION_UNIVERSAL_IDENTIFIER]:
+            TWENTY_STANDARD_APPLICATION_ID,
+        },
       },
-      ...(isApplicationWorkflow
-        ? {
-            rolesPermissions: applicationRole
-              ? {
-                  'application-role-id': {
-                    'test-object-metadata': {
-                      canReadObjectRecords:
-                        applicationRole.canReadObjectRecords,
-                      canUpdateObjectRecords: false,
-                      canSoftDeleteObjectRecords: false,
-                      canDestroyObjectRecords: false,
-                      restrictedFields: {},
-                      rowLevelPermissionPredicates: [],
-                      rowLevelPermissionPredicateGroups: [],
-                    },
-                  },
-                }
-              : {},
-            roleIdsWithAllRecordsAccess: [],
-            flatRowLevelPermissionPredicateMaps: createEmptyFlatEntityMaps(),
-            flatRowLevelPermissionPredicateGroupMaps:
-              createEmptyFlatEntityMaps(),
-            flatFieldMetadataMaps: createEmptyFlatEntityMaps(),
-          }
-        : {}),
+      rolesPermissions: {
+        [STANDARD_ROLE_ID]: readPermissions(),
+        ...(applicationRole
+          ? {
+              'application-role-id': readPermissions(
+                applicationRole.canReadObjectRecords,
+              ),
+            }
+          : {}),
+      },
+      flatFieldMetadataMaps: createEmptyFlatEntityMaps(),
       flatRoleMaps: { byUniversalIdentifier: {} },
       workflowAutomatedTriggerMaps: {
         byWorkflowId: Object.fromEntries(
@@ -186,10 +190,6 @@ describe('WorkflowDatabaseEventTriggerListener', () => {
       } as never),
     } as any;
 
-    recordShareStorageService = {
-      findByRecordIds: jest.fn().mockResolvedValue([]),
-    } as unknown as jest.Mocked<RecordShareStorageService>;
-
     workflowCommonWorkspaceService = {
       getWorkflowById: jest.fn(),
       getObjectMetadataInfo: jest.fn().mockResolvedValue({
@@ -214,12 +214,6 @@ describe('WorkflowDatabaseEventTriggerListener', () => {
           provide: WorkspaceCacheService,
           useValue: workspaceCacheService,
         },
-        {
-          provide: RecordShareStorageService,
-          useValue: recordShareStorageService,
-        },
-
-        RecordAccessPolicyService,
         {
           provide: 'MESSAGE_QUEUE_workflow-queue',
           useValue: messageQueueService,
@@ -722,10 +716,7 @@ describe('WorkflowDatabaseEventTriggerListener', () => {
       );
     });
 
-    it('should only trigger workflow for records of a private object shared with the workflow role', async () => {
-      const applicationRoleId = 'application-role-id';
-      const applicationId = TWENTY_STANDARD_APPLICATION_ID;
-
+    it('should trigger workflow for every record of a private object its role may read', async () => {
       const privatePayload: WorkspaceEventBatch<ObjectRecordUpdateEvent> = {
         ...mockPayload,
         objectMetadata: createMockFlatObjectMetadata({
@@ -737,83 +728,13 @@ describe('WorkflowDatabaseEventTriggerListener', () => {
         ],
       };
 
-      workspaceCacheService.getOrRecompute.mockImplementation(((
-        _workspaceId: string,
-        keys: string[],
-      ) =>
-        Promise.resolve(
-          !keys.includes('workflowAutomatedTriggerMaps')
-            ? {
-                flatObjectMetadataMaps: { byUniversalIdentifier: {} },
-                featureFlagsMap: {},
-                flatApplicationMaps: {
-                  byId: {
-                    [applicationId]: {
-                      id: applicationId,
-                      defaultRoleId: applicationRoleId,
-                    },
-                  },
-                  idByUniversalIdentifier: {
-                    [TWENTY_STANDARD_APPLICATION_UNIVERSAL_IDENTIFIER]:
-                      applicationId,
-                  },
-                },
-                flatRoleMaps: { byUniversalIdentifier: {} },
-                rolesPermissions: {},
-                roleIdsWithAllRecordsAccess: [],
-                flatRowLevelPermissionPredicateMaps:
-                  createEmptyFlatEntityMaps(),
-                flatRowLevelPermissionPredicateGroupMaps:
-                  createEmptyFlatEntityMaps(),
-                flatFieldMetadataMaps: createEmptyFlatEntityMaps(),
-              }
-            : {
-                flatApplicationMaps: { byId: {}, idByUniversalIdentifier: {} },
-                workflowAutomatedTriggerMaps: {
-                  byWorkflowId: {
-                    [workflowId]: {
-                      type: AutomatedTriggerType.DATABASE_EVENT,
-                      coreWorkflowVersionId: `core-version-${workflowId}`,
-                      workspaceWorkflowVersionId: `workspace-version-${workflowId}`,
-                      workflowId,
-                      applicationId: WORKSPACE_CUSTOM_APPLICATION_ID,
-                      settings: { eventName: databaseEventName },
-                    },
-                  },
-                },
-              },
-        )) as never);
-
-      recordShareStorageService.findByRecordIds.mockResolvedValue([
-        {
-          id: 'record-share-1',
-          recordId: 'test-record-2',
-          objectMetadataId: privatePayload.objectMetadata.id,
-          principalId: applicationRoleId,
-          principalType: RecordSharePrincipalType.ROLE,
-          accessLevel: RecordShareAccessLevel.READ,
-          rowCause: RecordShareRowCause.MANUAL,
-          sourceId: 'source-1',
-        },
+      setTriggerMap([
+        { workflowId, settings: { eventName: databaseEventName } },
       ]);
 
       await listener.handleObjectRecordUpdateEvent(privatePayload);
 
-      expect(recordShareStorageService.findByRecordIds).toHaveBeenCalledWith({
-        workspaceId,
-        objectMetadataId: privatePayload.objectMetadata.id,
-        recordIds: ['test-record', 'test-record-2'],
-      });
-      expect(messageQueueService.add).toHaveBeenCalledTimes(1);
-      expect(messageQueueService.add).toHaveBeenCalledWith(
-        WorkflowTriggerJob.name,
-        expect.objectContaining({ payload: privatePayload.events[1] }),
-        {
-          retryLimit: 3,
-          workspaceId,
-          isWorkspaceJob: true,
-        },
-      );
+      expect(messageQueueService.add).toHaveBeenCalledTimes(2);
     });
 
     it('should handle multiple events in a batch', async () => {

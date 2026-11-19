@@ -16,7 +16,6 @@ import { RecordTransformerModule } from 'src/engine/core-modules/record-transfor
 import { ViewFilterGroupModule } from 'src/engine/metadata-modules/view-filter-group/view-filter-group.module';
 import { ViewFilterModule } from 'src/engine/metadata-modules/view-filter/view-filter.module';
 import { ViewModule } from 'src/engine/metadata-modules/view/view.module';
-import { RecordShareModule } from 'src/engine/core-modules/record-share/record-share.module';
 import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache.module';
 
 @Module({
@@ -30,7 +29,6 @@ import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache
     ViewFilterGroupModule,
     MetricsModule,
     RecordPositionModule,
-    RecordShareModule,
     RecordTransformerModule,
     WorkspaceCacheModule,
   ],

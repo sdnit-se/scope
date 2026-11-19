@@ -43,7 +43,6 @@ import {
   PermissionsExceptionCode,
   PermissionsExceptionMessage,
 } from 'src/engine/metadata-modules/permissions/permissions.exception';
-import { RecordShareOwnershipTransferService } from 'src/engine/core-modules/record-share/services/record-share-ownership-transfer.service';
 import { ConnectedAccountOwnershipTransferService } from 'src/engine/metadata-modules/connected-account/services/connected-account-ownership-transfer.service';
 import { detachAgentChatChannelThreadsFromWorkspaceMember } from 'src/engine/metadata-modules/ai/ai-chat/utils/detach-agent-chat-channel-threads-from-workspace-member.util';
 import { AgentChatThreadWorkspaceEntity } from 'src/engine/metadata-modules/ai/ai-history/standard-objects/agent-chat-thread.workspace-entity';
@@ -61,7 +60,6 @@ export class UserService {
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
     private readonly connectedAccountOwnershipTransferService: ConnectedAccountOwnershipTransferService,
-    private readonly recordShareOwnershipTransferService: RecordShareOwnershipTransferService,
     private readonly workspaceDomainsService: WorkspaceDomainsService,
     private readonly emailVerificationService: EmailVerificationService,
     private readonly workspaceService: WorkspaceService,
@@ -388,14 +386,6 @@ export class UserService {
     await this.connectedAccountOwnershipTransferService.transferConnectedAccountsOwnershipToCustodian(
       {
         removedUserWorkspace: userWorkspace,
-        actingUserWorkspaceId,
-      },
-    );
-
-    await this.recordShareOwnershipTransferService.transferRecordSharesToCustodian(
-      {
-        removedUserWorkspace: userWorkspace,
-        removedWorkspaceMemberId: workspaceMember.id,
         actingUserWorkspaceId,
       },
     );

@@ -7,8 +7,6 @@ import { commonQueryRunnerToRestApiExceptionHandler } from 'src/engine/api/commo
 import { CommonSelectFieldsException } from 'src/engine/api/common/common-select-fields/common-select-fields.exception';
 import { RestInputRequestParserException } from 'src/engine/api/rest/input-request-parsers/rest-input-request-parser.exception';
 import { ThrottlerException } from 'src/engine/core-modules/throttler/throttler.exception';
-import { RecordShareException } from 'src/engine/core-modules/record-share/record-share.exception';
-import { recordShareRestApiExceptionHandler } from 'src/engine/core-modules/record-share/utils/record-share-rest-api-exception-handler.util';
 import { throttlerToRestApiExceptionHandler } from 'src/engine/core-modules/throttler/utils/throttler-to-rest-api-exception-handler.util';
 import { TwentyOrmException } from 'src/engine/twenty-orm/exceptions/twenty-orm.exception';
 import { isTwentyOrmUserInputError } from 'src/engine/twenty-orm/utils/is-twenty-orm-user-input-error.util';
@@ -23,8 +21,6 @@ export const workspaceQueryRunnerRestApiExceptionHandler = (
   switch (true) {
     case error instanceof CommonQueryRunnerException:
       return commonQueryRunnerToRestApiExceptionHandler(error);
-    case error instanceof RecordShareException:
-      return recordShareRestApiExceptionHandler(error);
     case error instanceof CommonSelectFieldsException:
       throw new BadRequestException(
         `'fields' parameter invalid. ${error.message}`,

@@ -7,12 +7,11 @@ import {
   FieldMetadataType,
   MetadataReadability,
   type ObjectsPermissionsByRoleId,
+  type RestrictedFieldsPermissions,
 } from 'twenty-shared/types';
 
 import { MessageQueue } from 'src/engine/core-modules/message-queue/message-queue.constants';
 import { getQueueToken } from 'src/engine/core-modules/message-queue/utils/get-queue-token.util';
-import { RecordAccessPolicyService } from 'src/engine/core-modules/record-share/services/record-access-policy.service';
-import { RecordShareStorageService } from 'src/engine/core-modules/record-share/services/record-share-storage.service';
 import { CallAgentDatabaseEventTriggersJob } from 'src/engine/metadata-modules/ai/ai-agent-trigger/jobs/call-agent-database-event-triggers.job';
 import { RunAgentTriggerJob } from 'src/engine/metadata-modules/ai/ai-agent-trigger/jobs/run-agent-trigger.job';
 import { AgentTriggerThrottlerService } from 'src/engine/metadata-modules/ai/ai-agent-trigger/services/agent-trigger-throttler.service';
@@ -21,7 +20,6 @@ import { createEmptyFlatEntityMaps } from 'src/engine/metadata-modules/flat-enti
 import { addFlatEntityToFlatEntityMapsOrThrow } from 'src/engine/metadata-modules/flat-entity/utils/add-flat-entity-to-flat-entity-maps-or-throw.util';
 import { getFlatFieldMetadataMock } from 'src/engine/metadata-modules/flat-field-metadata/__mocks__/get-flat-field-metadata.mock';
 import { getFlatObjectMetadataMock } from 'src/engine/metadata-modules/flat-object-metadata/__mocks__/get-flat-object-metadata.mock';
-import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
 import { type WorkspaceEventBatch } from 'src/engine/workspace-event-emitter/types/workspace-event-batch.type';
 
@@ -29,6 +27,7 @@ const WORKSPACE_ID = 'workspace-id';
 const OBJECT_METADATA_ID = 'company-object-id';
 const NAME_FIELD_ID = 'name-field-id';
 const CITY_FIELD_ID = 'city-field-id';
+const UPDATED_BY_FIELD_ID = 'updated-by-field-id';
 const APPLICATION_ID = 'application-id';
 const AGENT_ID = 'agent-id';
 const AGENT_ROLE_ID = 'agent-role-id';
@@ -64,7 +63,21 @@ const flatFieldMetadataMaps = buildMaps([
     type: FieldMetadataType.TEXT,
     name: 'city',
   }),
+  getFlatFieldMetadataMock({
+    id: UPDATED_BY_FIELD_ID,
+    universalIdentifier: UPDATED_BY_FIELD_ID,
+    objectMetadataId: OBJECT_METADATA_ID,
+    type: FieldMetadataType.ACTOR,
+    name: 'updatedBy',
+  }),
 ]);
+
+const AGENT_ACTOR = {
+  source: FieldActorSource.AGENT,
+  workspaceMemberId: null,
+  name: 'Enricher',
+  context: { agentId: AGENT_ID },
+};
 
 const buildTrigger = (
   settings: Partial<
@@ -111,6 +124,7 @@ const buildEvent = (
 
 const buildRolesPermissions = (
   canReadObjectRecords = true,
+  restrictedFields: RestrictedFieldsPermissions = {},
 ): ObjectsPermissionsByRoleId => ({
   [AGENT_ROLE_ID]: {
     [OBJECT_METADATA_ID]: {
@@ -118,9 +132,7 @@ const buildRolesPermissions = (
       canUpdateObjectRecords: false,
       canSoftDeleteObjectRecords: false,
       canDestroyObjectRecords: false,
-      restrictedFields: {},
-      rowLevelPermissionPredicates: [],
-      rowLevelPermissionPredicateGroups: [],
+      restrictedFields,
     },
   },
 });
@@ -143,8 +155,12 @@ describe('CallAgentDatabaseEventTriggersJob', () => {
       namePlural: 'companies',
       applicationId: 'other-application-id',
       readability: MetadataReadability.OPEN,
-      fieldIds: [NAME_FIELD_ID, CITY_FIELD_ID],
-      fieldUniversalIdentifiers: [NAME_FIELD_ID, CITY_FIELD_ID],
+      fieldIds: [NAME_FIELD_ID, CITY_FIELD_ID, UPDATED_BY_FIELD_ID],
+      fieldUniversalIdentifiers: [
+        NAME_FIELD_ID,
+        CITY_FIELD_ID,
+        UPDATED_BY_FIELD_ID,
+      ],
     }),
     events,
   });
@@ -164,9 +180,6 @@ describe('CallAgentDatabaseEventTriggersJob', () => {
         [AGENT_ID]: { agentId: AGENT_ID, roleId: AGENT_ROLE_ID },
       },
       rolesPermissions: buildRolesPermissions(),
-      roleIdsWithAllRecordsAccess: [],
-      flatRowLevelPermissionPredicateMaps: createEmptyFlatEntityMaps(),
-      flatRowLevelPermissionPredicateGroupMaps: createEmptyFlatEntityMaps(),
       flatFieldMetadataMaps,
       flatFieldMetadataMapsOrm: flatFieldMetadataMaps,
     };
@@ -184,7 +197,6 @@ describe('CallAgentDatabaseEventTriggersJob', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CallAgentDatabaseEventTriggersJob,
-        RecordAccessPolicyService,
         {
           provide: getQueueToken(MessageQueue.aiQueue),
           useValue: messageQueueService,
@@ -201,19 +213,6 @@ describe('CallAgentDatabaseEventTriggersJob', () => {
         {
           provide: AgentTriggerThrottlerService,
           useValue: agentTriggerThrottlerService,
-        },
-        {
-          provide: RecordShareStorageService,
-          useValue: { findByRecordIds: jest.fn().mockResolvedValue([]) },
-        },
-        {
-          provide: WorkspaceOrmManager,
-          useValue: {
-            getRepository: jest.fn(),
-            executeInWorkspaceContext: jest
-              .fn()
-              .mockImplementation((fn: () => unknown) => fn()),
-          },
         },
       ],
     }).compile();
@@ -285,14 +284,25 @@ describe('CallAgentDatabaseEventTriggersJob', () => {
   it('should skip updates the agent made itself', async () => {
     await job.handle(
       buildBatch([
-        buildEvent('record-1', {
-          updatedBy: {
-            source: FieldActorSource.AGENT,
-            workspaceMemberId: null,
-            name: 'Enricher',
-            context: { agentId: AGENT_ID },
-          },
-        }),
+        buildEvent('record-1', { updatedBy: AGENT_ACTOR }),
+        buildEvent('record-2'),
+      ]),
+    );
+
+    expect(enqueuedJobs()).toHaveLength(1);
+    expect(enqueuedJobs()[0].payload).toMatchObject({
+      events: [{ recordId: 'record-2' }],
+    });
+  });
+
+  it('should skip updates the agent made itself even when its role cannot read who made them', async () => {
+    cacheData.rolesPermissions = buildRolesPermissions(true, {
+      [UPDATED_BY_FIELD_ID]: { canRead: false, canUpdate: false },
+    });
+
+    await job.handle(
+      buildBatch([
+        buildEvent('record-1', { updatedBy: AGENT_ACTOR }),
         buildEvent('record-2'),
       ]),
     );

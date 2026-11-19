@@ -8,8 +8,7 @@ import { isUserAuthContext } from 'src/engine/core-modules/auth/guards/is-user-a
 import { type WorkspaceAuthContext } from 'src/engine/core-modules/auth/types/workspace-auth-context.type';
 import { AGENT_CHAT_THREAD_ACTIVITY_COLUMNS } from 'src/engine/metadata-modules/ai/ai-chat/constants/agent-chat-thread-activity-columns.constant';
 import { AgentChatChannelAccessService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-channel-access.service';
-import { AgentChatChannelGrantService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-channel-grant.service';
-import { AgentChatSharingService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-sharing.service';
+import { AgentChatThreadAccessService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-thread-access.service';
 import { AgentChatThreadParticipantService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-thread-participant.service';
 import { AgentChatThreadRecordEventService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-thread-record-event.service';
 import { type AgentChatThreadAccessArgs } from 'src/engine/metadata-modules/ai/ai-chat/types/agent-chat-thread-access-args.type';
@@ -34,15 +33,14 @@ export class AgentChatThreadService {
   constructor(
     @InjectAgentHistoryRepository('agentChatThread')
     private readonly threadRepository: AgentHistoryRepository<AgentChatThreadWorkspaceEntity>,
-    private readonly sharingService: AgentChatSharingService,
+    private readonly threadAccessService: AgentChatThreadAccessService,
     private readonly threadRecordEventService: AgentChatThreadRecordEventService,
     private readonly participantService: AgentChatThreadParticipantService,
     private readonly channelAccessService: AgentChatChannelAccessService,
-    private readonly channelGrantService: AgentChatChannelGrantService,
   ) {}
 
   async createThread(
-    args: Parameters<AgentChatSharingService['createThread']>[0],
+    args: Parameters<AgentChatThreadAccessService['createThread']>[0],
   ) {
     if (isDefined(args.channelId)) {
       await this.channelAccessService.assertChannelAccess({
@@ -52,7 +50,7 @@ export class AgentChatThreadService {
       });
     }
 
-    const savedThread = await this.sharingService.createThread(args);
+    const savedThread = await this.threadAccessService.createThread(args);
 
     // Sent first, so the new thread never shows as unread to its owner
     await this.participantService.emitParticipantCreated({
@@ -143,7 +141,7 @@ export class AgentChatThreadService {
   }): Promise<void> {
     if (!isDefined(threadBefore.workspaceMemberId)) {
       const claimedThread =
-        await this.sharingService.claimUnownedThreadForRun(args);
+        await this.threadAccessService.claimUnownedThreadForRun(args);
 
       if (isDefined(claimedThread)) {
         await this.participantService.emitParticipantCreated(args);
@@ -174,7 +172,7 @@ export class AgentChatThreadService {
     args: AgentChatThreadAccessArgs;
     threadBefore: AgentChatThreadWorkspaceEntity | null;
   }): Promise<AgentChatThreadWorkspaceEntity> {
-    const thread = await this.sharingService.restoreThreadWithAccess(args);
+    const thread = await this.threadAccessService.restoreThreadWithAccess(args);
 
     if (isDefined(threadBefore)) {
       await this.threadRecordEventService.emitThreadUpdated({
@@ -211,8 +209,9 @@ export class AgentChatThreadService {
       return;
     }
 
-    const participantObjectMetadataId =
-      await this.sharingService.getParticipantObjectMetadataId(workspaceId);
+    await this.threadAccessService.assertHasMentionResolutionOrThrow(
+      workspaceId,
+    );
 
     const { generatedMaps: assignedThreads } =
       await this.threadRepository.update(
@@ -233,12 +232,11 @@ export class AgentChatThreadService {
     const setUpThreads = await this.threadRepository.query(
       workspaceId,
       (context) =>
-        this.sharingService.setUpCreatedThreadsInboxState({
+        this.threadAccessService.setUpCreatedThreadsInboxState({
           ...context,
           workspaceId,
           workspaceMemberId,
           threadIds: assignedThreadIds,
-          participantObjectMetadataId,
         }),
     );
 
@@ -287,7 +285,7 @@ export class AgentChatThreadService {
   }
 
   async getWritableThread(args: AgentChatThreadAccessArgs) {
-    return this.sharingService.getThreadWithAccess({
+    return this.threadAccessService.getThreadWithAccess({
       ...args,
       operationType: 'update',
     });
@@ -358,7 +356,7 @@ export class AgentChatThreadService {
       participantArgs: AgentChatThreadAccessArgs,
     ) => Promise<void>;
   }): Promise<string[]> {
-    await this.sharingService.assertHasMentionResolutionOrThrow(
+    await this.threadAccessService.assertHasMentionResolutionOrThrow(
       args.workspaceId,
     );
 
@@ -372,7 +370,7 @@ export class AgentChatThreadService {
     }
 
     const participantMemberIds =
-      await this.sharingService.shareThreadWithMembers({
+      await this.threadAccessService.findMembersWhoCanReply({
         ...args,
         memberIds: candidateMemberIds,
       });
@@ -427,7 +425,7 @@ export class AgentChatThreadService {
       assigneeWorkspaceMemberId !== args.workspaceMemberId
     ) {
       const [assigneeWhoCanReply] =
-        await this.sharingService.shareThreadWithMembers({
+        await this.threadAccessService.findMembersWhoCanReply({
           ...args,
           memberIds: [assigneeWorkspaceMemberId],
         });
@@ -542,13 +540,6 @@ export class AgentChatThreadService {
            SELECT id FROM moved_thread`,
           [args.threadId, channelId],
         );
-
-        await this.channelGrantService.rewriteThreadGrantsInTransaction({
-          manager,
-          workspaceId: args.workspaceId,
-          threadIds: movedThreads.map(({ id }) => id),
-          affectedChannelIds: [lockedThread.channelId, channelId],
-        });
 
         return movedThreads;
       },

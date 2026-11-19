@@ -10,7 +10,7 @@ import { isDefined } from 'twenty-shared/utils';
 import { type EntityManager } from 'typeorm';
 
 import { AgentChatEventPublisherService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-event-publisher.service';
-import { AgentChatSharingService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-sharing.service';
+import { AgentChatThreadAccessService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-thread-access.service';
 import { getAgentMessageReactionTable } from 'src/engine/metadata-modules/ai/ai-chat/utils/get-agent-message-reaction-table.util';
 import { throwAgentChatMessageNotFound } from 'src/engine/metadata-modules/ai/ai-chat/utils/throw-agent-chat-message-not-found.util';
 import { AgentMessageRole } from 'src/engine/metadata-modules/ai/ai-history/enums/agent-message-role.enum';
@@ -102,7 +102,7 @@ export class AgentChatMessageReactionService {
     @InjectAgentHistoryRepository('agentMessage')
     private readonly messageRepository: AgentHistoryRepository<AgentMessageWorkspaceEntity>,
     private readonly storageService: AgentHistoryWorkspaceStorageService,
-    private readonly sharingService: AgentChatSharingService,
+    private readonly threadAccessService: AgentChatThreadAccessService,
     private readonly eventPublisherService: AgentChatEventPublisherService,
     private readonly workspaceCacheService: WorkspaceCacheService,
   ) {}
@@ -191,7 +191,7 @@ export class AgentChatMessageReactionService {
 
     // Agents and the assistant react from turns the server already allowed
     if (isDefined(workspaceMemberId)) {
-      await this.sharingService.getReadableThread({
+      await this.threadAccessService.getReadableThread({
         threadId: message.threadId,
         workspaceMemberId,
         workspaceId,

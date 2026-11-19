@@ -15,13 +15,12 @@ import { type AgentChatThreadParticipantDTO } from 'src/engine/metadata-modules/
 import { AgentChatInboxAction } from 'src/engine/metadata-modules/ai/ai-chat/enums/agent-chat-inbox-action.enum';
 import { END_AGENT_CHAT_THREAD_SNOOZE_JOB_NAME } from 'src/engine/metadata-modules/ai/ai-chat/jobs/end-agent-chat-thread-snooze-job-name.constant';
 import { type EndAgentChatThreadSnoozeJobData } from 'src/engine/metadata-modules/ai/ai-chat/jobs/end-agent-chat-thread-snooze-job.types';
-import { AgentChatSharingService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-sharing.service';
+import { AgentChatThreadAccessService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-thread-access.service';
 import { AgentChatThreadParticipantEventService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-thread-participant-event.service';
 import { type AgentChatThreadAccessArgs } from 'src/engine/metadata-modules/ai/ai-chat/types/agent-chat-thread-access-args.type';
 import { type AgentChatThreadWriteStep } from 'src/engine/metadata-modules/ai/ai-chat/types/agent-chat-thread-write-step.type';
 import { type AgentChatThreadParticipantRow } from 'src/engine/metadata-modules/ai/ai-chat/types/agent-chat-thread-participant-row.type';
 import { type AgentChatThreadActivity } from 'src/engine/metadata-modules/ai/ai-chat/types/agent-chat-thread-activity.type';
-import { buildAgentChatThreadParticipantOwnerShareInsert } from 'src/engine/metadata-modules/ai/ai-chat/utils/build-agent-chat-thread-participant-owner-share-insert.util';
 import { buildAgentChatThreadActivitySetClause } from 'src/engine/metadata-modules/ai/ai-chat/utils/build-agent-chat-thread-activity-set-clause.util';
 import { getAgentChatThreadParticipantTable } from 'src/engine/metadata-modules/ai/ai-chat/utils/get-agent-chat-thread-participant-table.util';
 import { throwAgentChatThreadNotFound } from 'src/engine/metadata-modules/ai/ai-chat/utils/throw-agent-chat-thread-not-found.util';
@@ -148,7 +147,7 @@ export class AgentChatThreadParticipantService {
   constructor(
     @InjectAgentHistoryRepository('agentChatThread')
     private readonly threadRepository: AgentHistoryRepository<AgentChatThreadWorkspaceEntity>,
-    private readonly sharingService: AgentChatSharingService,
+    private readonly threadAccessService: AgentChatThreadAccessService,
     private readonly participantEventService: AgentChatThreadParticipantEventService,
     @InjectMessageQueue(MessageQueue.delayedJobsQueue)
     private readonly delayedJobsQueueService: MessageQueueService,
@@ -323,11 +322,12 @@ export class AgentChatThreadParticipantService {
       return;
     }
 
-    const [readableThreadId] = await this.sharingService.findReadableThreadIds({
-      workspaceId: args.workspaceId,
-      workspaceMemberId: args.workspaceMemberId,
-      threadIds: [args.threadId],
-    });
+    const [readableThreadId] =
+      await this.threadAccessService.findReadableThreadIds({
+        workspaceId: args.workspaceId,
+        workspaceMemberId: args.workspaceMemberId,
+        threadIds: [args.threadId],
+      });
 
     if (!isDefined(readableThreadId)) {
       return;
@@ -351,7 +351,7 @@ export class AgentChatThreadParticipantService {
   }
 
   async isFollowing(args: AgentChatThreadAccessArgs): Promise<boolean> {
-    await this.sharingService.assertHasMentionResolutionOrThrow(
+    await this.threadAccessService.assertHasMentionResolutionOrThrow(
       args.workspaceId,
     );
 
@@ -365,7 +365,7 @@ export class AgentChatThreadParticipantService {
 
   // For the row written along with a new thread
   async emitParticipantCreated(args: AgentChatThreadAccessArgs): Promise<void> {
-    await this.sharingService.assertHasMentionResolutionOrThrow(
+    await this.threadAccessService.assertHasMentionResolutionOrThrow(
       args.workspaceId,
     );
 
@@ -396,8 +396,9 @@ export class AgentChatThreadParticipantService {
     text: string;
   }): Promise<AgentChatThreadActivity> {
     const participantTable = getAgentChatThreadParticipantTable(workspaceId);
-    const participantObjectMetadataId =
-      await this.sharingService.getParticipantObjectMetadataId(workspaceId);
+    await this.threadAccessService.assertHasMentionResolutionOrThrow(
+      workspaceId,
+    );
 
     const { rows, before, after } = await this.threadRepository.query(
       workspaceId,
@@ -431,11 +432,9 @@ export class AgentChatThreadParticipantService {
                "isSubscribed" = true,
                "updatedAt" = ${NEXT_PARTICIPANT_UPDATED_AT}
              RETURNING id, "workspaceMemberId"
-           ), owner_share AS (
-             ${buildAgentChatThreadParticipantOwnerShareInsert({ workspaceId, participantSource: 'participant', objectMetadataIdParameter: '$4' })}
            )
            SELECT ${AGENT_CHAT_THREAD_ACTIVITY_COLUMNS} FROM thread`,
-          [threadId, workspaceMemberId, text, participantObjectMetadataId],
+          [threadId, workspaceMemberId, text],
         );
 
         const after = await this.findOne({
@@ -499,9 +498,11 @@ export class AgentChatThreadParticipantService {
     AgentChatThreadAccessArgs,
     'threadId'
   >): Promise<AgentChatOpenThreadsSummaryDTO> {
-    await this.sharingService.assertHasMentionResolutionOrThrow(workspaceId);
+    await this.threadAccessService.assertHasMentionResolutionOrThrow(
+      workspaceId,
+    );
 
-    const authContext = await this.sharingService.getAuthContext({
+    const authContext = await this.threadAccessService.getAuthContext({
       workspaceId,
       workspaceMemberId,
     });
@@ -522,7 +523,7 @@ export class AgentChatThreadParticipantService {
             '"thread"."pendingQuestionMessageId"',
             'pendingQuestionMessageId',
           )
-          .applyRowLevelPermissions();
+          .applyRowAccessPolicy();
 
         return repository.executeRaw<
           Pick<
@@ -626,11 +627,12 @@ export class AgentChatThreadParticipantService {
   }: Omit<AgentChatThreadAccessArgs, 'threadId'> & {
     threadIds: string[];
   }): Promise<void> {
-    const readableThreadIds = await this.sharingService.findReadableThreadIds({
-      workspaceId,
-      workspaceMemberId,
-      threadIds,
-    });
+    const readableThreadIds =
+      await this.threadAccessService.findReadableThreadIds({
+        workspaceId,
+        workspaceMemberId,
+        threadIds,
+      });
 
     if (readableThreadIds.length !== threadIds.length) {
       throwAgentChatThreadNotFound();
@@ -653,24 +655,18 @@ export class AgentChatThreadParticipantService {
     extraParameters: unknown[] = [],
     writeThread?: AgentChatThreadWriteStep,
   ): Promise<AgentChatThreadParticipantRow[]> {
-    const objectMetadataId =
-      await this.sharingService.getParticipantObjectMetadataId(workspaceId);
+    await this.threadAccessService.assertHasMentionResolutionOrThrow(
+      workspaceId,
+    );
 
     const writes = await this.threadRepository.query(
       workspaceId,
       async ({ manager, table }) => {
-        const parameterCount = extraParameters.length + 3;
         const query = `WITH written_participant AS (
              ${buildQuery({
                participantTable:
                  getAgentChatThreadParticipantTable(workspaceId),
                threadTable: table('agentChatThread'),
-             })}
-           ), owner_share AS (
-             ${buildAgentChatThreadParticipantOwnerShareInsert({
-               workspaceId,
-               participantSource: 'written_participant',
-               objectMetadataIdParameter: `$${parameterCount}`,
              })}
            )
            SELECT ${PARTICIPANT_COLUMNS} FROM written_participant`;
@@ -692,7 +688,7 @@ export class AgentChatThreadParticipantService {
 
           const [after] = await manager.query<AgentChatThreadParticipantRow[]>(
             query,
-            [threadId, workspaceMemberId, ...extraParameters, objectMetadataId],
+            [threadId, workspaceMemberId, ...extraParameters],
           );
 
           if (isDefined(after)) {

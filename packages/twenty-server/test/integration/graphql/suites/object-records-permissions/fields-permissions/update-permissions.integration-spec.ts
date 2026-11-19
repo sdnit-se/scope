@@ -3,7 +3,6 @@ import { randomUUID } from 'crypto';
 import gql from 'graphql-tag';
 import request from 'supertest';
 import { createCustomRoleWithObjectPermissions } from 'test/integration/graphql/utils/create-custom-role-with-object-permissions.util';
-import { createManyOperationFactory } from 'test/integration/graphql/utils/create-many-operation-factory.util';
 import { createOneOperationFactory } from 'test/integration/graphql/utils/create-one-operation-factory.util';
 import { deleteRole } from 'test/integration/graphql/utils/delete-one-role.util';
 import { makeGraphqlApiRequestWithMemberRole } from 'test/integration/graphql/utils/make-graphql-api-request-with-member-role.util';
@@ -12,9 +11,7 @@ import { updateManyOperationFactory } from 'test/integration/graphql/utils/updat
 import { updateOneOperationFactory } from 'test/integration/graphql/utils/update-one-operation-factory.util';
 import { updateWorkspaceMemberRole } from 'test/integration/graphql/utils/update-workspace-member-role.util';
 import { upsertFieldPermissions } from 'test/integration/graphql/utils/upsert-field-permissions.util';
-import { upsertRowLevelPermissionPredicates } from 'test/integration/metadata/suites/row-level-permission-predicate/utils/upsert-row-level-permission-predicates.util';
 import { makeMetadataApiRequest } from 'test/integration/metadata/suites/utils/make-metadata-api-request.util';
-import { RowLevelPermissionPredicateOperand } from 'twenty-shared/types';
 
 import { ErrorCode } from 'src/engine/core-modules/graphql/utils/graphql-errors.util';
 import { PermissionsExceptionMessage } from 'src/engine/metadata-modules/permissions/permissions.exception';
@@ -39,27 +36,6 @@ const expectPermissionDeniedError = (response: any) => {
     PermissionsExceptionMessage.PERMISSION_DENIED,
   );
   expect(response.body.errors[0].extensions.code).toBe(ErrorCode.FORBIDDEN);
-};
-
-const expectEmployeesIsAccessible = ({
-  response,
-  operationName,
-  expectedEmployees,
-}: {
-  response: any;
-  operationName: 'createCompanies' | 'createCompany';
-  expectedEmployees: number;
-}) => {
-  expect(response.body.errors).toBeUndefined();
-  expect(response.body.data).toBeDefined();
-
-  const result =
-    operationName === 'createCompany'
-      ? response.body.data[operationName]
-      : response.body.data[operationName]?.[0];
-
-  expect(result).toBeDefined();
-  expect(result.employees).toBe(expectedEmployees);
 };
 
 describe('Field update permissions restrictions', () => {
@@ -235,78 +211,6 @@ describe('Field update permissions restrictions', () => {
     }
   });
 
-  describe('should allow employees field when creating if field is in RLS predicate', () => {
-    beforeEach(async () => {
-      await restrictUpdateAccessToCompanyEmployee(
-        customRoleId,
-        companyObjectId,
-        restrictedCompanyFieldId,
-      );
-
-      await upsertRowLevelPermissionPredicates({
-        input: {
-          roleId: customRoleId,
-          objectMetadataId: companyObjectId,
-          predicates: [
-            {
-              fieldMetadataId: restrictedCompanyFieldId,
-              operand: RowLevelPermissionPredicateOperand.IS_NOT_EMPTY,
-            },
-          ],
-          predicateGroups: [],
-        },
-      });
-    });
-
-    afterEach(async () => {
-      await upsertRowLevelPermissionPredicates({
-        input: {
-          roleId: customRoleId,
-          objectMetadataId: companyObjectId,
-          predicates: [],
-          predicateGroups: [],
-        },
-      });
-    });
-
-    it('1. createMany with restricted field in RLS predicate', async () => {
-      const graphqlOperation = createManyOperationFactory({
-        objectMetadataSingularName: 'company',
-        objectMetadataPluralName: 'companies',
-        gqlFields: COMPANY_GQL_FIELDS_WITH_EMPLOYEES,
-        data: [
-          { id: randomUUID(), name: 'NewCompany1', employees: 15 },
-          { id: randomUUID(), name: 'NewCompany2', employees: 20 },
-        ],
-      });
-
-      const response =
-        await makeGraphqlApiRequestWithMemberRole(graphqlOperation);
-
-      expectEmployeesIsAccessible({
-        response,
-        operationName: 'createCompanies',
-        expectedEmployees: 15,
-      });
-    });
-
-    it('2. createOne with restricted field in RLS predicate', async () => {
-      const graphqlOperation = createOneOperationFactory({
-        objectMetadataSingularName: 'company',
-        gqlFields: COMPANY_GQL_FIELDS_WITH_EMPLOYEES,
-        data: { id: randomUUID(), name: 'NewCompany3', employees: 25 },
-      });
-
-      const response =
-        await makeGraphqlApiRequestWithMemberRole(graphqlOperation);
-
-      expectEmployeesIsAccessible({
-        response,
-        operationName: 'createCompany',
-        expectedEmployees: 25,
-      });
-    });
-  });
   describe('should block read-restricted field in update operation responses', () => {
     beforeEach(async () => {
       await restrictReadAccessToCompanyEmployee(

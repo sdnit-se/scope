@@ -8,7 +8,6 @@ import { createOneOperationFactory } from 'test/integration/graphql/utils/create
 import { findManyOperationFactory } from 'test/integration/graphql/utils/find-many-operation-factory.util';
 import { makeGraphqlApiRequest } from 'test/integration/graphql/utils/make-graphql-api-request.util';
 import { createFileUploadMutation } from 'test/integration/graphql/utils/upload-file-with-direct-upload.util';
-import { upsertContainsRlsPredicate } from 'test/integration/graphql/utils/upsert-contains-rls-predicate.util';
 import { makeRestApiRequest } from 'test/integration/rest/utils/make-rest-api-request.util';
 import { cleanupApplicationAndAppRegistration } from 'test/integration/metadata/suites/application/utils/cleanup-application-and-app-registration.util';
 import {
@@ -253,13 +252,6 @@ describe('Code interpreter sandbox token beyond the agent role should be refused
         ],
       },
       expectToFail: false,
-    });
-
-    await upsertContainsRlsPredicate({
-      roleId: agentRoleId,
-      objectNameSingular: 'company',
-      fieldName: 'name',
-      value: AGENT_VISIBLE_COMPANY_NAME_TOKEN,
     });
 
     const assignResponse = await makeMetadataApiRequest({
@@ -510,19 +502,5 @@ describe('Code interpreter sandbox token beyond the agent role should be refused
         globalTestContext.visibleCompanyId,
       ].sort(),
     );
-  });
-
-  it('should apply the agent role row-level rules to MCP tools for a member run', async () => {
-    const sandboxToken = await captureSandboxTokenForAgentRun({
-      globalTestContext,
-      token: APPLE_JONY_MEMBER_ACCESS_TOKEN,
-    });
-
-    expect(
-      await findCompanyIdsThroughMcp({
-        globalTestContext,
-        token: sandboxToken,
-      }),
-    ).toEqual([globalTestContext.visibleCompanyId]);
   });
 });

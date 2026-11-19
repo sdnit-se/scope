@@ -4,7 +4,7 @@ import { isDefined } from 'twenty-shared/utils';
 import { IsNull } from 'typeorm';
 
 import { isUserAuthContext } from 'src/engine/core-modules/auth/guards/is-user-auth-context.guard';
-import { AgentChatSharingService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-sharing.service';
+import { AgentChatThreadAccessService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-thread-access.service';
 import { AgentChatThreadService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-thread.service';
 import { type AgentInboxCallerAuthContext } from 'src/engine/metadata-modules/ai/ai-chat/types/agent-inbox-caller-auth-context.type';
 import { throwAgentChatThreadNotFound } from 'src/engine/metadata-modules/ai/ai-chat/utils/throw-agent-chat-thread-not-found.util';
@@ -18,7 +18,7 @@ export class AgentInboxAccessService {
     @InjectAgentHistoryRepository('agentMessage')
     private readonly agentMessageRepository: AgentHistoryRepository<AgentMessageWorkspaceEntity>,
     private readonly threadService: AgentChatThreadService,
-    private readonly sharingService: AgentChatSharingService,
+    private readonly threadAccessService: AgentChatThreadAccessService,
   ) {}
 
   async assertThreadIsWritableOrThrow({
@@ -48,9 +48,8 @@ export class AgentInboxAccessService {
         threadId,
       })) ||
       (isDefined(defaultRoleId) &&
-        (await this.sharingService.isThreadWritableByRole({
+        (await this.threadAccessService.isThreadWritableByRole({
           workspaceId,
-          threadId,
           roleId: defaultRoleId,
         })));
 

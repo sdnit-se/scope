@@ -9,8 +9,6 @@ import { DeleteRoleTool } from 'src/engine/metadata-modules/role/tools/delete-ro
 import { ListRolesTool } from 'src/engine/metadata-modules/role/tools/list-roles.tool';
 import { UpdateRoleTool } from 'src/engine/metadata-modules/role/tools/update-role.tool';
 import { UpsertObjectPermissionsTool } from 'src/engine/metadata-modules/role/tools/upsert-object-permissions.tool';
-import { UpsertRowLevelPermissionRulesTool } from 'src/engine/metadata-modules/role/tools/upsert-row-level-permission-rules.tool';
-import { RowLevelPermissionModule } from 'src/engine/metadata-modules/row-level-permission-predicate/row-level-permission.module';
 import { UserRoleModule } from 'src/engine/metadata-modules/user-role/user-role.module';
 
 @Module({
@@ -18,7 +16,6 @@ import { UserRoleModule } from 'src/engine/metadata-modules/user-role/user-role.
     RoleModule,
     UserRoleModule,
     ObjectPermissionModule,
-    RowLevelPermissionModule,
     ApplicationModule,
   ],
   providers: [
@@ -28,7 +25,6 @@ import { UserRoleModule } from 'src/engine/metadata-modules/user-role/user-role.
     DeleteRoleTool,
     AssignRoleToWorkspaceMemberTool,
     UpsertObjectPermissionsTool,
-    UpsertRowLevelPermissionRulesTool,
   ],
 })
 export class RoleToolsModule {}

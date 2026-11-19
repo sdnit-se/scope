@@ -5,9 +5,6 @@ import {
   FieldMetadataType,
   MetadataReadability,
   type ObjectsPermissionsByRoleId,
-  RecordShareAccessLevel,
-  RecordSharePrincipalType,
-  RecordShareRowCause,
 } from 'twenty-shared/types';
 
 import { LogicFunctionTriggerJob } from 'src/engine/core-modules/logic-function/logic-function-trigger/jobs/logic-function-trigger.job';
@@ -20,9 +17,6 @@ import { createEmptyFlatEntityMaps } from 'src/engine/metadata-modules/flat-enti
 import { addFlatEntityToFlatEntityMapsOrThrow } from 'src/engine/metadata-modules/flat-entity/utils/add-flat-entity-to-flat-entity-maps-or-throw.util';
 import { getFlatFieldMetadataMock } from 'src/engine/metadata-modules/flat-field-metadata/__mocks__/get-flat-field-metadata.mock';
 import { getFlatObjectMetadataMock } from 'src/engine/metadata-modules/flat-object-metadata/__mocks__/get-flat-object-metadata.mock';
-import { RecordAccessPolicyService } from 'src/engine/core-modules/record-share/services/record-access-policy.service';
-import { RecordShareStorageService } from 'src/engine/core-modules/record-share/services/record-share-storage.service';
-import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
 import { type WorkspaceEventBatch } from 'src/engine/workspace-event-emitter/types/workspace-event-batch.type';
 
@@ -33,6 +27,9 @@ const SALARY_FIELD_ID = 'salary-field-id';
 const CITY_FIELD_ID = 'city-field-id';
 const APPLICATION_ID = 'application-id';
 const APPLICATION_ROLE_ID = 'application-role-id';
+const OTHER_APPLICATION_ID = 'other-application-id';
+const OTHER_APPLICATION_ROLE_ID = 'other-application-role-id';
+const OTHER_LOGIC_FUNCTION_ID = 'other-logic-function-id';
 const LOGIC_FUNCTION_ID = 'logic-function-id';
 const TRIGGER_JOB_ID = 'trigger-job-id';
 
@@ -107,30 +104,31 @@ const buildEvent = (
     },
   }) as unknown as ObjectRecordUpdateEvent;
 
-const buildRolesPermissions = ({
+const buildObjectPermissions = ({
   canReadObjectRecords = true,
   restrictedFields = {},
 }: {
   canReadObjectRecords?: boolean;
   restrictedFields?: Record<string, { canRead: boolean; canUpdate: boolean }>;
-} = {}): ObjectsPermissionsByRoleId => ({
-  [APPLICATION_ROLE_ID]: {
-    [OBJECT_METADATA_ID]: {
-      canReadObjectRecords,
-      canUpdateObjectRecords: false,
-      canSoftDeleteObjectRecords: false,
-      canDestroyObjectRecords: false,
-      restrictedFields,
-      rowLevelPermissionPredicates: [],
-      rowLevelPermissionPredicateGroups: [],
-    },
+} = {}) => ({
+  [OBJECT_METADATA_ID]: {
+    canReadObjectRecords,
+    canUpdateObjectRecords: false,
+    canSoftDeleteObjectRecords: false,
+    canDestroyObjectRecords: false,
+    restrictedFields,
   },
+});
+
+const buildRolesPermissions = (
+  options: Parameters<typeof buildObjectPermissions>[0] = {},
+): ObjectsPermissionsByRoleId => ({
+  [APPLICATION_ROLE_ID]: buildObjectPermissions(options),
 });
 
 describe('CallDatabaseEventTriggerJobsJob', () => {
   let job: CallDatabaseEventTriggerJobsJob;
   let messageQueueService: { bulkAdd: jest.Mock };
-  let recordShareStorageService: { findByRecordIds: jest.Mock };
   let cacheData: Record<string, unknown>;
 
   const buildBatch = (
@@ -176,22 +174,15 @@ describe('CallDatabaseEventTriggerJobsJob', () => {
         idByUniversalIdentifier: {},
       },
       rolesPermissions: buildRolesPermissions(),
-      roleIdsWithAllRecordsAccess: [],
-      flatRowLevelPermissionPredicateMaps: createEmptyFlatEntityMaps(),
-      flatRowLevelPermissionPredicateGroupMaps: createEmptyFlatEntityMaps(),
       flatFieldMetadataMaps,
       flatFieldMetadataMapsOrm: flatFieldMetadataMaps,
     };
 
     messageQueueService = { bulkAdd: jest.fn().mockResolvedValue(undefined) };
-    recordShareStorageService = {
-      findByRecordIds: jest.fn().mockResolvedValue([]),
-    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CallDatabaseEventTriggerJobsJob,
-        RecordAccessPolicyService,
         {
           provide: getQueueToken(MessageQueue.logicFunctionQueue),
           useValue: messageQueueService,
@@ -212,20 +203,6 @@ describe('CallDatabaseEventTriggerJobsJob', () => {
         {
           provide: ApplicationRepeatedEventRecorderService,
           useValue: { record: jest.fn() },
-        },
-        {
-          provide: RecordShareStorageService,
-          useValue: recordShareStorageService,
-        },
-
-        {
-          provide: WorkspaceOrmManager,
-          useValue: {
-            getRepository: jest.fn(),
-            executeInWorkspaceContext: jest
-              .fn()
-              .mockImplementation((fn: () => unknown) => fn()),
-          },
         },
       ],
     }).compile();
@@ -318,38 +295,6 @@ describe('CallDatabaseEventTriggerJobsJob', () => {
     expect(messageQueueService.bulkAdd).not.toHaveBeenCalled();
   });
 
-  it('should only enqueue the events passing the role row-level filter', async () => {
-    cacheData.flatRowLevelPermissionPredicateMaps = buildMaps([
-      {
-        id: 'predicate-city',
-        universalIdentifier: 'predicate-city',
-        roleId: APPLICATION_ROLE_ID,
-        objectMetadataId: OBJECT_METADATA_ID,
-        fieldMetadataId: CITY_FIELD_ID,
-        operand: 'CONTAINS',
-        value: 'Paris',
-        subFieldName: null,
-        workspaceMemberFieldMetadataId: null,
-        workspaceMemberSubFieldName: null,
-        rowLevelPermissionPredicateGroupId: null,
-        positionInRowLevelPermissionPredicateGroup: null,
-        deletedAt: null,
-      },
-    ]);
-
-    await job.handle(
-      buildBatch([
-        buildEvent('record-paris', { name: 'A', salary: 1, city: 'Paris' }),
-        buildEvent('record-berlin', { name: 'B', salary: 2, city: 'Berlin' }),
-      ]),
-      { jobId: TRIGGER_JOB_ID },
-    );
-
-    expect(enqueuedPayloads().map((payload) => payload.recordId)).toEqual([
-      'record-paris',
-    ]);
-  });
-
   it('should omit the fields the application role cannot read', async () => {
     cacheData.rolesPermissions = buildRolesPermissions({
       restrictedFields: {
@@ -387,25 +332,61 @@ describe('CallDatabaseEventTriggerJobsJob', () => {
     expect(messageQueueService.bulkAdd).not.toHaveBeenCalled();
   });
 
-  it('should only enqueue the events of a private object shared with the application role', async () => {
-    recordShareStorageService.findByRecordIds.mockResolvedValue([
+  it('should send a change to the function whose role may read the object, and not to one whose role may not', async () => {
+    cacheData.flatLogicFunctionMaps = buildMaps([
       {
-        id: 'record-share-1',
-        recordId: 'record-shared',
-        objectMetadataId: OBJECT_METADATA_ID,
-        principalId: APPLICATION_ROLE_ID,
-        principalType: RecordSharePrincipalType.ROLE,
-        accessLevel: RecordShareAccessLevel.READ,
-        rowCause: RecordShareRowCause.MANUAL,
-        sourceId: 'source-1',
+        id: LOGIC_FUNCTION_ID,
+        universalIdentifier: LOGIC_FUNCTION_ID,
+        workspaceId: WORKSPACE_ID,
+        applicationId: APPLICATION_ID,
+        databaseEventTriggerSettings: { eventName: 'company.updated' },
+        deletedAt: null,
+      },
+      {
+        id: OTHER_LOGIC_FUNCTION_ID,
+        universalIdentifier: OTHER_LOGIC_FUNCTION_ID,
+        workspaceId: WORKSPACE_ID,
+        applicationId: OTHER_APPLICATION_ID,
+        databaseEventTriggerSettings: { eventName: 'company.updated' },
+        deletedAt: null,
       },
     ]);
+    (cacheData.flatApplicationMaps as { byId: Record<string, unknown> }).byId[
+      OTHER_APPLICATION_ID
+    ] = {
+      id: OTHER_APPLICATION_ID,
+      universalIdentifier: 'other-application-universal-identifier',
+      applicationRegistrationId: 'other-application-registration-id',
+      defaultRoleId: OTHER_APPLICATION_ROLE_ID,
+      deletedAt: null,
+    };
+    cacheData.rolesPermissions = {
+      [APPLICATION_ROLE_ID]: buildObjectPermissions(),
+      [OTHER_APPLICATION_ROLE_ID]: buildObjectPermissions({
+        canReadObjectRecords: false,
+      }),
+    };
 
+    await job.handle(
+      buildBatch([buildEvent('record-1', { name: 'New', salary: 10 })]),
+      { jobId: TRIGGER_JOB_ID },
+    );
+
+    expect(
+      messageQueueService.bulkAdd.mock.calls.flatMap(([, jobs]) =>
+        (jobs as { data: { logicFunctionId: string } }[]).map(
+          (enqueuedJob) => enqueuedJob.data.logicFunctionId,
+        ),
+      ),
+    ).toEqual([LOGIC_FUNCTION_ID]);
+  });
+
+  it('should send every change of a private object to a role that may read it', async () => {
     await job.handle(
       buildBatch(
         [
-          buildEvent('record-private', { name: 'A', salary: 1 }),
-          buildEvent('record-shared', { name: 'B', salary: 2 }),
+          buildEvent('record-1', { name: 'A', salary: 1 }),
+          buildEvent('record-2', { name: 'B', salary: 2 }),
         ],
         MetadataReadability.PRIVATE,
       ),
@@ -413,7 +394,8 @@ describe('CallDatabaseEventTriggerJobsJob', () => {
     );
 
     expect(enqueuedPayloads().map((payload) => payload.recordId)).toEqual([
-      'record-shared',
+      'record-1',
+      'record-2',
     ]);
   });
 });

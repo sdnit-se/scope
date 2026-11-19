@@ -39,7 +39,7 @@ import { AgentChatService } from 'src/engine/metadata-modules/ai/ai-chat/service
 import { AgentChatThreadService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-thread.service';
 import { AgentConversationReaderService } from 'src/engine/metadata-modules/ai/ai-history/services/agent-conversation-reader.service';
 import { AgentChatThreadLifecycleService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-thread-lifecycle.service';
-import { AgentChatSharingService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-sharing.service';
+import { AgentChatThreadAccessService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-thread-access.service';
 import { AiChatFileAttachment } from 'src/engine/metadata-modules/ai/ai-chat/types/ai-chat-file-attachment.type';
 import { formatErrorWithCause } from 'src/engine/metadata-modules/ai/ai-chat/utils/format-error-with-cause.util';
 import { mapErrorToStreamError } from 'src/engine/metadata-modules/ai/ai-history/utils/map-error-to-stream-error.util';
@@ -89,7 +89,7 @@ export class AgentChatStreamingService {
     private readonly turnRecorderService: AgentTurnRecorderService,
     private readonly agentRunSuspensionService: AgentRunSuspensionService,
     private readonly threadLifecycleService: AgentChatThreadLifecycleService,
-    private readonly sharingService: AgentChatSharingService,
+    private readonly threadAccessService: AgentChatThreadAccessService,
   ) {}
 
   // a message sent while a reply or a run streams in the conversation waits in its queue
@@ -113,7 +113,9 @@ export class AgentChatStreamingService {
     const threadId = thread.id;
     const workspaceId = workspace.id;
 
-    await this.sharingService.assertHasMentionResolutionOrThrow(workspaceId);
+    await this.threadAccessService.assertHasMentionResolutionOrThrow(
+      workspaceId,
+    );
 
     const [conversationWait, hasQueuedBacklog] = await Promise.all([
       this.agentRunSuspensionService.findConversationWait({

@@ -18,8 +18,6 @@ const COMPANY_OBJECT_PERMISSIONS: ObjectPermissionsWithObjectMetadataId = {
   restrictedFields: {
     'company-name-field-metadata-id': { canRead: true, canUpdate: false },
   },
-  rowLevelPermissionPredicates: [],
-  rowLevelPermissionPredicateGroups: [],
 };
 
 const PERSON_OBJECT_PERMISSIONS_WITH_UNSET_FLAGS: CurrentUserWorkspaceObjectPermissions =
@@ -89,8 +87,6 @@ describe('objectPermissionsByObjectMetadataIdSelector', () => {
       canSoftDeleteObjectRecords: true,
       canDestroyObjectRecords: true,
       restrictedFields: {},
-      rowLevelPermissionPredicates: [],
-      rowLevelPermissionPredicateGroups: [],
     });
   });
 

@@ -24,13 +24,8 @@ export class CreateManyRecordsService {
   ) {}
 
   async execute(params: CreateManyRecordsParams): Promise<ToolOutput> {
-    const {
-      objectName,
-      objectRecords,
-      authContext,
-      rolePermissionConfig,
-      shareWith,
-    } = params;
+    const { objectName, objectRecords, authContext, rolePermissionConfig } =
+      params;
 
     try {
       const {
@@ -69,7 +64,6 @@ export class CreateManyRecordsService {
         await this.commonCreateManyRunner.execute(
           {
             data: cleanedRecords,
-            shareWith,
             selectedFields,
           },
           queryRunnerContext,

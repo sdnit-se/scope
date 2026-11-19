@@ -1,24 +1,16 @@
 import { randomUUID } from 'node:crypto';
 
 import { getAppProviderByClassName } from 'test/integration/utils/get-app-provider-by-class-name.util';
-import { setManualRecordShare } from 'test/integration/utils/set-manual-record-share.util';
 import { waitForAllJobsToFinish } from 'test/integration/utils/wait-for-all-jobs-to-finish.util';
-import { STANDARD_OBJECTS } from 'twenty-shared/metadata';
-import {
-  FeatureFlagKey,
-  RecordShareAccessLevel,
-  RecordSharePrincipalType,
-} from 'twenty-shared/types';
-import { isDefined } from 'twenty-shared/utils';
+import { FeatureFlagKey } from 'twenty-shared/types';
 
 import { type FeatureFlagService } from 'src/engine/core-modules/feature-flag/services/feature-flag.service';
 import { type AgentChatService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat.service';
-import { type AgentChatSharingService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-sharing.service';
+import { type AgentChatThreadAccessService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-thread-access.service';
 import { type AgentChatThreadService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-thread.service';
 import { AgentMessageRole } from 'src/engine/metadata-modules/ai/ai-history/enums/agent-message-role.enum';
 import { AgentTurnStatus } from 'src/engine/metadata-modules/ai/ai-history/enums/agent-turn-status.enum';
 import { type AgentChatThreadConversationType } from 'src/engine/metadata-modules/ai/ai-history/types/agent-chat-thread-conversation-type.type';
-import { type WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
 import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
 import { SEED_APPLE_WORKSPACE_ID } from 'src/engine/workspace-manager/dev-seeder/core/constants/seeder-workspaces.constant';
 import { USER_WORKSPACE_DATA_SEED_IDS } from 'src/engine/workspace-manager/dev-seeder/core/utils/seed-user-workspaces.util';
@@ -35,9 +27,10 @@ export const createChatParticipationTestContext = async () => {
   );
   const chatService =
     getAppProviderByClassName<AgentChatService>('AgentChatService');
-  const sharingService = getAppProviderByClassName<AgentChatSharingService>(
-    'AgentChatSharingService',
-  );
+  const threadAccessService =
+    getAppProviderByClassName<AgentChatThreadAccessService>(
+      'AgentChatThreadAccessService',
+    );
   const featureFlagService =
     getAppProviderByClassName<FeatureFlagService>('FeatureFlagService');
   const wasInboxEnabled = await featureFlagService.isFeatureEnabled(
@@ -118,45 +111,6 @@ export const createChatParticipationTestContext = async () => {
      FROM "${schema}"."agentChatThreadParticipant" WHERE "threadId" = $1`,
       [threadId],
     );
-  const share = async ({
-    threadId,
-    recipientWorkspaceMemberId,
-    accessLevel,
-  }: {
-    threadId: string;
-    recipientWorkspaceMemberId: string;
-    accessLevel: RecordShareAccessLevel;
-  }) => {
-    const cache = getAppProviderByClassName<WorkspaceCacheService>(
-      'WorkspaceCacheService',
-    );
-    const { flatObjectMetadataMaps } = await cache.getOrRecompute(workspaceId, [
-      'flatObjectMetadataMaps',
-    ]);
-    const objectMetadata =
-      flatObjectMetadataMaps.byUniversalIdentifier[
-        STANDARD_OBJECTS.agentChatThread.universalIdentifier
-      ];
-
-    expect(objectMetadata).toBeDefined();
-
-    if (!isDefined(objectMetadata)) {
-      return;
-    }
-
-    await setManualRecordShare({
-      workspaceId,
-      enabled: true,
-      share: {
-        objectMetadataId: objectMetadata.id,
-        recordId: threadId,
-        sourceId: threadId,
-        principalType: RecordSharePrincipalType.WORKSPACE_MEMBER,
-        principalId: recipientWorkspaceMemberId,
-        accessLevel,
-      },
-    });
-  };
   const saveMessage = ({
     threadId,
     id = randomUUID(),
@@ -183,13 +137,12 @@ export const createChatParticipationTestContext = async () => {
     schema,
     threadService,
     chatService,
-    sharingService,
+    threadAccessService,
     featureFlagService,
     registerThread,
     createThread,
     readThread,
     readParticipants,
-    share,
     saveMessage,
     cleanup: async () => {
       await waitForAllJobsToFinish();

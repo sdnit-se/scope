@@ -22,8 +22,6 @@ const objectPermissionsByObjectMetadataId = {
     canDestroyObjectRecords: true,
     objectMetadataId: personObjectMetadataItem.id,
     restrictedFields: {},
-    rowLevelPermissionPredicates: [],
-    rowLevelPermissionPredicateGroups: [],
   },
 };
 

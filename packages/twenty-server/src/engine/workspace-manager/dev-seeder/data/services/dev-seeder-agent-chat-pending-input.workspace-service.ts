@@ -1,17 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
 import { type AskQuestionItem, type RequestFormField } from 'twenty-shared/ai';
-import { STANDARD_OBJECTS } from 'twenty-shared/metadata';
-import {
-  FieldMetadataType,
-  RecordShareAccessLevel,
-  RecordSharePrincipalType,
-  RecordShareRowCause,
-} from 'twenty-shared/types';
+import { FieldMetadataType } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 import { v5 } from 'uuid';
 
-import { RecordShareStorageService } from 'src/engine/core-modules/record-share/services/record-share-storage.service';
 import { AgentMessageRole } from 'src/engine/metadata-modules/ai/ai-history/enums/agent-message-role.enum';
 import { PAUSING_TOOLS } from 'src/engine/metadata-modules/ai/ai-agent-execution/pausing-tools/constants/pausing-tools.constant';
 import { mapAiStepsToUIMessageParts } from 'src/engine/metadata-modules/ai/ai-history/utils/map-ai-steps-to-ui-message-parts.util';
@@ -19,7 +12,6 @@ import { AgentHistoryRepository } from 'src/engine/metadata-modules/ai/ai-histor
 import { InjectAgentHistoryRepository } from 'src/engine/metadata-modules/ai/ai-history/repositories/inject-agent-history-repository.decorator';
 import { AgentConversationWriterService } from 'src/engine/metadata-modules/ai/ai-history/services/agent-conversation-writer.service';
 import { type AgentChatThreadWorkspaceEntity } from 'src/engine/metadata-modules/ai/ai-history/standard-objects/agent-chat-thread.workspace-entity';
-import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
 import { AGENT_CHAT_PENDING_INPUT_THREAD_DATA_SEED_IDS } from 'src/engine/workspace-manager/dev-seeder/core/constants/agent-chat-seeds.constant';
 import { SEED_APPLE_WORKSPACE_ID } from 'src/engine/workspace-manager/dev-seeder/core/constants/seeder-workspaces.constant';
 import { USER_WORKSPACE_DATA_SEED_IDS } from 'src/engine/workspace-manager/dev-seeder/core/utils/seed-user-workspaces.util';
@@ -210,7 +202,6 @@ type ConversationToSeed = {
     response: Record<string, unknown>;
     reply: string;
   };
-  sharedWith?: { member: Member; accessLevel: RecordShareAccessLevel };
 };
 
 const CONVERSATIONS_TO_SEED: ConversationToSeed[] = [
@@ -230,10 +221,6 @@ const CONVERSATIONS_TO_SEED: ConversationToSeed[] = [
     prompt: 'Draft the follow-up to Airbnb after Tuesday’s demo.',
     intro: 'Here is a draft. Review it before it goes out:',
     calls: [proposeEmailCall(AIRBNB_FOLLOW_UP_EMAIL)],
-    sharedWith: {
-      member: 'JONY',
-      accessLevel: RecordShareAccessLevel.READ_WRITE,
-    },
   },
   {
     threadId: AGENT_CHAT_PENDING_INPUT_THREAD_DATA_SEED_IDS.SENT_EMAIL_APPROVAL,
@@ -254,7 +241,6 @@ const CONVERSATIONS_TO_SEED: ConversationToSeed[] = [
       reply:
         'Sent. I copied Phil so he can follow up on the signature. Want me to set a reminder for Friday if Stripe hasn’t signed?',
     },
-    sharedWith: { member: 'PHIL', accessLevel: RecordShareAccessLevel.READ },
   },
   {
     threadId: AGENT_CHAT_PENDING_INPUT_THREAD_DATA_SEED_IDS.ANSWERED_QUESTION,
@@ -268,7 +254,6 @@ const CONVERSATIONS_TO_SEED: ConversationToSeed[] = [
       reply:
         'Phil owns the Linear onboarding. I will create the kickoff, the SSO setup and the data import tasks for him.',
     },
-    sharedWith: { member: 'PHIL', accessLevel: RecordShareAccessLevel.READ },
   },
   {
     threadId:
@@ -291,7 +276,6 @@ const CONVERSATIONS_TO_SEED: ConversationToSeed[] = [
       'Google signed the iPad deployment. Update the deal and hand it to Phil for onboarding.',
     intro: 'Here is the change. Approve it and I will update the deal:',
     calls: [IPAD_DEAL_HANDOVER_CALL],
-    sharedWith: { member: 'PHIL', accessLevel: RecordShareAccessLevel.READ },
   },
   {
     threadId:
@@ -353,8 +337,6 @@ export class DevSeederAgentChatPendingInputWorkspaceService {
     @InjectAgentHistoryRepository('agentChatThread')
     private readonly threadRepository: AgentHistoryRepository<AgentChatThreadWorkspaceEntity>,
     private readonly conversationWriterService: AgentConversationWriterService,
-    private readonly recordShareStorageService: RecordShareStorageService,
-    private readonly workspaceCacheService: WorkspaceCacheService,
   ) {}
 
   async seed({ workspaceId }: { workspaceId: string }): Promise<void> {
@@ -365,8 +347,6 @@ export class DevSeederAgentChatPendingInputWorkspaceService {
     for (const conversation of CONVERSATIONS_TO_SEED) {
       await this.seedConversation({ workspaceId, conversation });
     }
-
-    await this.shareConversations(workspaceId);
   }
 
   private async seedConversation({
@@ -520,40 +500,6 @@ export class DevSeederAgentChatPendingInputWorkspaceService {
       agentId: null,
       senderUserWorkspaceId: null,
       parts: [{ type: 'text', text: conversation.answer.reply }],
-    });
-  }
-
-  private async shareConversations(workspaceId: string): Promise<void> {
-    const { flatObjectMetadataMaps } =
-      await this.workspaceCacheService.getOrRecompute(workspaceId, [
-        'flatObjectMetadataMaps',
-      ]);
-    const threadObjectMetadataId =
-      flatObjectMetadataMaps.byUniversalIdentifier[
-        STANDARD_OBJECTS.agentChatThread.universalIdentifier
-      ]?.id;
-
-    if (!isDefined(threadObjectMetadataId)) {
-      return;
-    }
-
-    await this.recordShareStorageService.insertMany({
-      workspaceId,
-      recordShares: CONVERSATIONS_TO_SEED.flatMap(({ threadId, sharedWith }) =>
-        isDefined(sharedWith)
-          ? [
-              {
-                recordId: threadId,
-                objectMetadataId: threadObjectMetadataId,
-                principalId: MEMBERS[sharedWith.member].workspaceMemberId,
-                principalType: RecordSharePrincipalType.WORKSPACE_MEMBER,
-                accessLevel: sharedWith.accessLevel,
-                rowCause: RecordShareRowCause.MANUAL,
-                sourceId: threadId,
-              },
-            ]
-          : [],
-      ),
     });
   }
 }
