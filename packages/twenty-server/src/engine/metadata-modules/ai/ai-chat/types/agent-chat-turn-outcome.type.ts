@@ -4,10 +4,6 @@ export type AgentChatTurnOutcome =
   | { kind: 'cancelled'; reason: 'user_cancelled' | 'superseded' }
   | {
       kind: 'failed';
-      failurePhase:
-        | 'no_text'
-        | 'credits_exhausted'
-        | 'user_credits_exhausted'
-        | 'execution';
+      failurePhase: 'no_text' | 'execution';
       errorCode?: string;
     };

@@ -400,7 +400,6 @@ describe('SyncAttachmentRecordPageCommand', () => {
           remainingFlatEntityMapsToValidate: createEmptyFlatEntityMaps(),
           additionalCacheDataMaps: {
             featureFlagsMap: {} as Record<FeatureFlagKey, boolean>,
-            billingEntitlements: {},
           },
           buildOptions: {
             isSystemBuild: true,

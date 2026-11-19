@@ -20,7 +20,6 @@ import { toDisplayCredits } from 'src/engine/core-modules/usage/utils/to-display
 import { findAwaitingPausingToolParts } from 'src/engine/metadata-modules/ai/ai-agent-execution/pausing-tools/utils/find-awaiting-pausing-tool-parts.util';
 import { type AgentTurn } from 'src/engine/metadata-modules/ai/ai-agent-execution/services/agent-turn.service';
 import { type AgentTurnUsage } from 'src/engine/metadata-modules/ai/ai-billing/types/agent-turn-usage.type';
-import { type StepDebitResult } from 'src/engine/metadata-modules/ai/ai-billing/types/step-debit-result.type';
 import { addStepToAgentTurnUsage } from 'src/engine/metadata-modules/ai/ai-billing/utils/add-step-to-agent-turn-usage.util';
 import { AGENT_CHAT_CHECKPOINT_INTERVAL_MS } from 'src/engine/metadata-modules/ai/ai-chat/constants/agent-chat-checkpoint-interval-ms.constant';
 import { AgentChatCancelSubscriberService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-cancel-subscriber.service';
@@ -83,7 +82,6 @@ export type AgentTurnStreamResult = {
 
 export type AgentTurnCompletion = {
   modelId: string;
-  stopReason: StepDebitResult['stopReason'];
   isWaiting?: boolean;
   usage?: AgentTurnStreamUsage;
 };
@@ -98,11 +96,9 @@ export type AgentTurnFinish = {
 const getTurnWithoutTextReason = ({
   isAborted,
   streamError,
-  stopReason,
 }: {
   isAborted: boolean;
   streamError: unknown;
-  stopReason: StepDebitResult['stopReason'];
 }): string => {
   if (isAborted) {
     return 'user-cancelled';
@@ -110,14 +106,6 @@ const getTurnWithoutTextReason = ({
 
   if (isDefined(streamError)) {
     return 'stream-error';
-  }
-
-  if (stopReason === 'userAllowance') {
-    return 'user-credits-exhausted';
-  }
-
-  if (stopReason === 'workspaceAllowance') {
-    return 'credits-exhausted';
   }
 
   return 'empty-completion';
@@ -245,7 +233,6 @@ export class AgentTurnStreamService {
       turnId,
       result: { ...streamed, usage: completion.usage ?? streamed.usage },
       modelId: completion.modelId,
-      stopReason: completion.stopReason,
       isWaiting: completion.isWaiting,
       isBackgroundRun,
     });
@@ -263,13 +250,10 @@ export class AgentTurnStreamService {
     await this.eventPublisherService.publish({
       threadId,
       workspaceId,
-      event:
-        completion.stopReason === 'workspaceAllowance'
-          ? { type: 'credits-exhausted' }
-          : {
-              type: 'message-persisted',
-              messageId: streamed.assistantMessageId,
-            },
+      event: {
+        type: 'message-persisted',
+        messageId: streamed.assistantMessageId,
+      },
     });
 
     return { streamed, completion, finish };
@@ -440,7 +424,6 @@ export class AgentTurnStreamService {
     turnId,
     result,
     modelId,
-    stopReason,
     isWaiting = false,
     isBackgroundRun = false,
   }: {
@@ -448,7 +431,6 @@ export class AgentTurnStreamService {
     turnId: string;
     result: AgentTurnStreamResult;
     modelId: string;
-    stopReason: StepDebitResult['stopReason'];
     isWaiting?: boolean;
     // a background run's reply stays out of the inbox unless it asks something, and its result
     // stands in for a written reply
@@ -471,7 +453,6 @@ export class AgentTurnStreamService {
       isAborted: result.isAborted,
       isAwaitingUserAnswer: awaitingParts.length > 0 || isWaiting,
       isSilent,
-      stopReason,
       isTextReplyRequired: !isBackgroundRun,
     });
 
@@ -480,7 +461,6 @@ export class AgentTurnStreamService {
         claim,
         result,
         modelId,
-        stopReason,
         hasText,
         isSilent,
         hasAwaitingCall: awaitingParts.length > 0,
@@ -583,7 +563,6 @@ export class AgentTurnStreamService {
     claim: { threadId, workspaceId },
     result: { replyParts, isAborted, streamError, usage },
     modelId,
-    stopReason,
     hasText,
     isSilent,
     hasAwaitingCall,
@@ -594,7 +573,6 @@ export class AgentTurnStreamService {
       'replyParts' | 'isAborted' | 'streamError' | 'usage'
     >;
     modelId: string;
-    stopReason: StepDebitResult['stopReason'];
     hasText: boolean;
     isSilent: boolean;
     hasAwaitingCall: boolean;
@@ -606,7 +584,6 @@ export class AgentTurnStreamService {
     const reason = getTurnWithoutTextReason({
       isAborted,
       streamError,
-      stopReason,
     });
 
     const errorDetail = isDefined(streamError)
@@ -617,7 +594,7 @@ export class AgentTurnStreamService {
       `[AI_CHAT_NO_TEXT] Assistant turn ended without a text reply — ` +
         `reason=${reason}, model=${modelId}, ` +
         `threadId=${threadId}, workspaceId=${workspaceId}, ` +
-        `isAborted=${isAborted}, stopReason=${stopReason}, hasText=${hasText}, ` +
+        `isAborted=${isAborted}, hasText=${hasText}, ` +
         `streamError=${errorDetail}, ` +
         `inputTokens=${usage.inputTokens},` +
         `responseMessage.parts=${JSON.stringify(replyParts)}`,

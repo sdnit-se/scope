@@ -23,7 +23,6 @@ import { type FlatApplication } from 'src/engine/core-modules/application/types/
 import { canCallerReachApplication } from 'src/engine/core-modules/application/utils/can-caller-reach-application.util';
 import { PreventNestToAutoLogGraphqlErrorsFilter } from 'src/engine/core-modules/graphql/filters/prevent-nest-to-auto-log-graphql-errors.filter';
 import { ResolverValidationPipe } from 'src/engine/core-modules/graphql/pipes/resolver-validation.pipe';
-import { UsageLimitGraphqlApiExceptionFilter } from 'src/engine/core-modules/usage-limit/filters/usage-limit-graphql-api-exception.filter';
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { type AuthContextUser } from 'src/engine/core-modules/auth/types/auth-context.type';
 import { AuthGraphqlApiExceptionFilter } from 'src/engine/core-modules/auth/filters/auth-graphql-api-exception.filter';
@@ -77,7 +76,6 @@ import { WorkspaceMigrationGraphqlApiExceptionInterceptor } from 'src/engine/wor
 @MetadataResolver(() => LogicFunctionDTO)
 @UsePipes(ResolverValidationPipe)
 @UseFilters(
-  UsageLimitGraphqlApiExceptionFilter,
   PreventNestToAutoLogGraphqlErrorsFilter,
   ApplicationExceptionFilter,
   AuthGraphqlApiExceptionFilter,

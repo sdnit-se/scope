@@ -23,10 +23,8 @@ import { CodeInterpreterService } from 'src/engine/core-modules/code-interpreter
 import { WorkspaceDomainsService } from 'src/engine/core-modules/domain/workspace-domains/services/workspace-domains.service';
 import { FeatureFlagService } from 'src/engine/core-modules/feature-flag/services/feature-flag.service';
 import { type ToolContext } from 'src/engine/core-modules/tool-provider/types/tool-context.type';
-import { UsageOperationType } from 'src/engine/core-modules/usage/enums/usage-operation-type.enum';
 import { type WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { AgentActorContextService } from 'src/engine/metadata-modules/ai/ai-agent-execution/services/agent-actor-context.service';
-import { type AgentStepLoopInput } from 'src/engine/metadata-modules/ai/ai-agent-execution/services/agent-step-loop.service';
 import {
   type AgentTurn,
   AgentTurnService,
@@ -90,15 +88,9 @@ export type ChatExecutionOptions = {
   modelId?: string;
   abortSignal: AbortSignal;
   conversationSizeTokens: number;
-  onUserCreditsExhausted: NonNullable<
-    AgentStepLoopInput['onUserCreditsExhausted']
-  >;
 };
 
-type ChatExecutionResult = Pick<
-  AgentTurn,
-  'stream' | 'modelConfig' | 'getStopReason'
-> & {
+type ChatExecutionResult = Pick<AgentTurn, 'stream' | 'modelConfig'> & {
   getStreamError: () => unknown;
 };
 
@@ -135,7 +127,6 @@ export class ChatExecutionService {
     modelId,
     abortSignal,
     conversationSizeTokens,
-    onUserCreditsExhausted,
   }: ChatExecutionOptions): Promise<ChatExecutionResult> {
     const getAuthorization = createTurnAuthorizer({
       authorize: () =>
@@ -341,13 +332,6 @@ export class ChatExecutionService {
         COMPLETE_WORKSPACE_SETUP_TOOL_NAME,
         NO_REPLY_TOOL_NAME,
       ),
-      billing: {
-        workspaceId: workspace.id,
-        operationType: UsageOperationType.AI_CHAT_TOKEN,
-        webSearchOperationType: UsageOperationType.WEB_SEARCH,
-        spenders: { userWorkspaceId },
-      },
-      onUserCreditsExhausted,
       telemetry: {
         functionId: isWorkspaceSetupThread
           ? AI_CHAT_WORKSPACE_SETUP_STREAM_FUNCTION_ID

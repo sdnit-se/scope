@@ -1,10 +1,8 @@
 import { WorkflowCoreModule } from 'src/engine/core-modules/workflow/workflow-core.module';
 import { Module } from '@nestjs/common';
 
-import { BillingModule } from 'src/engine/core-modules/billing/billing.module';
 import { FeatureFlagModule } from 'src/engine/core-modules/feature-flag/feature-flag.module';
 import { MetricsModule } from 'src/engine/core-modules/metrics/metrics.module';
-import { UsageLimitModule } from 'src/engine/core-modules/usage-limit/usage-limit.module';
 import { ApplicationWorkflowStepPermissionService } from 'src/modules/workflow/workflow-executor/services/application-workflow-step-permission.service';
 import { PermissionsModule } from 'src/engine/metadata-modules/permissions/permissions.module';
 import { WorkflowActionFactory } from 'src/modules/workflow/workflow-executor/factories/workflow-action.factory';
@@ -38,7 +36,6 @@ import { WorkflowStepWaitModule } from 'src/modules/workflow/workflow-wait/workf
     WaitForEventActionModule,
     RecordCRUDActionModule,
     FormActionModule,
-    BillingModule,
     FilterActionModule,
     IfElseActionModule,
     IteratorActionModule,
@@ -51,7 +48,6 @@ import { WorkflowStepWaitModule } from 'src/modules/workflow/workflow-wait/workf
     SendChatMessageActionModule,
     CreateCalendarEventActionModule,
     MetricsModule,
-    UsageLimitModule,
     WorkflowStepWaitModule,
     PermissionsModule,
   ],

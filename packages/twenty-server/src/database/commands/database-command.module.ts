@@ -25,8 +25,6 @@ import { StaleRegistrationCleanupModule } from 'src/engine/core-modules/applicat
 import { ApplicationUpgradeModule } from 'src/engine/core-modules/application/application-upgrade/application-upgrade.module';
 import { ApplicationModule } from 'src/engine/core-modules/application/application.module';
 import { PreInstalledAppsModule } from 'src/engine/core-modules/application/pre-installed-apps/pre-installed-apps.module';
-import { ApplicationRecurringChargeModule } from 'src/engine/core-modules/billing/app-billing/application-recurring-charge.module';
-import { BillingReminderModule } from 'src/engine/core-modules/billing/reminders/billing-reminder.module';
 import { FeatureFlagModule } from 'src/engine/core-modules/feature-flag/feature-flag.module';
 import { FileModule } from 'src/engine/core-modules/file/file.module';
 import { PendingWakeUpModule } from 'src/engine/core-modules/pending-wake-up/pending-wake-up.module';
@@ -84,8 +82,6 @@ import { AutomatedTriggerModule } from 'src/modules/workflow/workflow-trigger/au
     WorkspaceMigrationModule,
     WorkspaceMigrationRunnerModule,
     TrashCleanupModule,
-    BillingReminderModule,
-    ApplicationRecurringChargeModule,
     CodeInterpreterSessionCleanupModule,
     TwentyConfigModule,
     MarketplaceModule,

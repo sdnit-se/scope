@@ -23,8 +23,6 @@ import { type Repository } from 'typeorm';
 
 import { isUserAuthContext } from 'src/engine/core-modules/auth/guards/is-user-auth-context.guard';
 import { type ToolContext } from 'src/engine/core-modules/tool-provider/types/tool-context.type';
-import { UsageOperationType } from 'src/engine/core-modules/usage/enums/usage-operation-type.enum';
-import { type UsageSpenders } from 'src/engine/core-modules/usage/types/usage-spenders.type';
 import { buildToolCatalogSection } from 'src/engine/core-modules/tool-provider/utils/build-tool-catalog-section.util';
 import { OUTPUT_NAVIGATION_TOOL_NAMES } from 'src/engine/core-modules/tool/tools/output-navigation-tool/constants/output-navigation-tool-names.constant';
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
@@ -90,15 +88,6 @@ export type CompletedAgentRunTurn = AgentExecutionResult & {
   structuredOutputSteps: AgentTurnUsageStep[];
 };
 
-const buildSpenders = ({
-  agent,
-  executionContext,
-}: Pick<AgentRunTurnInput, 'agent' | 'executionContext'>): UsageSpenders => ({
-  userWorkspaceId: executionContext.userWorkspaceId,
-  agentId: agent.id,
-  applicationId: agent.applicationId,
-});
-
 @Injectable()
 export class AgentRunTurnService {
   constructor(
@@ -133,14 +122,7 @@ export class AgentRunTurnService {
 
     assertAgentResponseFormatHasOutputFieldsOrThrow(responseFormat);
 
-    const { userWorkspaceId, usageOperationType } = executionContext;
-    const spenders = buildSpenders({ agent, executionContext });
-
-    await this.aiBillingService.assertAiExecutionAllowed({
-      workspaceId,
-      operationType: usageOperationType,
-      spenders,
-    });
+    const { userWorkspaceId } = executionContext;
 
     const workspace = await this.workspaceRepository.findOneBy({
       id: workspaceId,
@@ -188,12 +170,6 @@ export class AgentRunTurnService {
       }),
       promptCacheKey: agent.id,
       abortSignal,
-      billing: {
-        workspaceId,
-        operationType: usageOperationType,
-        webSearchOperationType: UsageOperationType.AI_WORKFLOW_WEB_SEARCH,
-        spenders,
-      },
       telemetry: {
         functionId: 'agent-execution',
         workspaceId,
@@ -248,8 +224,7 @@ export class AgentRunTurnService {
   > & {
     started: StartedAgentRunTurn;
   }): Promise<CompletedAgentRunTurn> {
-    const { userWorkspaceId, usageOperationType } = executionContext;
-    const spenders = buildSpenders({ agent, executionContext });
+    const { userWorkspaceId } = executionContext;
     const [text, loopUsage, loopSteps] = await Promise.all([
       turn.stream.text,
       turn.stream.usage,
@@ -263,7 +238,6 @@ export class AgentRunTurnService {
     const agentSchema =
       responseFormat?.type === 'json' ? responseFormat.schema : undefined;
 
-    const stopReason = turn.getStopReason();
     let result: object = { response: text };
     let usage = loopUsage;
     let steps = loopSteps;
@@ -295,19 +269,6 @@ export class AgentRunTurnService {
         }),
       });
 
-      void this.aiBillingService.calculateAndBillUsage({
-        modelId: registeredModel.modelId,
-        billingInput: {
-          usage: structuredResult.usage,
-          cacheCreationTokens: extractCacheCreationTokensFromSteps(
-            structuredResult.steps,
-          ),
-        },
-        workspaceId,
-        operationType: usageOperationType,
-        spenders,
-      });
-
       usage = mergeLanguageModelUsage(usage, structuredResult.usage);
       steps = [...steps, ...structuredResult.steps];
       structuredOutputSteps = structuredResult.steps;
@@ -332,9 +293,7 @@ export class AgentRunTurnService {
       usage,
       cacheCreationTokens: extractCacheCreationTokensFromSteps(steps),
       nativeWebSearchCallCount,
-      stopReason,
-      // out of credits fails the execution even if it asked something, so it is never left waiting for an answer
-      isPaused: isPaused && !isDefined(stopReason),
+      isPaused,
       steps,
       modelId: registeredModel.modelId,
       totalCostInDollars,

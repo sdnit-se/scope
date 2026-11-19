@@ -1,6 +1,4 @@
-import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
-
-import { CreditUsedItemDTO } from 'src/engine/core-modules/usage/dtos/credit-used-item.dto';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 
 @ObjectType('VersionDistributionEntry')
 export class VersionDistributionEntryDTO {
@@ -13,12 +11,6 @@ export class VersionDistributionEntryDTO {
 
 @ObjectType('ApplicationRegistrationStats')
 export class ApplicationRegistrationStatsDTO {
-  @Field(() => Float, { nullable: true })
-  totalCreditsUsed: number | null;
-
-  @Field(() => [CreditUsedItemDTO], { nullable: true })
-  creditsUsedBreakdown: CreditUsedItemDTO[] | null;
-
   @Field(() => Int)
   activeInstalls: number;
 

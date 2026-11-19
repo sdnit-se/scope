@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import crypto from 'crypto';
 
-import { msg } from '@lingui/core/macro';
 import { isNonEmptyString } from '@sniptt/guards';
 import * as bcrypt from 'bcrypt';
 import isEqual from 'lodash.isequal';
@@ -57,7 +56,6 @@ import {
   type UpdateApplicationRegistrationPayload,
 } from 'src/engine/core-modules/application/application-registration/dtos/update-application-registration.input';
 import { ApplicationRegistrationSourceType } from 'src/engine/core-modules/application/application-registration/enums/application-registration-source-type.enum';
-import { type ApplicationInstallation } from 'src/engine/core-modules/application/application-registration/types/application-installation.type';
 import { buildRegistrationManifestUpdateFields } from 'src/engine/core-modules/application/application-registration/utils/build-registration-manifest-update-fields.util';
 import { fromManifestApplicationToDisplayFields } from 'src/engine/core-modules/application/application-registration/utils/from-manifest-application-to-display-fields.util';
 import { getApplicationAuthorDisplayName } from 'src/engine/core-modules/application/application-registration/utils/get-application-author-display-name.util';
@@ -81,8 +79,6 @@ import { MessageQueue } from 'src/engine/core-modules/message-queue/message-queu
 import { MessageQueueService } from 'src/engine/core-modules/message-queue/services/message-queue.service';
 import { MetricsService } from 'src/engine/core-modules/metrics/metrics.service';
 import { MetricsKeys } from 'src/engine/core-modules/metrics/types/metrics-keys.type';
-import { type CreditUsedItemDTO } from 'src/engine/core-modules/usage/dtos/credit-used-item.dto';
-import { UsageAnalyticsService } from 'src/engine/core-modules/usage/services/usage-analytics.service';
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { WorkspaceEventBroadcaster } from 'src/engine/subscriptions/workspace-event-broadcaster/workspace-event-broadcaster.service';
 import { TWENTY_CLI_APPLICATION_REGISTRATION } from 'src/engine/workspace-manager/twenty-standard-application/constants/twenty-cli-application-registration.constant';
@@ -140,7 +136,6 @@ export class ApplicationRegistrationService {
     private readonly cacheLockService: CacheLockService,
     private readonly coreEntityCacheService: CoreEntityCacheService,
     private readonly metricsService: MetricsService,
-    private readonly usageAnalyticsService: UsageAnalyticsService,
     @InjectMessageQueue(MessageQueue.applicationUpgradeQueue)
     private readonly applicationUpgradeQueueService: MessageQueueService,
     private readonly workspaceEventBroadcaster: WorkspaceEventBroadcaster,
@@ -1148,77 +1143,32 @@ export class ApplicationRegistrationService {
   async getStats({
     applicationRegistrationId,
     ownerWorkspaceId,
-    includeCreditsUsed = false,
-    periodStart,
-    periodEnd,
   }: {
     applicationRegistrationId: string;
     ownerWorkspaceId: string;
-    includeCreditsUsed?: boolean;
-    periodStart?: Date;
-    periodEnd?: Date;
   }): Promise<ApplicationRegistrationStatsDTO> {
     await this.applicationRegistrationLookupService.findOneByIdOrThrow({
       applicationRegistrationId,
       ownerWorkspaceId,
     });
 
-    return this.computeStats({
-      applicationRegistrationId,
-      includeCreditsUsed,
-      periodStart,
-      periodEnd,
-    });
+    return this.computeStats(applicationRegistrationId);
   }
 
   // Admin panel views apps across all workspaces, so ownership is not enforced.
   async getStatsGlobal({
     applicationRegistrationId,
-    includeCreditsUsed = false,
-    periodStart,
-    periodEnd,
   }: {
     applicationRegistrationId: string;
-    includeCreditsUsed?: boolean;
-    periodStart?: Date;
-    periodEnd?: Date;
   }): Promise<ApplicationRegistrationStatsDTO> {
     await this.findOneByIdGlobal(applicationRegistrationId);
 
-    return this.computeStats({
-      applicationRegistrationId,
-      includeCreditsUsed,
-      periodStart,
-      periodEnd,
-    });
+    return this.computeStats(applicationRegistrationId);
   }
 
-  private async computeStats({
-    applicationRegistrationId,
-    includeCreditsUsed,
-    periodStart,
-    periodEnd,
-  }: {
-    applicationRegistrationId: string;
-    includeCreditsUsed: boolean;
-    periodStart?: Date;
-    periodEnd?: Date;
-  }): Promise<ApplicationRegistrationStatsDTO> {
-    if (
-      includeCreditsUsed &&
-      (!isDefined(periodStart) ||
-        !isDefined(periodEnd) ||
-        periodStart >= periodEnd)
-    ) {
-      throw new ApplicationRegistrationException(
-        'Credits used requires a valid start and end date',
-        ApplicationRegistrationExceptionCode.INVALID_INPUT,
-        {
-          userFriendlyMessage: msg`Credits used requires a valid start and end date.`,
-        },
-      );
-    }
-
+  private async computeStats(
+    applicationRegistrationId: string,
+  ): Promise<ApplicationRegistrationStatsDTO> {
     const rawVersionDistribution: {
       version: string;
       count: number;
@@ -1259,23 +1209,9 @@ export class ApplicationRegistrationService {
     );
 
     const mostInstalledVersion = rawVersionDistribution[0]?.version ?? null;
-    const creditsUsedBreakdown =
-      includeCreditsUsed && isDefined(periodStart) && isDefined(periodEnd)
-        ? await this.getCreditsUsedBreakdown({
-            applicationRegistrationId,
-            periodStart,
-            periodEnd,
-          })
-        : null;
 
     return {
       activeInstalls,
-      creditsUsedBreakdown,
-      totalCreditsUsed:
-        creditsUsedBreakdown?.reduce(
-          (sum, entry) => sum + entry.creditsUsed,
-          0,
-        ) ?? null,
       autoUpdateEnabled: rawVersionDistribution.reduce(
         (sum, entry) => sum + entry.autoUpdateEnabled,
         0,
@@ -1287,64 +1223,6 @@ export class ApplicationRegistrationService {
         count: entry.count,
       })),
     };
-  }
-
-  private async getCreditsUsedBreakdown({
-    applicationRegistrationId,
-    periodStart,
-    periodEnd,
-  }: {
-    applicationRegistrationId: string;
-    periodStart: Date;
-    periodEnd: Date;
-  }): Promise<CreditUsedItemDTO[] | null> {
-    try {
-      const installations = await this.findInstallations({
-        applicationRegistrationId,
-      });
-
-      return await this.usageAnalyticsService.getCreditsUsedBreakdownForInstallations(
-        { installations, periodStart, periodEnd },
-      );
-    } catch (error) {
-      this.logger.warn(
-        `Failed to load credits used for registration ${applicationRegistrationId}`,
-        error,
-      );
-
-      return null;
-    }
-  }
-
-  async findInstallations({
-    applicationRegistrationId,
-    workspaceId,
-  }: {
-    applicationRegistrationId: string;
-    workspaceId?: string;
-  }): Promise<ApplicationInstallation[]> {
-    const queryBuilder = this.applicationRepository
-      .createQueryBuilder('application')
-      .select('application.id', 'applicationId')
-      .addSelect('application.workspaceId', 'workspaceId')
-      .innerJoin('application.workspace', 'workspace')
-      .where(
-        'application.applicationRegistrationId = :applicationRegistrationId',
-        { applicationRegistrationId },
-      )
-      .andWhere('workspace.deletedAt IS NULL');
-
-    if (isDefined(workspaceId)) {
-      queryBuilder.andWhere('application.workspaceId = :workspaceId', {
-        workspaceId,
-      });
-    }
-
-    // Ordered so identical installation lists hit the ClickHouse query cache
-    return queryBuilder
-      .orderBy('application.workspaceId')
-      .addOrderBy('application.id')
-      .getRawMany<ApplicationInstallation>();
   }
 
   // Admin panel only, which views apps across all workspaces, so ownership is not enforced

@@ -67,9 +67,6 @@ const buildService = (triggerType: WorkflowTriggerType) => {
     } as never,
     workflowRunWorkspaceService as never,
     {
-      getSubscriptionInactiveReason: jest.fn().mockResolvedValue(undefined),
-    } as never,
-    {
       throttleOrThrowIfHardLimitReached: jest.fn(),
       increaseWorkflowRunNotStartedCount: jest.fn(),
     } as never,

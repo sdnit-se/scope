@@ -94,7 +94,6 @@ export class ProvisionAgentChatThreadTargetCommand extends ProvisionedWorkspaceC
         'flatFieldMetadataMaps',
         'flatIndexMaps',
         'featureFlagsMap',
-        'billingEntitlements',
       ]),
     );
 
@@ -145,7 +144,6 @@ export class ProvisionAgentChatThreadTargetCommand extends ProvisionedWorkspaceC
           },
           additionalCacheDataMaps: {
             featureFlagsMap: existing.featureFlagsMap,
-            billingEntitlements: existing.billingEntitlements,
           },
           idByUniversalIdentifierByMetadataName,
           fromToAllFlatEntityMaps: {

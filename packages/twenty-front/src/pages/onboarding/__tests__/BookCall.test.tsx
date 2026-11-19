@@ -42,10 +42,7 @@ const renderPage = () =>
         <I18nProvider i18n={i18n}>
           <Routes>
             <Route path={AppPath.BookCall} element={<BookCall />} />
-            <Route
-              path={AppPath.PlanRequired}
-              element={<div>Choose your plan</div>}
-            />
+            <Route path={AppPath.Index} element={<div>Home</div>} />
           </Routes>
         </I18nProvider>
       </JotaiProvider>
@@ -70,12 +67,12 @@ describe('BookCall', () => {
     );
   });
 
-  it('should redirect to the plan step rather than render an empty embed', () => {
-    mockOnboardingStatus.mockReturnValue(OnboardingStatus.PLAN_REQUIRED);
+  it('should redirect home rather than render an empty embed', () => {
+    mockOnboardingStatus.mockReturnValue(OnboardingStatus.COMPLETED);
 
     renderPage();
 
-    expect(screen.getByText('Choose your plan')).toBeInTheDocument();
+    expect(screen.getByText('Home')).toBeInTheDocument();
     expect(screen.queryByTestId('book-call-embed')).not.toBeInTheDocument();
   });
 
@@ -84,7 +81,7 @@ describe('BookCall', () => {
 
     expect(screen.getByText('Talk to our team')).toBeInTheDocument();
     expect(screen.getByText('Skip')).toBeInTheDocument();
-    expect(screen.queryByText('Choose your plan')).not.toBeInTheDocument();
+    expect(screen.queryByText('Home')).not.toBeInTheDocument();
     expect(screen.queryByTestId('book-call-embed')).not.toBeInTheDocument();
   });
 });

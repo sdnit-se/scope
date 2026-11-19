@@ -5,7 +5,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { CoreEntityCacheModule } from 'src/engine/core-entity-cache/core-entity-cache.module';
 import { AdminPanelApplicationRegistrationResolver } from 'src/engine/core-modules/admin-panel/admin-panel-application-registration.resolver';
-import { AdminPanelUsageLimitResolver } from 'src/engine/core-modules/admin-panel/admin-panel-usage-limit.resolver';
 import { AdminPanelWorkspaceDataExportResolver } from 'src/engine/core-modules/admin-panel/admin-panel-workspace-data-export.resolver';
 import { AdminPanelHealthService } from 'src/engine/core-modules/admin-panel/admin-panel-health.service';
 import { AdminPanelQueueService } from 'src/engine/core-modules/admin-panel/admin-panel-queue.service';
@@ -16,8 +15,6 @@ import { DatabaseHealthIndicator } from 'src/engine/core-modules/admin-panel/ind
 import { RedisHealthIndicator } from 'src/engine/core-modules/admin-panel/indicators/redis.health';
 import { WorkerHealthIndicator } from 'src/engine/core-modules/admin-panel/indicators/worker.health';
 import { MaintenanceModeService } from 'src/engine/core-modules/admin-panel/maintenance-mode.service';
-import { AdminPanelUsageLimitService } from 'src/engine/core-modules/admin-panel/services/admin-panel-usage-limit.service';
-import { AdminPanelBillingService } from 'src/engine/core-modules/admin-panel/services/admin-panel-billing.service';
 import { AdminPanelChatService } from 'src/engine/core-modules/admin-panel/services/admin-panel-chat.service';
 import { AdminPanelConfigService } from 'src/engine/core-modules/admin-panel/services/admin-panel-config.service';
 import { AdminPanelServerAdminService } from 'src/engine/core-modules/admin-panel/services/admin-panel-server-admin.service';
@@ -26,9 +23,6 @@ import { AdminPanelStatisticsService } from 'src/engine/core-modules/admin-panel
 import { AdminPanelUserLookupService } from 'src/engine/core-modules/admin-panel/services/admin-panel-user-lookup.service';
 import { AdminPanelVersionService } from 'src/engine/core-modules/admin-panel/services/admin-panel-version.service';
 import { ApplicationRegistrationModule } from 'src/engine/core-modules/application/application-registration/application-registration.module';
-import { BillingModule } from 'src/engine/core-modules/billing/billing.module';
-import { BillingCustomerEntity } from 'src/engine/core-modules/billing/entities/billing-customer.entity';
-import { BillingPriceEntity } from 'src/engine/core-modules/billing/entities/billing-price.entity';
 import { WorkspaceDomainsModule } from 'src/engine/core-modules/domain/workspace-domains/workspace-domains.module';
 import { EventLogEmitterModule } from 'src/engine/core-modules/event-logs/emit/event-log-emitter.module';
 import { FeatureFlagEntity } from 'src/engine/core-modules/feature-flag/feature-flag.entity';
@@ -40,8 +34,6 @@ import { MetricsModule } from 'src/engine/core-modules/metrics/metrics.module';
 import { SecureHttpClientModule } from 'src/engine/core-modules/secure-http-client/secure-http-client.module';
 import { TwoFactorAuthenticationModule } from 'src/engine/core-modules/two-factor-authentication/two-factor-authentication.module';
 import { UpgradeModule } from 'src/engine/core-modules/upgrade/upgrade.module';
-import { UsageLimitModule } from 'src/engine/core-modules/usage-limit/usage-limit.module';
-import { UsageModule } from 'src/engine/core-modules/usage/usage.module';
 import { UserWorkspaceEntity } from 'src/engine/core-modules/user-workspace/user-workspace.entity';
 import { UserVarsModule } from 'src/engine/core-modules/user/user-vars/user-vars.module';
 import { UserEntity } from 'src/engine/core-modules/user/user.entity';
@@ -59,10 +51,7 @@ import { provideWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspac
       WorkspaceEntity,
       UserWorkspaceEntity,
       FeatureFlagEntity,
-      BillingCustomerEntity,
-      BillingPriceEntity,
     ]),
-    BillingModule,
     FileModule,
     WorkspaceDomainsModule,
     TerminusModule,
@@ -71,8 +60,6 @@ import { provideWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspac
     PermissionsModule,
     SecureHttpClientModule,
     ApplicationRegistrationModule,
-    UsageModule,
-    UsageLimitModule,
     KeyValuePairModule,
     UserVarsModule,
     UpgradeModule,
@@ -87,13 +74,10 @@ import { provideWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspac
   providers: [
     AdminPanelResolver,
     AdminPanelApplicationRegistrationResolver,
-    AdminPanelUsageLimitResolver,
     AdminPanelWorkspaceDataExportResolver,
-    AdminPanelUsageLimitService,
     AdminPanelUserLookupService,
     AdminPanelServerAdminService,
     AdminPanelStatisticsService,
-    AdminPanelBillingService,
     AdminPanelChatService,
     AdminPanelConfigService,
     AdminPanelSigningKeyService,
@@ -107,7 +91,6 @@ import { provideWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspac
     ConnectedAccountHealth,
     AppHealthIndicator,
     provideWorkspaceScopedRepository(FeatureFlagEntity),
-    provideWorkspaceScopedRepository(BillingCustomerEntity),
   ],
   exports: [MaintenanceModeService],
 })

@@ -25,7 +25,6 @@ import {
   type LogicFunctionTranspileResult,
 } from 'src/engine/core-modules/logic-function/logic-function-drivers/interfaces/logic-function-driver.interface';
 
-import { isBillingExemptApplication } from 'src/engine/core-modules/application/application-marketplace/utils/is-billing-exempt-application.util';
 import { ApplicationRegistrationVariableService } from 'src/engine/core-modules/application/application-registration-variable/application-registration-variable.service';
 import { ApplicationStopService } from 'src/engine/core-modules/application/application-stop/application-stop.service';
 import { UserApplicationVariableValueService } from 'src/engine/core-modules/application/application-variable/user-application-variable-value.service';
@@ -41,7 +40,6 @@ import { EventLogLiveService } from 'src/engine/core-modules/event-logs/live/eve
 import { parseApplicationLogLines } from 'src/engine/core-modules/event-logs/producers/application-log/parse-application-log-lines';
 import { LogicFunctionDriverFactory } from 'src/engine/core-modules/logic-function/logic-function-drivers/logic-function-driver.factory';
 import { buildLogicFunctionErrorLogLine } from 'src/engine/core-modules/logic-function/logic-function-executor/utils/build-logic-function-error-log-line.util';
-import { buildLogicFunctionExecutionUsage } from 'src/engine/core-modules/logic-function/logic-function-executor/utils/build-logic-function-execution-usage.util';
 import { buildLogicFunctionRunMetricEvent } from 'src/engine/core-modules/logic-function/logic-function-executor/utils/build-logic-function-run-metric-event.util';
 import { LogicFunctionPrebuiltWarmUpService } from 'src/engine/core-modules/logic-function/logic-function-prebuilt-warm-up/logic-function-prebuilt-warm-up.service';
 import { SERVER_ROUTE_PATH } from 'src/engine/core-modules/server-route-trigger/constants/server-route-path.constant';
@@ -51,10 +49,6 @@ import {
 } from 'src/engine/core-modules/throttler/throttler.exception';
 import { ThrottlerService } from 'src/engine/core-modules/throttler/throttler.service';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
-import { UsageLimitQuotaService } from 'src/engine/core-modules/usage-limit/services/usage-limit-quota.service';
-import { UsageQuotaAdmissionService } from 'src/engine/core-modules/usage-limit/services/usage-quota-admission.service';
-import { UsageOperationType } from 'src/engine/core-modules/usage/enums/usage-operation-type.enum';
-import { UsageResourceType } from 'src/engine/core-modules/usage/enums/usage-resource-type.enum';
 import { resolveWorkspaceMemberIdForUser } from 'src/engine/core-modules/user/utils/resolve-workspace-member-id-for-user.util';
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { findFlatEntityByIdInFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-id-in-flat-entity-maps.util';
@@ -113,8 +107,6 @@ export class LogicFunctionExecutorService {
     private readonly subscriptionService: SubscriptionService,
     private readonly eventLogLiveService: EventLogLiveService,
     private readonly eventLogEmitterService: EventLogEmitterService,
-    private readonly usageQuotaAdmissionService: UsageQuotaAdmissionService,
-    private readonly usageLimitQuotaService: UsageLimitQuotaService,
     private readonly workspaceDomainsService: WorkspaceDomainsService,
     private readonly applicationService: ApplicationService,
     private readonly applicationStopService: ApplicationStopService,
@@ -156,7 +148,6 @@ export class LogicFunctionExecutorService {
     executionMode,
     workspaceDeletionRequestTimestamp,
     retry = { retryCount: 0, maxRetries: 0 },
-    shouldEnforceUsageLimits = true,
   }: {
     logicFunctionId: string;
     workspaceId: string;
@@ -166,7 +157,6 @@ export class LogicFunctionExecutorService {
     executionMode?: LogicFunctionExecutionMode;
     workspaceDeletionRequestTimestamp?: string;
     retry?: LogicFunctionRetryContext;
-    shouldEnforceUsageLimits?: boolean;
   }): Promise<LogicFunctionExecuteResult> {
     const { flatApplication, flatLogicFunction, flatApplicationVariableMaps } =
       await this.getFlatEntitiesOrThrow({
@@ -178,14 +168,6 @@ export class LogicFunctionExecutorService {
     await this.assertApplicationNotStopped(flatApplication);
 
     await this.throttleExecution(workspaceId);
-
-    if (shouldEnforceUsageLimits) {
-      await this.assertExecutionAllowed({
-        workspaceId,
-        flatApplication,
-        flatLogicFunction,
-      });
-    }
 
     const envVariables = await this.getExecutionEnvVariables({
       workspaceId,
@@ -273,30 +255,6 @@ export class LogicFunctionExecutorService {
         LogicFunctionExceptionCode.LOGIC_FUNCTION_DISABLED,
       );
     }
-  }
-
-  private async assertExecutionAllowed({
-    workspaceId,
-    flatApplication,
-    flatLogicFunction,
-  }: {
-    workspaceId: string;
-    flatApplication: FlatApplication;
-    flatLogicFunction: FlatLogicFunction;
-  }): Promise<void> {
-    if (isBillingExemptApplication(flatApplication.universalIdentifier)) {
-      return;
-    }
-
-    await this.usageQuotaAdmissionService.assertUsageAllowed({
-      workspaceId,
-      resourceType: UsageResourceType.LOGIC_FUNCTION,
-      operationType: UsageOperationType.CODE_EXECUTION,
-      spenders: {
-        logicFunctionId: flatLogicFunction.id,
-        applicationId: flatApplication.id,
-      },
-    });
   }
 
   private async throttleExecution(workspaceId: string) {
@@ -630,21 +588,5 @@ export class LogicFunctionExecutorService {
         functionId: flatLogicFunction.id,
         functionName: flatLogicFunction.name,
       });
-
-    // Billing-exempt apps skip the invocation charge; their explicit chargeCredits and AI usage are still billed.
-    await this.usageLimitQuotaService.charge({
-      workspaceId,
-      events: buildLogicFunctionExecutionUsage({
-        durationMs: result.billedDurationMs,
-        isBillingExempt: isBillingExemptApplication(
-          flatApplication.universalIdentifier,
-        ),
-        resourceId: flatLogicFunction.id,
-        spenders: {
-          logicFunctionId: flatLogicFunction.id,
-          applicationId: flatApplication.id,
-        },
-      }),
-    });
   }
 }

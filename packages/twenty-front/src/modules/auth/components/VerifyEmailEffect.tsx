@@ -1,4 +1,3 @@
-import { verifyEmailRedirectPathState } from '@/auth/states/verifyEmailRedirectPathState';
 import { useAuth } from '@/auth/hooks/useAuth';
 import { useVerifyLogin } from '@/auth/hooks/useVerifyLogin';
 import { clientConfigApiStatusState } from '@/client-config/states/clientConfigApiStatusState';
@@ -6,13 +5,11 @@ import { useIsCurrentLocationOnAWorkspace } from '@/domain-manager/hooks/useIsCu
 import { useRedirectToWorkspaceDomain } from '@/domain-manager/hooks/useRedirectToWorkspaceDomain';
 import { getToastOptionsFromError } from '@/error-handler/utils/getToastOptionsFromError';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
-import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
 import { CombinedGraphQLErrors } from '@apollo/client/errors';
 import { useLingui } from '@lingui/react/macro';
 import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AppPath } from 'twenty-shared/types';
-import { isDefined } from 'twenty-shared/utils';
 import { useToast, type ToastOptions } from 'twenty-ui/components/feedback';
 import { useNavigateApp } from '~/hooks/useNavigateApp';
 import { getWorkspaceUrl } from '~/utils/getWorkspaceUrl';
@@ -35,13 +32,8 @@ export const VerifyEmailEffect = ({ onError }: VerifyEmailEffectProps) => {
 
   const [searchParams] = useSearchParams();
 
-  const setVerifyEmailRedirectPath = useSetAtomState(
-    verifyEmailRedirectPathState,
-  );
-
   const email = searchParams.get('email');
   const emailVerificationToken = searchParams.get('emailVerificationToken');
-  const verifyEmailRedirectPath = searchParams.get('nextPath');
 
   const navigate = useNavigateApp();
   const { redirectToWorkspaceDomain } = useRedirectToWorkspaceDomain();
@@ -91,10 +83,6 @@ export const VerifyEmailEffect = ({ onError }: VerifyEmailEffectProps) => {
           return await redirectToWorkspaceDomain(workspaceUrl, AppPath.Verify, {
             loginToken: loginToken.token,
           });
-        }
-
-        if (isDefined(verifyEmailRedirectPath)) {
-          setVerifyEmailRedirectPath(verifyEmailRedirectPath);
         }
 
         await verifyLoginToken(loginToken.token);

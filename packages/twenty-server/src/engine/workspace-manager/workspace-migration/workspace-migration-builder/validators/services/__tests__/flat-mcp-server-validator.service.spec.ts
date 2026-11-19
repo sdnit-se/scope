@@ -100,7 +100,6 @@ const buildValidationArgs = (
   return {
     additionalCacheDataMaps: {
       featureFlagsMap: buildFeatureFlagsMap(),
-      billingEntitlements: {},
     },
     optimisticFlatEntityMapsAndRelatedFlatEntityMaps,
     remainingFlatEntityMapsToValidate: createEmptyFlatEntityMaps(),

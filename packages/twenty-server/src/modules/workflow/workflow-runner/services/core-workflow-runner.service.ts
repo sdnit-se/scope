@@ -4,7 +4,6 @@ import { type ActorMetadata } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 
 import { ApplicationService } from 'src/engine/core-modules/application/application.service';
-import { BillingUsageService } from 'src/engine/core-modules/billing/services/billing-usage.service';
 import { InjectMessageQueue } from 'src/engine/core-modules/message-queue/decorators/message-queue.decorator';
 import { MessageQueue } from 'src/engine/core-modules/message-queue/message-queue.constants';
 import { MessageQueueService } from 'src/engine/core-modules/message-queue/services/message-queue.service';
@@ -38,7 +37,6 @@ export class CoreWorkflowRunnerService {
     private readonly workflowCoreSyncService: WorkflowCoreSyncService,
     private readonly workflowVersionCoreSyncService: WorkflowVersionCoreSyncService,
     private readonly workflowRunWorkspaceService: WorkflowRunWorkspaceService,
-    private readonly billingUsageService: BillingUsageService,
     private readonly workflowThrottlingWorkspaceService: WorkflowThrottlingWorkspaceService,
     private readonly metricsService: MetricsService,
     private readonly applicationService: ApplicationService,
@@ -99,15 +97,6 @@ export class CoreWorkflowRunnerService {
       throw new WorkflowRunException(
         'Core workflow not found',
         WorkflowRunExceptionCode.WORKFLOW_RUN_INVALID,
-      );
-    }
-
-    const subscriptionInactiveReason =
-      await this.billingUsageService.getSubscriptionInactiveReason(workspaceId);
-
-    if (isDefined(subscriptionInactiveReason)) {
-      this.logger.log(
-        `Cannot execute billed function for this workspace: ${subscriptionInactiveReason}`,
       );
     }
 

@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 
 import { RetryableLogicFunctionError } from 'twenty-shared/logic-function';
 
-import { isUsageRefusedError } from 'src/engine/core-modules/billing/utils/is-usage-refused-error.util';
 import {
   LogicFunctionExecutionException,
   LogicFunctionExecutionExceptionCode,
@@ -101,14 +100,6 @@ export class LogicFunctionJobRunnerService {
         ))
       ) {
         this.logger.log(
-          `Skipping function ${logicFunctionPayload.logicFunctionId} (workspace ${logicFunctionPayload.workspaceId}): ${error.message}`,
-        );
-
-        return;
-      }
-
-      if (isUsageRefusedError(error)) {
-        this.logger.warn(
           `Skipping function ${logicFunctionPayload.logicFunctionId} (workspace ${logicFunctionPayload.workspaceId}): ${error.message}`,
         );
 

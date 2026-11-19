@@ -5,7 +5,6 @@ import { TypeORMModule } from 'src/database/typeorm/typeorm.module';
 import { ApplicationModule } from 'src/engine/core-modules/application/application.module';
 import { ApplicationManifestModule } from 'src/engine/core-modules/application/application-manifest/application-manifest.module';
 import { PreInstalledAppsModule } from 'src/engine/core-modules/application/pre-installed-apps/pre-installed-apps.module';
-import { BillingModule } from 'src/engine/core-modules/billing/billing.module';
 import { CompanyEnrichmentModule } from 'src/engine/core-modules/company-enrichment/company-enrichment.module';
 import { SubdomainManagerModule } from 'src/engine/core-modules/domain/subdomain-manager/subdomain-manager.module';
 import { WorkspaceDomainsModule } from 'src/engine/core-modules/domain/workspace-domains/workspace-domains.module';
@@ -23,7 +22,6 @@ import { WorkspaceService } from 'src/engine/core-modules/workspace/services/wor
 import { WorkspaceGaugeService } from 'src/engine/core-modules/workspace/workspace-gauge.service';
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { WorkspaceResolver } from 'src/engine/core-modules/workspace/workspace.resolver';
-import { BillingDisabledGuard } from 'src/engine/guards/billing-disabled.guard';
 import { AiAgentModule } from 'src/engine/metadata-modules/ai/ai-agent/ai-agent.module';
 import { WorkspaceManyOrAllFlatEntityMapsCacheModule } from 'src/engine/metadata-modules/flat-entity/services/workspace-many-or-all-flat-entity-maps-cache.module';
 import { PermissionsModule } from 'src/engine/metadata-modules/permissions/permissions.module';
@@ -46,7 +44,6 @@ import { StandardObjectsPrefillModule } from 'src/engine/workspace-manager/stand
     ]),
     MetricsModule,
     StandardObjectsPrefillModule,
-    BillingModule,
     FileModule,
     UserWorkspaceModule,
     WorkspaceManagerModule,
@@ -76,7 +73,6 @@ import { StandardObjectsPrefillModule } from 'src/engine/workspace-manager/stand
     WorkspaceService,
     WorkspaceGaugeService,
     WorkspaceEntityCacheProviderService,
-    BillingDisabledGuard,
   ],
 })
 export class WorkspaceModule {}

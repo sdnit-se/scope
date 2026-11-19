@@ -9,7 +9,6 @@ import { FileStorageService } from 'src/engine/core-modules/file-storage/service
 import { ServerFileStorageService } from 'src/engine/core-modules/file-storage/services/server-file-storage.service';
 import { FileEntity } from 'src/engine/core-modules/file/entities/file.entity';
 import { TwentyConfigModule } from 'src/engine/core-modules/twenty-config/twenty-config.module';
-import { UsageLimitModule } from 'src/engine/core-modules/usage-limit/usage-limit.module';
 import { provideWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/provide-workspace-scoped-repository';
 import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache.module';
 @Global()
@@ -22,7 +21,6 @@ export class FileStorageModule {
         CacheLockModule,
         TypeOrmModule.forFeature([FileEntity]),
         WorkspaceCacheModule,
-        UsageLimitModule,
       ],
       providers: [
         FileStorageDriverFactory,

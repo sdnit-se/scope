@@ -581,7 +581,6 @@ export class AgentRunnerService {
             execution,
             wait,
             modelId: execution.modelId,
-            stopReason: execution.stopReason,
             isWaiting: isDefined(wait),
             usage: execution.structuredOutputSteps.reduce(
               (usage, step) => ({
@@ -643,7 +642,7 @@ export class AgentRunnerService {
     suspension: AgentRunSuspension | null;
     streamId: string;
   }): Promise<AgentRunnerOutcome> {
-    if (!isDefined(execution.stopReason) && !execution.isPaused) {
+    if (!execution.isPaused) {
       return { status: 'COMPLETED', result: execution.result };
     }
 
@@ -659,7 +658,6 @@ export class AgentRunnerService {
 
     // A failure to suspend only fails the run, like a pause that could not be recorded
     const isSuspended =
-      !isDefined(execution.stopReason) &&
       !hasPausedTooOften &&
       isDefined(condition) &&
       (await this.tryRecording(
@@ -704,13 +702,6 @@ export class AgentRunnerService {
       isAwaitingAnswer,
       streamId,
     });
-
-    if (isDefined(execution.stopReason)) {
-      return {
-        status: 'FAILED',
-        error: 'Agent stopped: no more available credits.',
-      };
-    }
 
     if (hasPausedTooOften) {
       return {

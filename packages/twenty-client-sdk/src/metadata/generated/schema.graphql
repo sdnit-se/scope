@@ -259,19 +259,6 @@ enum AggregateOperations {
   SUM
 }
 
-type AiChatUsage {
-  consumedValue: BigInt
-  kind: String!
-  limitValue: BigInt!
-  periodEnd: DateTime
-}
-
-type AiChatUserCreditsUsage {
-  consumedValue: BigInt
-  limitValue: BigInt!
-  periodEnd: DateTime!
-}
-
 enum AiModelTier {
   balanced
   extraFast
@@ -630,10 +617,8 @@ enum ApplicationRegistrationSourceType {
 type ApplicationRegistrationStats {
   activeInstalls: Int!
   autoUpdateEnabled: Int!
-  creditsUsedBreakdown: [CreditUsedItem!]
   mostInstalledVersion: String
   suspendedInstalls: Int!
-  totalCreditsUsed: Float
   versionDistribution: [VersionDistributionEntry!]!
 }
 
@@ -823,18 +808,6 @@ type BarChartSeries {
   label: String!
 }
 
-"""
-The `BigInt` scalar type represents non-fractional signed whole numeric values.
-"""
-scalar BigInt
-
-type Billing {
-  billingUrl: String
-  isBillingEnabled: Boolean!
-  stripePublishableKey: String
-  trialPeriods: [BillingTrialPeriod!]!
-}
-
 type BillingCustomer {
   hasPaymentMethod: Boolean
   id: UUID!
@@ -858,22 +831,6 @@ type BillingEndTrialPeriod {
 
   """Updated subscription status"""
   status: SubscriptionStatus
-}
-
-type BillingEntitlement {
-  key: BillingEntitlementKey!
-  value: Boolean!
-}
-
-enum BillingEntitlementKey {
-  AUDIT_LOGS
-  CUSTOM_DOMAIN
-  CUSTOM_ROLES
-  RECORD_SHARING
-  RLS
-  SSO
-  USAGE_LIMIT
-  VALIDATION_RULES
 }
 
 type BillingLicensedProduct implements BillingProductDTO {
@@ -988,7 +945,6 @@ type BillingSubscription {
   cancelAt: DateTime
   collectionMethod: BillingSubscriptionCollectionMethod
   currentPeriodEnd: DateTime
-  hasUserCredits: Boolean
   id: UUID!
   interval: SubscriptionInterval
   metadata: JSON!
@@ -1020,11 +976,6 @@ type BillingSubscriptionSchedulePhase {
 type BillingSubscriptionSchedulePhaseItem {
   price: String!
   quantity: Float
-}
-
-type BillingTrialPeriod {
-  duration: Float!
-  isCreditCardRequired: Boolean!
 }
 
 type BillingUpdate {
@@ -1214,12 +1165,10 @@ type ClientConfig {
   api: ApiConfig!
   appVersion: String
   authProviders: AuthProviders!
-  billing: Billing!
   calendarBookingPageId: String
   canManageFeatureFlags: Boolean!
   captcha: Captcha!
   defaultSubdomain: String
-  enterpriseInstanceType: String!
   frontDomain: String!
   isAttachmentPreviewEnabled: Boolean!
   isBookCallOnboardingStepEnabled: Boolean!
@@ -1630,19 +1579,6 @@ input CreateSkillInput {
   name: String!
 }
 
-input CreateUsageLimitInput {
-  burstValue: BigInt
-  limitKind: String!
-  limitValue: BigInt!
-  operationType: UsageOperationType!
-  periodCount: Int!
-  periodUnit: String!
-  resourceType: UsageResourceType!
-  spenderId: String
-  spenderType: String!
-  unit: UsageUnit!
-}
-
 input CreateViewFieldGroupInput {
   id: UUID
   isVisible: Boolean = true
@@ -1731,13 +1667,6 @@ input CreateWebhookInput {
   operations: [String!]!
   secret: String
   targetUrl: String!
-}
-
-type CreditUsedItem {
-  creditsUsed: Float!
-  label: String
-  operation: UsageOperationType
-  resource: UsageResourceType
 }
 
 input CursorPaging {
@@ -2972,7 +2901,6 @@ type Mutation {
   createPageLayoutWidget(input: CreatePageLayoutWidgetInput!): PageLayoutWidget!
   createSkill(input: CreateSkillInput!): Skill!
   createSubscriptionPaymentIntent(idempotencyKey: String!, plan: BillingPlanKey!, recurringInterval: SubscriptionInterval!, requirePaymentMethod: Boolean! = true, successUrlPath: String): BillingPaymentIntent!
-  createUsageLimit(input: CreateUsageLimitInput!): UsageLimit!
   createView(input: CreateViewInput!): View!
   createViewField(input: CreateViewFieldInput!): ViewField!
   createViewFieldGroup(input: CreateViewFieldGroupInput!): ViewFieldGroup!
@@ -3004,7 +2932,6 @@ type Mutation {
   deleteQueuedChatMessage(messageId: UUID!): Boolean!
   deleteSkill(id: UUID!): Skill!
   deleteTwoFactorAuthenticationMethod(twoFactorAuthenticationMethodId: UUID!): DeleteTwoFactorAuthenticationMethod!
-  deleteUsageLimit(usageLimitId: UUID!): Boolean!
   deleteUser: User!
   deleteUserFromWorkspace(workspaceMemberIdToDelete: String!): UserWorkspace!
   deleteView(id: String!): Boolean!
@@ -3152,7 +3079,6 @@ type Mutation {
   updatePasswordViaResetToken(newPassword: String!, passwordResetToken: String!): InvalidatePassword!
   updateSkill(input: UpdateSkillInput!): Skill!
   updateTimelineActivityType(input: UpdateTimelineActivityTypeInput!): TimelineActivityType!
-  updateUsageLimit(input: UpdateUsageLimitInput!): UsageLimit!
   updateUserCreditsFallback(userCreditsFallback: UserCreditsFallback!): BillingCustomer!
   updateUserEmail(newEmail: String!, verifyEmailRedirectPath: String): Boolean!
   updateView(id: String!, input: UpdateViewInput!): View!
@@ -3403,7 +3329,6 @@ enum OnboardingStatus {
   BOOK_CALL
   COMPLETED
   INVITE_TEAM
-  PLAN_REQUIRED
   PROFILE_CREATION
   SYNC_EMAIL
   WORKSPACE_ACTIVATION
@@ -3686,8 +3611,6 @@ type Query {
   agentChatChannels: [AgentChatChannel!]!
   agentChatOpenThreadsSummary: AgentChatOpenThreadsSummary!
   agentRuns(agentId: UUID!, limit: Int! = 100): [AgentRun!]!
-  aiChatUsage: AiChatUsage
-  aiChatUserCreditsUsage: AiChatUserCreditsUsage
   apiKey(input: GetApiKeyInput!): ApiKey
   apiKeys: [ApiKey!]!
   appConnection(id: ID!): AppConnection!
@@ -3733,7 +3656,7 @@ type Query {
   ): FieldConnection!
   findApplicationRegistrationByClientId(clientId: String!): PublicApplicationRegistration
   findApplicationRegistrationByUniversalIdentifier(universalIdentifier: String!): ApplicationRegistration
-  findApplicationRegistrationStats(id: String!, periodEnd: DateTime, periodStart: DateTime): ApplicationRegistrationStats!
+  findApplicationRegistrationStats(id: String!): ApplicationRegistrationStats!
   findApplicationRegistrationVariables(applicationRegistrationId: String!): [ApplicationRegistrationVariable!]!
   findClaimableApplicationRegistration(sourcePackage: String, universalIdentifier: String): ClaimableApplicationRegistration
   findInstallApplicationJobStatus(jobId: String, universalIdentifier: String!): JobStatus
@@ -3778,7 +3701,6 @@ type Query {
   getRoles: [Role!]!
   getToolIndex: [ToolIndexEntry!]!
   getToolInputSchema(toolName: String!): JSON
-  getUsageAnalytics(input: UsageAnalyticsInput): UsageAnalytics!
   getView(id: String!): View
   getViewField(id: String!): ViewField
   getViewFieldGroup(id: String!): ViewFieldGroup
@@ -3832,10 +3754,6 @@ type Query {
   skills: [Skill!]!
   timelineActivityTypes: [TimelineActivityType!]!
   twoFactorAuthenticationRecoveryStatus(userId: UUID!): TwoFactorAuthenticationRecoveryStatus!
-  usageLimits: [UsageLimit!]!
-  usageQuotaDefinitions: UsageQuotaDefinitions!
-  usageQuotaScopeConsumption(input: UsageQuotaScopeInput!): UsageQuotaScopeConsumption
-  usageQuotasWithConsumption: [UsageQuotaWithConsumption!]!
   validatePasswordResetToken(passwordResetToken: String!): ValidatePasswordResetToken!
   webhook(id: UUID!): Webhook
   webhooks: [Webhook!]!
@@ -4824,11 +4742,6 @@ input UpdateTimelineActivityTypeInput {
   translations: [MetadataTranslationOverrideInput!]
 }
 
-input UpdateUsageLimitInput {
-  id: UUID!
-  payload: CreateUsageLimitInput!
-}
-
 input UpdateViewFieldGroupInput {
   """The id of the view field group to update"""
   id: UUID!
@@ -5137,163 +5050,6 @@ input UpsertViewWidgetViewSortInput {
   direction: ViewSortDirection = ASC
   fieldMetadataId: UUID!
   id: UUID
-}
-
-type UsageAnalytics {
-  periodEnd: DateTime!
-  periodStart: DateTime!
-  timeSeries: [UsageTimeSeries!]!
-  usageByApplication: [UsageBreakdownItem!]!
-  usageByModel: [UsageBreakdownItem!]!
-  usageByOperationType: [UsageBreakdownItem!]!
-  usageByUser: [UsageBreakdownItem!]!
-  userDailyUsage: UsageUserDaily
-}
-
-input UsageAnalyticsInput {
-  operationTypes: [UsageOperationType!]
-  periodEnd: DateTime
-  periodStart: DateTime
-  userWorkspaceId: String
-}
-
-type UsageBreakdownItem {
-  creditsUsed: Float!
-  key: String!
-  label: String
-  userCreditsUsed: Float!
-  workspaceCreditsUsed: Float!
-}
-
-type UsageLimit {
-  burstValue: BigInt
-  createdAt: DateTime!
-  id: UUID!
-  limitKind: String!
-  limitValue: BigInt!
-  operationType: UsageOperationType!
-  periodCount: Int!
-  periodUnit: String!
-  resourceType: UsageResourceType!
-  spenderId: String
-  spenderType: String!
-  unit: UsageUnit!
-  updatedAt: DateTime!
-}
-
-type UsageLimitOperationDefinition {
-  allowedUnits: [UsageUnit!]!
-  operationType: UsageOperationType!
-}
-
-enum UsageOperationType {
-  AI_CHAT_TOKEN
-  AI_WORKFLOW_TOKEN
-  AI_WORKFLOW_WEB_SEARCH
-  ALL
-  API_REQUEST
-  CALL_RECORDING
-  CODE_EXECUTION
-  EMAIL_SEND
-  MESSAGE_CAMPAIGN_SEND
-  RECORD_WRITE
-  STORAGE_FILE
-  SUBSCRIPTION
-  WEBHOOK_CALL
-  WEB_SEARCH
-  WORKFLOW_EXECUTION
-}
-
-type UsageQuotaDefinition {
-  allowedOperations: [UsageLimitOperationDefinition!]!
-  allowedSpenderTypes: [String!]!
-  limitKind: String!
-  operatorOnlyScopes: [UsageQuotaOperatorOnlyScope!]!
-  resourceType: UsageResourceType!
-}
-
-type UsageQuotaDefinitions {
-  definitions: [UsageQuotaDefinition!]!
-  hasAllowancePeriod: Boolean!
-  isIntraWorkspaceLimitEntitled: Boolean!
-}
-
-type UsageQuotaOperatorOnlyScope {
-  operationType: UsageOperationType!
-  periodUnit: String!
-  spenderType: String!
-  unit: UsageUnit!
-}
-
-type UsageQuotaScopeConsumption {
-  consumedValue: BigInt
-  periodEnd: DateTime!
-  periodStart: DateTime!
-}
-
-input UsageQuotaScopeInput {
-  operationType: UsageOperationType!
-  periodUnit: String!
-  resourceType: UsageResourceType!
-  spenderId: String
-  spenderType: String!
-  unit: UsageUnit!
-}
-
-type UsageQuotaWithConsumption {
-  consumedValue: BigInt
-  id: UUID!
-  isEnforced: Boolean!
-  limitValue: BigInt!
-  operationType: UsageOperationType!
-  periodEnd: DateTime
-  periodStart: DateTime
-  periodUnit: String!
-  remainingValue: BigInt
-  resourceType: UsageResourceType!
-  spenderId: String
-  spenderLabel: String
-  spenderType: String!
-  unit: UsageUnit!
-}
-
-enum UsageResourceType {
-  AI
-  ALL
-  API
-  APP
-  EMAIL
-  LOGIC_FUNCTION
-  RECORD
-  STORAGE
-  WEBHOOK
-  WORKFLOW
-}
-
-type UsageTimeSeries {
-  creditsUsed: Float!
-  date: String!
-  workspaceCreditsUsed: Float!
-}
-
-enum UsageUnit {
-  BYTE
-  COMPLEXITY
-  CREDIT
-  FILE
-  INVOCATION
-  MILLISECOND
-  MINUTE
-  RECORD
-  REQUEST
-  SEAT
-  TOKEN
-  USER_CREDIT
-}
-
-type UsageUserDaily {
-  dailyUsage: [UsageTimeSeries!]!
-  userWorkspaceId: String!
 }
 
 type User {
@@ -5686,11 +5442,7 @@ type Workspace {
   aiModelIdByTier: JSON!
   allowImpersonation: Boolean!
   allowedIframeOrigins: [String!]
-  billingCustomer: BillingCustomer
-  billingEntitlements: [BillingEntitlement!]!
-  billingSubscriptions: [BillingSubscription!]!
   createdAt: DateTime!
-  currentBillingSubscription: BillingSubscription
   customDomain: String
   databaseSchema: String
   defaultRole: Role
@@ -5698,8 +5450,6 @@ type Workspace {
   displayName: String
   editableProfileFields: [String!]
   featureFlags: [FeatureFlag!]
-  hasValidEnterpriseValidityToken: Boolean!
-  hasValidSignedEnterpriseKey: Boolean!
   id: UUID!
   installedApplications: [Application!]!
   inviteHash: String
@@ -5713,7 +5463,6 @@ type Workspace {
   isPasswordAuthBypassEnabled: Boolean!
   isPasswordAuthEnabled: Boolean!
   isPublicInviteLinkEnabled: Boolean!
-  isTrialAvailable: Boolean!
   isTwoFactorAuthenticationEnforced: Boolean!
   logo: String
   logoFileId: UUID

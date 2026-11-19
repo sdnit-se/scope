@@ -1,4 +1,3 @@
-import { checkoutSession } from 'test/integration/graphql/suites/user-session/utils/checkout-session.util';
 import { currentUserApplicationAuthorizations } from 'test/integration/graphql/suites/user-session/utils/current-user-application-authorizations.util';
 import { generateAppleAdminApplicationTokenPair } from 'test/integration/utils/generate-apple-admin-application-token-pair.util';
 import { currentUserSessions } from 'test/integration/graphql/suites/user-session/utils/current-user-sessions.util';
@@ -18,11 +17,7 @@ import {
   type ApplicationWithVariable,
   setupApplicationWithVariable,
 } from 'test/integration/metadata/suites/application/utils/setup-application-with-variable.util';
-import { SystemPermissionFlag } from 'twenty-shared/constants';
 
-import { BillingPlanKey } from 'src/engine/core-modules/billing/enums/billing-plan-key.enum';
-import { SubscriptionInterval } from 'src/engine/core-modules/billing/enums/billing-subscription-interval.enum';
-import { AUTH_PRINCIPAL_REFUSED_MESSAGE } from 'src/engine/guards/constants/auth-principal-refused-message.constant';
 import { SEED_APPLE_WORKSPACE_ID } from 'src/engine/workspace-manager/dev-seeder/core/constants/seeder-workspaces.constant';
 import { USER_DATA_SEED_IDS } from 'src/engine/workspace-manager/dev-seeder/core/utils/seed-users.util';
 import { TWO_FACTOR_AUTHENTICATION_METHOD_DATA_SEED_IDS } from 'src/engine/workspace-manager/dev-seeder/core/utils/seed-two-factor-authentication-methods.util';
@@ -43,9 +38,7 @@ const OFFICIAL_APPLICATION_CURRENT_USER_FIELDS = `
 
 describe('User session operations and application access that must keep working', () => {
   let applicationsApplication: ApplicationWithVariable;
-  let workspaceMembersApplication: ApplicationWithVariable;
   let applicationsApplicationToken: string;
-  let workspaceMembersApplicationToken: string;
   let memberSessionToken: string;
 
   beforeAll(async () => {
@@ -55,42 +48,22 @@ describe('User session operations and application access that must keep working'
       email: 'jony.ive@apple.dev',
     });
 
-    // One at a time: each sync migrates workspace metadata and bumps its
-    // version, which two concurrent syncs interleave.
     applicationsApplication = await setupApplicationWithVariable({
       name: 'User Session Reader',
       variableKey: 'USER_SESSION_READER',
     });
-    workspaceMembersApplication = await setupApplicationWithVariable({
-      name: 'User Session Inviter',
-      variableKey: 'USER_SESSION_INVITER',
-      permissionFlagUniversalIdentifiers: [
-        SystemPermissionFlag.WORKSPACE_MEMBERS,
-      ],
+
+    const readerTokenPair = await generateAppleAdminApplicationTokenPair({
+      applicationId: applicationsApplication.id,
     });
 
-    const [readerTokenPair, inviterTokenPair] = await Promise.all([
-      generateAppleAdminApplicationTokenPair({
-        applicationId: applicationsApplication.id,
-      }),
-      generateAppleAdminApplicationTokenPair({
-        applicationId: workspaceMembersApplication.id,
-      }),
-    ]);
-
     applicationsApplicationToken = readerTokenPair.applicationAccessToken.token;
-    workspaceMembersApplicationToken =
-      inviterTokenPair.applicationAccessToken.token;
   }, 120000);
 
   afterAll(async () => {
     await cleanupApplicationAndAppRegistration({
       applicationUniversalIdentifier:
         applicationsApplication.universalIdentifier,
-    });
-    await cleanupApplicationAndAppRegistration({
-      applicationUniversalIdentifier:
-        workspaceMembersApplication.universalIdentifier,
     });
   });
 
@@ -351,24 +324,6 @@ describe('User session operations and application access that must keep working'
         data.currentUser.currentUserWorkspace
           ?.twoFactorAuthenticationMethodSummary,
       ).toBeNull();
-    });
-
-    // Billing is off in the integration environment, so the mutation cannot
-    // complete; what this asserts is that AuthPrincipalGuard is not what
-    // stopped it, leaving checkoutSession on its permission path.
-    it('should reach the checkout session permission path', async () => {
-      const { errors } = await checkoutSession({
-        input: {
-          recurringInterval: SubscriptionInterval.Month,
-          plan: BillingPlanKey.PRO,
-        },
-        token: workspaceMembersApplicationToken,
-        expectToFail: null,
-      });
-
-      expect((errors ?? []).map(({ message }) => message)).not.toContain(
-        AUTH_PRINCIPAL_REFUSED_MESSAGE,
-      );
     });
   });
 });

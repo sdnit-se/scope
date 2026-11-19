@@ -1,4 +1,3 @@
-import { verifyEmailRedirectPathState } from '@/auth/states/verifyEmailRedirectPathState';
 import { ONBOARDING_PATHS } from '@/auth/constants/OnboardingPaths';
 import { ONGOING_USER_CREATION_PATHS } from '@/auth/constants/OngoingUserCreationPaths';
 import { useIsLogged } from '@/auth/hooks/useIsLogged';
@@ -9,7 +8,6 @@ import { isMinimalMetadataReadyState } from '@/metadata-store/states/isMinimalMe
 import { useDefaultHomePagePath } from '@/navigation/hooks/useDefaultHomePagePath';
 import { objectMetadataItemsSelector } from '@/object-metadata/states/objectMetadataItemsSelector';
 import { useOnboardingStatus } from '@/onboarding/hooks/useOnboardingStatus';
-import { isOnboardingCheckoutPendingState } from '@/onboarding/states/isOnboardingCheckoutPendingState';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { isValidReturnToPath } from '@/auth/utils/isValidReturnToPath';
 import { useQuery } from '@apollo/client/react';
@@ -64,18 +62,10 @@ export const usePageChangeEffectNavigateLocation = () => {
       skip: !isOnPageLayoutPage || !isDefined(pageLayoutId),
     },
   );
-  const verifyEmailRedirectPath = useAtomStateValue(
-    verifyEmailRedirectPathState,
-  );
-
   const returnToPath = useAtomStateValue(returnToPathState);
   const resolvedReturnToPath = isNonEmptyString(returnToPath)
     ? returnToPath
     : readReturnToPathFromUrlSearchParams();
-
-  const isOnboardingCheckoutPending = useAtomStateValue(
-    isOnboardingCheckoutPendingState,
-  );
 
   if (
     (!isLogged || !isOnAWorkspace || !isDefined(currentWorkspace)) &&
@@ -85,23 +75,6 @@ export const usePageChangeEffectNavigateLocation = () => {
     ])
   ) {
     return AppPath.SignInUp;
-  }
-
-  if (
-    onboardingStatus === OnboardingStatus.PLAN_REQUIRED &&
-    !someMatchingLocationOf([
-      AppPath.PlanRequired,
-      AppPath.PlanRequiredSuccess,
-      AppPath.BookCall,
-    ])
-  ) {
-    if (
-      isMatchingLocation(location, AppPath.VerifyEmail) &&
-      isDefined(verifyEmailRedirectPath)
-    ) {
-      return verifyEmailRedirectPath;
-    }
-    return AppPath.PlanRequired;
   }
 
   if (
@@ -149,13 +122,6 @@ export const usePageChangeEffectNavigateLocation = () => {
     isLogged &&
     isOnAWorkspace
   ) {
-    if (
-      isMatchingLocation(location, AppPath.PlanRequiredSuccess) &&
-      isOnboardingCheckoutPending
-    ) {
-      return;
-    }
-
     return resolvedReturnToPath ?? defaultHomePagePath;
   }
 

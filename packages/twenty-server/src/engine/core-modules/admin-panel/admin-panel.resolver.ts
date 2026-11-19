@@ -1,12 +1,11 @@
 import { UseFilters, UseGuards, UsePipes } from '@nestjs/common';
-import { Args, Info, Int, Mutation, Query } from '@nestjs/graphql';
+import { Args, Int, Mutation, Query } from '@nestjs/graphql';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { type GraphQLResolveInfo } from 'graphql';
 import GraphQLJSON from 'graphql-type-json';
 import { AI_MODEL_TIERS } from 'twenty-shared/ai';
 import { isDefined } from 'twenty-shared/utils';
-import { In, type Repository } from 'typeorm';
+import { type Repository } from 'typeorm';
 
 import { UUIDScalarType } from 'src/engine/api/graphql/workspace-schema-builder/graphql-types/scalars';
 import { InstanceAndAllWorkspacesUpgradeStatusDTO } from 'src/engine/core-modules/upgrade/dtos/instance-and-all-workspaces-upgrade-status.dto';
@@ -19,10 +18,6 @@ import { AdminPanelQueueService } from 'src/engine/core-modules/admin-panel/admi
 import { AdminChatThreadMessagesDTO } from 'src/engine/core-modules/admin-panel/dtos/admin-chat-thread-messages.dto';
 import { AdminPanelRecentUserDTO } from 'src/engine/core-modules/admin-panel/dtos/admin-panel-recent-user.dto';
 import { AdminPanelTopWorkspaceDTO } from 'src/engine/core-modules/admin-panel/dtos/admin-panel-top-workspace.dto';
-import { AdminPanelWorkspaceBillingDTO } from 'src/engine/core-modules/admin-panel/dtos/admin-panel-workspace-billing.dto';
-import { AdminPanelWorkspaceCreditGrantDTO } from 'src/engine/core-modules/admin-panel/dtos/admin-panel-workspace-credit-grant.dto';
-import { GrantWorkspaceCreditsInput } from 'src/engine/core-modules/admin-panel/dtos/grant-workspace-credits.input';
-import { RevokeWorkspaceCreditGrantInput } from 'src/engine/core-modules/admin-panel/dtos/revoke-workspace-credit-grant.input';
 import { AdminWorkspaceChatThreadDTO } from 'src/engine/core-modules/admin-panel/dtos/admin-workspace-chat-thread.dto';
 import { ConfigVariableDTO } from 'src/engine/core-modules/admin-panel/dtos/config-variable.dto';
 import { ConfigVariablesDTO } from 'src/engine/core-modules/admin-panel/dtos/config-variables.dto';
@@ -44,7 +39,6 @@ import { HealthIndicatorId } from 'src/engine/core-modules/admin-panel/enums/hea
 import { JobStateEnum } from 'src/engine/core-modules/message-queue/enums/job-state.enum';
 import { QueueMetricsTimeRange } from 'src/engine/core-modules/admin-panel/enums/queue-metrics-time-range.enum';
 import { MaintenanceModeService } from 'src/engine/core-modules/admin-panel/maintenance-mode.service';
-import { AdminPanelBillingService } from 'src/engine/core-modules/admin-panel/services/admin-panel-billing.service';
 import { AdminPanelChatService } from 'src/engine/core-modules/admin-panel/services/admin-panel-chat.service';
 import { AdminPanelConfigService } from 'src/engine/core-modules/admin-panel/services/admin-panel-config.service';
 import { AdminPanelSigningKeyService } from 'src/engine/core-modules/admin-panel/services/admin-panel-signing-key.service';
@@ -59,7 +53,6 @@ import { ApplicationRegistrationClaimService } from 'src/engine/core-modules/app
 import { ApplicationRegistrationEntity } from 'src/engine/core-modules/application/application-registration/application-registration.entity';
 import { ApplicationRegistrationExceptionFilter } from 'src/engine/core-modules/application/application-registration/application-registration-exception-filter';
 import { ApplicationRegistrationService } from 'src/engine/core-modules/application/application-registration/application-registration.service';
-import { isCreditsUsedRequested } from 'src/engine/core-modules/application/application-registration/utils/is-credits-used-requested.util';
 import { ApplicationRegistrationSourceType } from 'src/engine/core-modules/application/application-registration/enums/application-registration-source-type.enum';
 import { AdminApplicationRegistrationClaimDTO } from 'src/engine/core-modules/application/application-registration/dtos/admin-application-registration-claim.dto';
 import { AdminUpdateApplicationRegistrationInput } from 'src/engine/core-modules/application/application-registration/dtos/admin-update-application-registration.input';
@@ -86,8 +79,6 @@ import { ThrottlerGraphqlApiExceptionFilter } from 'src/engine/core-modules/thro
 import { TwoFactorAuthenticationExceptionFilter } from 'src/engine/core-modules/two-factor-authentication/two-factor-authentication-exception.filter';
 import { TwoFactorAuthenticationRecoveryCodeDTO } from 'src/engine/core-modules/two-factor-authentication/dto/two-factor-authentication-recovery-code.dto';
 import { TwoFactorAuthenticationRecoveryService } from 'src/engine/core-modules/two-factor-authentication/services/two-factor-authentication-recovery.service';
-import { UsageBreakdownItemDTO } from 'src/engine/core-modules/usage/dtos/usage-breakdown-item.dto';
-import { UsageAnalyticsService } from 'src/engine/core-modules/usage/services/usage-analytics.service';
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { AuthUser } from 'src/engine/decorators/auth/auth-user.decorator';
 import { AuthWorkspace } from 'src/engine/decorators/auth/auth-workspace.decorator';
@@ -135,7 +126,6 @@ export class AdminPanelResolver {
     private readonly adminServerAdminService: AdminPanelServerAdminService,
     private readonly twoFactorAuthenticationRecoveryService: TwoFactorAuthenticationRecoveryService,
     private readonly adminStatisticsService: AdminPanelStatisticsService,
-    private readonly adminBillingService: AdminPanelBillingService,
     private readonly adminChatService: AdminPanelChatService,
     private readonly adminConfigService: AdminPanelConfigService,
     private readonly adminVersionService: AdminPanelVersionService,
@@ -148,7 +138,6 @@ export class AdminPanelResolver {
     private featureFlagService: FeatureFlagService,
     private readonly twentyConfigService: TwentyConfigService,
     private readonly aiModelRegistryService: AiModelRegistryService,
-    private readonly usageAnalyticsService: UsageAnalyticsService,
     private readonly maintenanceModeService: MaintenanceModeService,
     private readonly upgradeStatusService: UpgradeStatusService,
     @InjectRepository(WorkspaceEntity)
@@ -598,49 +587,6 @@ export class AdminPanelResolver {
   }
 
   @UseGuards(AdminPanelGuard)
-  @Query(() => [UsageBreakdownItemDTO])
-  async getAdminAiUsageByWorkspace(
-    @Args('periodStart', { type: () => Date, nullable: true })
-    periodStart?: Date,
-    @Args('periodEnd', { type: () => Date, nullable: true })
-    periodEnd?: Date,
-  ): Promise<UsageBreakdownItemDTO[]> {
-    const defaultEnd = new Date();
-    const defaultStart = new Date();
-
-    defaultStart.setDate(defaultStart.getDate() - 30);
-
-    const useDollarMode = !this.twentyConfigService.get('IS_BILLING_ENABLED');
-
-    const items = await this.usageAnalyticsService.getAdminAiUsageByWorkspace({
-      periodStart: periodStart ?? defaultStart,
-      periodEnd: periodEnd ?? defaultEnd,
-      useDollarMode,
-    });
-
-    if (items.length === 0) {
-      return items;
-    }
-
-    const workspaceIds = items.map((item) => item.key);
-    const workspaces = await this.workspaceRepository.find({
-      where: { id: In(workspaceIds) },
-      select: { id: true, displayName: true },
-    });
-
-    const nameMap = new Map(
-      workspaces
-        .filter((workspace) => isDefined(workspace.displayName))
-        .map((workspace) => [workspace.id, workspace.displayName!]),
-    );
-
-    return items.map((item) => ({
-      ...item,
-      label: nameMap.get(item.key),
-    }));
-  }
-
-  @UseGuards(AdminPanelGuard)
   @Query(() => MaintenanceModeDTO, { nullable: true })
   async getMaintenanceMode(): Promise<MaintenanceModeDTO | null> {
     const value = await this.maintenanceModeService.getMaintenanceMode();
@@ -687,44 +633,6 @@ export class AdminPanelResolver {
   }
 
   @UseGuards(ServerLevelImpersonateGuard)
-  @Query(() => AdminPanelWorkspaceBillingDTO, { nullable: true })
-  async workspaceBillingAdminPanel(
-    @Args('workspaceId', { type: () => UUIDScalarType }) workspaceId: string,
-  ): Promise<AdminPanelWorkspaceBillingDTO | null> {
-    return this.adminBillingService.getWorkspaceBilling(workspaceId);
-  }
-
-  @UseGuards(AdminPanelGuard)
-  @Mutation(() => AdminPanelWorkspaceCreditGrantDTO)
-  async grantWorkspaceCredits(
-    @Args() input: GrantWorkspaceCreditsInput,
-    @AuthUser() actor: AuthContextUser,
-  ): Promise<AdminPanelWorkspaceCreditGrantDTO> {
-    return this.adminBillingService.grantWorkspaceCredits({
-      workspaceId: input.workspaceId,
-      amount: input.amount,
-      type: input.type,
-      reason: input.reason,
-      expiresInDays: input.expiresInDays,
-      clientOperationId: input.clientOperationId,
-      grantedByUserId: actor.id,
-    });
-  }
-
-  @UseGuards(AdminPanelGuard)
-  @Mutation(() => AdminPanelWorkspaceCreditGrantDTO)
-  async revokeWorkspaceCreditGrant(
-    @Args() input: RevokeWorkspaceCreditGrantInput,
-    @AuthUser() actor: AuthContextUser,
-  ): Promise<AdminPanelWorkspaceCreditGrantDTO> {
-    return this.adminBillingService.revokeWorkspaceCreditGrant({
-      workspaceId: input.workspaceId,
-      creditGrantId: input.creditGrantId,
-      revokedByUserId: actor.id,
-    });
-  }
-
-  @UseGuards(ServerLevelImpersonateGuard)
   @Query(() => [AdminWorkspaceChatThreadDTO])
   async getAdminWorkspaceChatThreads(
     @Args('workspaceId', { type: () => UUIDScalarType }) workspaceId: string,
@@ -767,17 +675,9 @@ export class AdminPanelResolver {
   @Query(() => ApplicationRegistrationStatsDTO)
   async findAdminApplicationRegistrationStats(
     @Args('id') id: string,
-    @Info() info: GraphQLResolveInfo,
-    @Args('periodStart', { type: () => Date, nullable: true })
-    periodStart?: Date,
-    @Args('periodEnd', { type: () => Date, nullable: true })
-    periodEnd?: Date,
   ): Promise<ApplicationRegistrationStatsDTO> {
     return this.applicationRegistrationService.getStatsGlobal({
       applicationRegistrationId: id,
-      includeCreditsUsed: isCreditsUsedRequested(info),
-      periodStart,
-      periodEnd,
     });
   }
 

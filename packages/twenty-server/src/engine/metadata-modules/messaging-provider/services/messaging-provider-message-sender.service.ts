@@ -92,7 +92,6 @@ export class MessagingProviderMessageSenderService {
       logicFunctionId: sendMessageLogicFunctionId,
       workspaceId,
       payload: { messagingProviderName: messagingProvider.name, ...payload },
-      shouldEnforceUsageLimits: true,
       toException: (reason) =>
         new MessagingProviderException(
           `sendMessage logic function of messaging provider ${messagingProvider.id} ${reason}`,

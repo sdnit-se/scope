@@ -69,11 +69,6 @@ export class CompanyEnrichmentResolver {
         workspaceId: workspace.id,
         employeeCount: enrichmentResult.enrichment.employeeCount,
       });
-
-      await this.onboardingService.creditEnrichmentQualificationReward({
-        workspaceId: workspace.id,
-        employeeCount: enrichmentResult.enrichment.employeeCount,
-      });
     }
 
     const isBookCallOnboardingStepPending =

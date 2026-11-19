@@ -19,10 +19,6 @@ import { ApplicationModule } from 'src/engine/core-modules/application/applicati
 import { PreInstalledAppsModule } from 'src/engine/core-modules/application/pre-installed-apps/pre-installed-apps.module';
 import { ApprovedAccessDomainModule } from 'src/engine/core-modules/approved-access-domain/approved-access-domain.module';
 import { AuthModule } from 'src/engine/core-modules/auth/auth.module';
-import { BillingWebhookModule } from 'src/engine/core-modules/billing-webhook/billing-webhook.module';
-import { AppBillingModule } from 'src/engine/core-modules/billing/app-billing/app-billing.module';
-import { BillingModule } from 'src/engine/core-modules/billing/billing.module';
-import { BillingGraphqlApiExceptionFilter } from 'src/engine/core-modules/billing/filters/billing-graphql-api-exception.filter';
 import { PermissionsGraphqlApiExceptionFilter } from 'src/engine/metadata-modules/permissions/utils/permissions-graphql-api-exception.filter';
 import { CacheStorageModule } from 'src/engine/core-modules/cache-storage/cache-storage.module';
 import { TimelineCalendarEventModule } from 'src/engine/core-modules/calendar/timeline-calendar-event.module';
@@ -57,12 +53,10 @@ import { WellKnownModule } from 'src/engine/core-modules/well-known/well-known.m
 import { TelemetryModule } from 'src/engine/core-modules/telemetry/telemetry.module';
 import { TwentyConfigModule } from 'src/engine/core-modules/twenty-config/twenty-config.module';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
-import { UsageModule } from 'src/engine/core-modules/usage/usage.module';
 import { UserModule } from 'src/engine/core-modules/user/user.module';
 import { WorkflowApiModule } from 'src/engine/core-modules/workflow/workflow-api.module';
 import { WorkspaceInvitationModule } from 'src/engine/core-modules/workspace-invitation/workspace-invitation.module';
 import { WorkspaceModule } from 'src/engine/core-modules/workspace/workspace.module';
-import { AiBillingModule } from 'src/engine/metadata-modules/ai/ai-billing/ai-billing.module';
 import { AiModelsModule } from 'src/engine/metadata-modules/ai/ai-models/ai-models.module';
 import { PageLayoutModule } from 'src/engine/metadata-modules/page-layout/page-layout.module';
 import { RoleModule } from 'src/engine/metadata-modules/role/role.module';
@@ -82,9 +76,6 @@ import { FileApiModule } from './file/file-api.module';
     TwentyConfigModule.forRoot(),
     HealthModule,
     AuthModule,
-    BillingModule,
-    BillingWebhookModule,
-    UsageModule,
     ClientConfigModule,
     FeatureFlagModule,
     FileApiModule,
@@ -148,7 +139,6 @@ import { FileApiModule } from './file/file-api.module';
     CacheStorageModule,
     I18nModule,
     AiModelsModule,
-    AiBillingModule,
     LogicFunctionModule.forRoot(),
     CodeInterpreterModule.forRoot(),
     SearchModule,
@@ -159,13 +149,8 @@ import { FileApiModule } from './file/file-api.module';
     TrashCleanupModule,
     CodeInterpreterSessionCleanupModule,
     PreInstalledAppsModule,
-    AppBillingModule,
   ],
   providers: [
-    {
-      provide: APP_FILTER,
-      useClass: BillingGraphqlApiExceptionFilter,
-    },
     {
       provide: APP_FILTER,
       useClass: PermissionsGraphqlApiExceptionFilter,

@@ -5,7 +5,6 @@ import { isLogicFunctionHttpResponse } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 import { type SelectQueryBuilder } from 'typeorm';
 
-import { isUsageRefusedError } from 'src/engine/core-modules/billing/utils/is-usage-refused-error.util';
 import { ApplicationRepeatedEventRecorderService } from 'src/engine/core-modules/event-logs/emit/application-repeated-event-recorder.service';
 import {
   LogicFunctionExecutionException,
@@ -422,10 +421,6 @@ export class ServerRouteTriggerService {
         payload,
       });
     } catch (error) {
-      if (isUsageRefusedError(error)) {
-        throw error;
-      }
-
       this.logger.error(
         `Server logic function ${logicFunction.id} failed in workspace ${workspaceId}: ${error instanceof Error ? error.message : String(error)}`,
         error instanceof Error ? error.stack : undefined,

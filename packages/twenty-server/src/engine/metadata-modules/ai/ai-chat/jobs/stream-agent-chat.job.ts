@@ -220,27 +220,6 @@ export class StreamAgentChatJob {
           },
           abortSignal,
           conversationSizeTokens: data.conversationSizeTokens,
-          onUserCreditsExhausted: ({
-            renewsAt,
-            isFallingBackToWorkspaceCredits,
-          }) =>
-            this.eventPublisherService
-              .publish({
-                threadId: data.threadId,
-                workspaceId: data.workspaceId,
-                event: {
-                  type: 'user-credits-exhausted',
-                  workspaceMemberId:
-                    authorization.authContext.workspaceMemberId,
-                  isFallingBackToWorkspaceCredits,
-                  renewsAt: renewsAt.toISOString(),
-                },
-              })
-              .catch((error: unknown) =>
-                this.logger.warn(
-                  `Could not publish the user credits notice for stream ${data.streamId}: ${formatErrorWithCause(error)}`,
-                ),
-              ),
         });
 
         return {
@@ -258,12 +237,10 @@ export class StreamAgentChatJob {
               }
             }),
           },
-          getStopReason: turn.getStopReason,
         };
       },
-      completeTurn: async ({ started }) => ({
+      completeTurn: async () => ({
         modelId: turnModelId,
-        stopReason: started.getStopReason(),
       }),
     });
 
