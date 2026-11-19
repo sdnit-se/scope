@@ -56,13 +56,7 @@ import { resolveEffectiveFlatEntityProperty } from 'src/engine/metadata-modules/
 import { resolveEffectiveTranslatedFlatEntity } from 'src/engine/metadata-modules/overrides/utils/resolve-effective-translated-flat-entity.util';
 import { type AgentDTO } from 'src/engine/metadata-modules/ai/ai-agent/dtos/agent.dto';
 import { fromFlatAgentWithRoleIdToAgentDto } from 'src/engine/metadata-modules/flat-agent/utils/from-agent-entity-to-agent-dto.util';
-import { fromFlatRowLevelPermissionPredicateGroupToDto } from 'src/engine/metadata-modules/flat-row-level-permission-predicate/utils/from-flat-row-level-permission-predicate-group-to-dto.util';
-import { fromFlatRowLevelPermissionPredicateToDto } from 'src/engine/metadata-modules/flat-row-level-permission-predicate/utils/from-flat-row-level-permission-predicate-to-dto.util';
-import {
-  type ApiKeyForRoleDTO,
-  type RoleDTO,
-} from 'src/engine/metadata-modules/role/dtos/role.dto';
-import { RowLevelPermissionPredicateService } from 'src/engine/metadata-modules/row-level-permission-predicate/services/row-level-permission-predicate.service';
+import { type ApiKeyForRoleDTO } from 'src/engine/metadata-modules/role/dtos/role.dto';
 import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
 
 export type RelationMetadataLoaderPayload = {
@@ -159,11 +153,6 @@ export type ApiKeysByRoleIdLoaderPayload = {
   roleId: string;
 };
 
-export type RowLevelPermissionsByRoleIdLoaderPayload = {
-  workspaceId: string;
-  roleId: string;
-};
-
 export type FlatEntitiesByApplicationIdLoaderPayload = {
   workspaceId: string;
   applicationId: string;
@@ -197,7 +186,6 @@ export class DataloaderService {
     private readonly fieldMetadataConnectionLoaderFactory: FieldMetadataConnectionLoaderFactory,
     private readonly indexMetadataConnectionLoaderFactory: IndexMetadataConnectionLoaderFactory,
     private readonly workspaceCacheService: WorkspaceCacheService,
-    private readonly rowLevelPermissionPredicateService: RowLevelPermissionPredicateService,
   ) {}
 
   createLoaders(): IDataloaders {
@@ -340,8 +328,6 @@ export class DataloaderService {
       this.createWorkspaceMembersByRoleIdLoader();
     const agentsByRoleIdLoader = this.createAgentsByRoleIdLoader();
     const apiKeysByRoleIdLoader = this.createApiKeysByRoleIdLoader();
-    const rowLevelPermissionsByRoleIdLoader =
-      this.createRowLevelPermissionsByRoleIdLoader();
 
     return {
       relationLoader,
@@ -374,7 +360,6 @@ export class DataloaderService {
       workspaceMembersByRoleIdLoader,
       agentsByRoleIdLoader,
       apiKeysByRoleIdLoader,
-      rowLevelPermissionsByRoleIdLoader,
     };
   }
 
@@ -1237,94 +1222,5 @@ export class DataloaderService {
         });
       },
     );
-  }
-
-  private createRowLevelPermissionsByRoleIdLoader() {
-    return new DataLoader<
-      RowLevelPermissionsByRoleIdLoaderPayload,
-      Required<
-        Pick<
-          RoleDTO,
-          'rowLevelPermissionPredicates' | 'rowLevelPermissionPredicateGroups'
-        >
-      >
-    >(async (dataLoaderParams: RowLevelPermissionsByRoleIdLoaderPayload[]) => {
-      const workspaceId = dataLoaderParams[0].workspaceId;
-
-      const hasRowLevelPermissionFeature =
-        await this.rowLevelPermissionPredicateService.hasRowLevelPermissionFeature(
-          workspaceId,
-        );
-
-      if (!hasRowLevelPermissionFeature) {
-        return dataLoaderParams.map(() => ({
-          rowLevelPermissionPredicates: [],
-          rowLevelPermissionPredicateGroups: [],
-        }));
-      }
-
-      const {
-        flatRoleMaps,
-        flatRowLevelPermissionPredicateMaps,
-        flatRowLevelPermissionPredicateGroupMaps,
-      } =
-        await this.flatEntityMapsCacheService.getOrRecomputeManyOrAllFlatEntityMaps(
-          {
-            workspaceId,
-            flatMapsKeys: [
-              'flatRoleMaps',
-              'flatRowLevelPermissionPredicateMaps',
-              'flatRowLevelPermissionPredicateGroupMaps',
-            ],
-          },
-        );
-
-      return dataLoaderParams.map(({ roleId }) => {
-        const flatRole = findFlatEntityByIdInFlatEntityMaps({
-          flatEntityId: roleId,
-          flatEntityMaps: flatRoleMaps,
-        });
-
-        if (!isDefined(flatRole)) {
-          return {
-            rowLevelPermissionPredicates: [],
-            rowLevelPermissionPredicateGroups: [],
-          };
-        }
-
-        return {
-          rowLevelPermissionPredicates: findManyFlatEntityByIdInFlatEntityMaps({
-            flatEntityIds: flatRole.rowLevelPermissionPredicateIds,
-            flatEntityMaps: flatRowLevelPermissionPredicateMaps,
-          })
-            .filter((flatPredicate) => !isDefined(flatPredicate.deletedAt))
-            .sort(
-              (flatPredicateA, flatPredicateB) =>
-                (flatPredicateA.positionInRowLevelPermissionPredicateGroup ??
-                  0) -
-                (flatPredicateB.positionInRowLevelPermissionPredicateGroup ??
-                  0),
-            )
-            .map(fromFlatRowLevelPermissionPredicateToDto),
-          rowLevelPermissionPredicateGroups:
-            findManyFlatEntityByIdInFlatEntityMaps({
-              flatEntityIds: flatRole.rowLevelPermissionPredicateGroupIds,
-              flatEntityMaps: flatRowLevelPermissionPredicateGroupMaps,
-            })
-              .filter(
-                (flatPredicateGroup) =>
-                  !isDefined(flatPredicateGroup.deletedAt),
-              )
-              .sort(
-                (flatPredicateGroupA, flatPredicateGroupB) =>
-                  (flatPredicateGroupA.positionInRowLevelPermissionPredicateGroup ??
-                    0) -
-                  (flatPredicateGroupB.positionInRowLevelPermissionPredicateGroup ??
-                    0),
-              )
-              .map(fromFlatRowLevelPermissionPredicateGroupToDto),
-        };
-      });
-    });
   }
 }

@@ -6,14 +6,12 @@ import { SecureHttpClientModule } from 'src/engine/core-modules/secure-http-clie
 import { CallWebhookJobsForMetadataJob } from 'src/engine/metadata-modules/webhook/jobs/call-webhook-jobs-for-metadata.job';
 import { CallWebhookJobsJob } from 'src/engine/metadata-modules/webhook/jobs/call-webhook-jobs.job';
 import { CallWebhookJob } from 'src/engine/metadata-modules/webhook/jobs/call-webhook.job';
-import { RecordShareModule } from 'src/engine/core-modules/record-share/record-share.module';
 import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache.module';
 
 @Module({
   imports: [
     EventLogEmitterModule,
     MetricsModule,
-    RecordShareModule,
     SecureHttpClientModule,
     WorkspaceCacheModule,
   ],

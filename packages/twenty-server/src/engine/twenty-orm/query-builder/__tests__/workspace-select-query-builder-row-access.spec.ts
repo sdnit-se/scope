@@ -38,7 +38,7 @@ describe('WorkspaceSelectQueryBuilder row access conditions', () => {
 
     queryBuilder
       .where('"person"."id" = :a', { a: 1 })
-      .applyRowLevelPermissions()
+      .applyRowAccessPolicy()
       .orWhere('"person"."id" = :b', { b: 2 });
 
     expect(queryBuilder.getQuery()).toContain(GUARDED_OR_CHAIN);
@@ -65,7 +65,7 @@ describe('WorkspaceSelectQueryBuilder row access conditions', () => {
         queryBuilder
           .where('"person"."id" = :a', { a: 1 })
           .orWhere('"person"."id" = :b', { b: 2 })
-          .applyRowLevelPermissions(),
+          .applyRowAccessPolicy(),
         'delete',
       );
 
@@ -77,9 +77,7 @@ describe('WorkspaceSelectQueryBuilder row access conditions', () => {
   it('should carry the row access condition onto a clone without applying it twice', async () => {
     const { queryBuilder, executedStatements } = buildRowAccessQueryBuilder();
 
-    queryBuilder
-      .where('"person"."id" = :a', { a: 1 })
-      .applyRowLevelPermissions();
+    queryBuilder.where('"person"."id" = :a', { a: 1 }).applyRowAccessPolicy();
 
     await queryBuilder
       .clone()
@@ -117,7 +115,7 @@ describe('WorkspaceSelectQueryBuilder row access conditions', () => {
     const mutationQueryBuilder =
       WorkspaceSelectQueryBuilder.toMutationQueryBuilder(
         queryBuilder
-          .applyRowLevelPermissions()
+          .applyRowAccessPolicy()
           .where('"person"."id" = :a', { a: 1 })
           .orWhere('"person"."id" = :b', { b: 2 }),
         'delete',
@@ -135,7 +133,7 @@ describe('WorkspaceSelectQueryBuilder row access conditions', () => {
     queryBuilder
       .where('"person"."id" = :a', { a: 1 })
       .orWhere('"person"."id" = :b', { b: 2 })
-      .applyRowLevelPermissions();
+      .applyRowAccessPolicy();
 
     snapshotQueryBuilder
       .setFindOptions({ select: { id: true } })

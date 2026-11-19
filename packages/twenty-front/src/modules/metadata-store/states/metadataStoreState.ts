@@ -29,8 +29,6 @@ export const ALL_METADATA_ENTITY_KEYS = [
   'roleTargets',
   'agents',
   'skills',
-  'rowLevelPermissionPredicates',
-  'rowLevelPermissionPredicateGroups',
   // TODO: clarify what is metadata (syncable entity?) vs core engine or broadcastable entity
   'applications',
 ] as const;

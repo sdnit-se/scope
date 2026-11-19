@@ -171,8 +171,6 @@ export const getCallRecordingWidgetStoryDecorator =
           canSoftDeleteObjectRecords: true,
           canDestroyObjectRecords: true,
           restrictedFields: {},
-          rowLevelPermissionPredicates: [],
-          rowLevelPermissionPredicateGroups: [],
         },
       ],
     });

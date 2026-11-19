@@ -536,7 +536,7 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
         selectQueryBuilder: relatedRepository
           .createQueryBuilder(alias)
           .where({ id: In(idsChunk) }),
-        rowLevelPermissionsApplied: false,
+        rowAccessPolicyApplied: false,
         kind: 'soft-delete',
         columnsToReturn: ['id'],
       });
@@ -547,7 +547,7 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
         selectQueryBuilder: relatedRepository
           .createQueryBuilder(alias)
           .where({ id: In(idsChunk) }),
-        rowLevelPermissionsApplied: false,
+        rowAccessPolicyApplied: false,
         kind: 'update',
         columnsToReturn: ['id'],
         data: { [joinColumnName]: priorityRecordId },
@@ -625,12 +625,12 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
           selectQueryBuilder: objectRepository
             .createQueryBuilder(alias)
             .where({ id: In(idsToDelete) }),
-          rowLevelPermissionsApplied: false,
+          rowAccessPolicyApplied: false,
           kind: 'delete',
           columnsToReturn,
         });
 
-        // Row-level permissions filter the delete, so a record the role can read but not delete is skipped silently
+        // The row access policy filters the delete, so a record the role can read but not delete is skipped silently
         if (deletedRecords.length !== idsToDelete.length) {
           throw new CommonQueryRunnerException(
             'Some records to merge cannot be deleted with the current role',
@@ -651,7 +651,7 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
           selectQueryBuilder: objectRepository
             .createQueryBuilder(alias)
             .where({ id: priorityRecordId }),
-          rowLevelPermissionsApplied: false,
+          rowAccessPolicyApplied: false,
           kind: 'update',
           columnsToReturn,
           data: resolvedMergedData,

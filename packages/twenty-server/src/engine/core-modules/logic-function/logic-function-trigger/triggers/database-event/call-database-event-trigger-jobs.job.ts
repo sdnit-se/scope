@@ -23,7 +23,6 @@ import {
   LogicFunctionTriggerJob,
   LogicFunctionTriggerJobData,
 } from 'src/engine/core-modules/logic-function/logic-function-trigger/jobs/logic-function-trigger.job';
-import { RecordAccessPolicyService } from 'src/engine/core-modules/record-share/services/record-access-policy.service';
 import { resolveEventsReadableByRole } from 'src/engine/metadata-modules/permissions/utils/resolve-events-readable-by-role.util';
 import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
 import { WorkspaceEventBatch } from 'src/engine/workspace-event-emitter/types/workspace-event-batch.type';
@@ -38,7 +37,6 @@ export class CallDatabaseEventTriggerJobsJob {
     private readonly workspaceCacheService: WorkspaceCacheService,
     private readonly applicationJobEnqueueThrottlerService: ApplicationJobEnqueueThrottlerService,
     private readonly applicationRepeatedEventRecorderService: ApplicationRepeatedEventRecorderService,
-    private readonly recordAccessPolicyService: RecordAccessPolicyService,
   ) {}
 
   @Process(CallDatabaseEventTriggerJobsJob.name)
@@ -50,9 +48,6 @@ export class CallDatabaseEventTriggerJobsJob {
       flatLogicFunctionMaps,
       flatApplicationMaps,
       rolesPermissions,
-      roleIdsWithAllRecordsAccess,
-      flatRowLevelPermissionPredicateMaps,
-      flatRowLevelPermissionPredicateGroupMaps,
       flatFieldMetadataMaps,
       flatObjectMetadataMaps,
     } = await this.workspaceCacheService.getOrRecompute(
@@ -61,9 +56,6 @@ export class CallDatabaseEventTriggerJobsJob {
         'flatLogicFunctionMaps',
         'flatApplicationMaps',
         'rolesPermissions',
-        'roleIdsWithAllRecordsAccess',
-        'flatRowLevelPermissionPredicateMaps',
-        'flatRowLevelPermissionPredicateGroupMaps',
         'flatFieldMetadataMaps',
         'flatObjectMetadataMaps',
       ],
@@ -94,11 +86,6 @@ export class CallDatabaseEventTriggerJobsJob {
       return;
     }
 
-    const eventRecordAccessGate =
-      this.recordAccessPolicyService.buildEventRecordAccessGate(
-        workspaceEventBatch,
-      );
-
     for (const [
       applicationId,
       logicFunctions,
@@ -113,15 +100,11 @@ export class CallDatabaseEventTriggerJobsJob {
         continue;
       }
 
-      const admittedEvents = await resolveEventsReadableByRole({
+      const admittedEvents = resolveEventsReadableByRole({
         roleId: application.defaultRoleId,
         owningApplicationId: application.id,
         workspaceEventBatch,
-        eventRecordAccessGate,
         rolesPermissions,
-        roleIdsWithAllRecordsAccess,
-        flatRowLevelPermissionPredicateMaps,
-        flatRowLevelPermissionPredicateGroupMaps,
         flatFieldMetadataMaps,
         flatObjectMetadataMaps,
       });

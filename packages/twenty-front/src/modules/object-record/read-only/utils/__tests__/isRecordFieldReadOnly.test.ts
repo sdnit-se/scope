@@ -18,8 +18,6 @@ const buildObjectPermissions = (
   canSoftDeleteObjectRecords: true,
   canDestroyObjectRecords: true,
   restrictedFields: {},
-  rowLevelPermissionPredicates: [],
-  rowLevelPermissionPredicateGroups: [],
   ...overrides,
 });
 

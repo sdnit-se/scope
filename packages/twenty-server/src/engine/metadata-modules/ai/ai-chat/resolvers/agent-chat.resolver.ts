@@ -2,7 +2,7 @@ import { AgentChatQueueService } from 'src/engine/metadata-modules/ai/ai-chat/se
 import { AuthWorkspaceMemberId } from 'src/engine/decorators/auth/auth-workspace-member-id.decorator';
 import { AuthPrincipalGuard } from 'src/engine/guards/auth-principal.guard';
 import { AgentChatThreadLifecycleService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-thread-lifecycle.service';
-import { AgentChatSharingService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-sharing.service';
+import { AgentChatThreadAccessService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-thread-access.service';
 import { UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
 import {
   Args,
@@ -74,7 +74,7 @@ export class AgentChatResolver {
     private readonly agentChatService: AgentChatService,
     private readonly agentChatQueueService: AgentChatQueueService,
     private readonly threadService: AgentChatThreadService,
-    private readonly sharingService: AgentChatSharingService,
+    private readonly threadAccessService: AgentChatThreadAccessService,
     private readonly agentChatStreamingService: AgentChatStreamingService,
     private readonly streamRecoveryService: AgentChatStreamRecoveryService,
     private readonly eventPublisherService: AgentChatEventPublisherService,
@@ -94,7 +94,7 @@ export class AgentChatResolver {
     @AuthWorkspaceMemberId() workspaceMemberId: string,
     @AuthWorkspace() { id: workspaceId }: WorkspaceEntity,
   ) {
-    return this.sharingService.getReadableThread({
+    return this.threadAccessService.getReadableThread({
       threadId: id,
       workspaceMemberId,
       workspaceId,
@@ -149,7 +149,7 @@ export class AgentChatResolver {
     @AuthWorkspaceMemberId() workspaceMemberId: string,
     @AuthWorkspace() { id: workspaceId }: WorkspaceEntity,
   ) {
-    const thread = await this.sharingService.getReadableThread({
+    const thread = await this.threadAccessService.getReadableThread({
       threadId,
       workspaceMemberId,
       workspaceId,

@@ -24,13 +24,8 @@ export class CreateRecordService {
   ) {}
 
   async execute(params: CreateRecordParams): Promise<ToolOutput> {
-    const {
-      objectName,
-      objectRecord,
-      authContext,
-      rolePermissionConfig,
-      shareWith,
-    } = params;
+    const { objectName, objectRecord, authContext, rolePermissionConfig } =
+      params;
 
     try {
       const {
@@ -69,7 +64,6 @@ export class CreateRecordService {
         await this.commonCreateOneRunner.execute(
           {
             data: dataWithActor,
-            shareWith,
             selectedFields,
           },
           queryRunnerContext,

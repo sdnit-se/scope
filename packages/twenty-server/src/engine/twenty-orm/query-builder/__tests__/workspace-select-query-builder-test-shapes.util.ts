@@ -89,7 +89,7 @@ export const ROW_ACCESS_CONDITION =
 export const applyRowAccessCondition = (
   queryBuilder: WorkspaceSelectQueryBuilder,
 ): void => {
-  if (!queryBuilder.markRowLevelPermissionApplied(queryBuilder.alias)) {
+  if (!queryBuilder.markRowAccessPolicyApplied(queryBuilder.alias)) {
     return;
   }
 

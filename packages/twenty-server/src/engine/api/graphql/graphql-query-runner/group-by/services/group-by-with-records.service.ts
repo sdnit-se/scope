@@ -215,7 +215,7 @@ export class GroupByWithRecordsService {
       'record_row_number',
     );
 
-    subQueryBuilder.applyRowLevelPermissions();
+    subQueryBuilder.applyRowAccessPolicy();
 
     const groupByAliases = groupByDefinitions
       .map((groupByDefinition) => `"${groupByDefinition.alias}"`)

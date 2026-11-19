@@ -244,24 +244,24 @@ describe('WorkspaceSelectQueryBuilder joins', () => {
     );
   });
 
-  it('should carry applied row-level markers onto a clone', () => {
+  it('should carry applied row access markers onto a clone', () => {
     const { queryBuilder } = buildQueryBuilder();
 
-    expect(queryBuilder.markRowLevelPermissionApplied('person')).toBe(true);
-    expect(queryBuilder.clone().markRowLevelPermissionApplied('person')).toBe(
+    expect(queryBuilder.markRowAccessPolicyApplied('person')).toBe(true);
+    expect(queryBuilder.clone().markRowAccessPolicyApplied('person')).toBe(
       false,
     );
   });
 
-  it('should keep applied row-level markers when where() replaces the WHERE', () => {
+  it('should keep applied row access markers when where() replaces the WHERE', () => {
     const { queryBuilder } = buildQueryBuilder();
 
     queryBuilder.leftJoin('person.company', 'company');
-    queryBuilder.markRowLevelPermissionApplied('person');
-    queryBuilder.markRowLevelPermissionApplied('company');
+    queryBuilder.markRowAccessPolicyApplied('person');
+    queryBuilder.markRowAccessPolicyApplied('company');
     queryBuilder.where('"person"."id" = :id', { id: 1 });
 
-    expect(queryBuilder.markRowLevelPermissionApplied('person')).toBe(false);
-    expect(queryBuilder.markRowLevelPermissionApplied('company')).toBe(false);
+    expect(queryBuilder.markRowAccessPolicyApplied('person')).toBe(false);
+    expect(queryBuilder.markRowAccessPolicyApplied('company')).toBe(false);
   });
 });

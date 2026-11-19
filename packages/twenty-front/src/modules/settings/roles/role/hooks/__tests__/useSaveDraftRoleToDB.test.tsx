@@ -58,8 +58,6 @@ const PERSISTED_ROLE: RoleWithPartialMembers = {
   permissionFlags: [],
   objectPermissions: [],
   fieldPermissions: [],
-  rowLevelPermissionPredicates: [],
-  rowLevelPermissionPredicateGroups: [],
 };
 
 const renderUseSaveDraftRoleToDB = ({

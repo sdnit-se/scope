@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { type ActorMetadata, FieldActorSource } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 
-import { WorkflowRunRecordShareService } from 'src/engine/core-modules/workflow/services/workflow-run-record-share.service';
+import { CoreWorkflowCreatorService } from 'src/engine/core-modules/workflow/services/core-workflow-creator.service';
 import { AgentCallerConversationService } from 'src/engine/metadata-modules/ai/ai-agent-execution/services/agent-caller-conversation.service';
 import { type AgentRunConversation } from 'src/engine/metadata-modules/ai/ai-agent-execution/types/agent-run-conversation.type';
 import {
@@ -19,7 +19,7 @@ export class WorkflowAgentConversationWorkspaceService {
   constructor(
     private readonly agentCallerConversationService: AgentCallerConversationService,
     private readonly workflowRunInboxSenderService: WorkflowRunInboxSenderWorkspaceService,
-    private readonly workflowRunRecordShareService: WorkflowRunRecordShareService,
+    private readonly coreWorkflowCreatorService: CoreWorkflowCreatorService,
   ) {}
 
   async openConversation({
@@ -45,7 +45,7 @@ export class WorkflowAgentConversationWorkspaceService {
       recipientWorkspaceMemberId,
     )
       ? null
-      : await this.workflowRunRecordShareService.findCreatorWorkspaceMemberId({
+      : await this.coreWorkflowCreatorService.findCreatorWorkspaceMemberId({
           workspaceId,
           coreWorkflowId: sender.workflowId,
         });

@@ -420,7 +420,7 @@ export abstract class CommonBaseQueryRunnerService<
           )[0]
         : data;
 
-    const { selectQueryBuilder, rowLevelPermissionsApplied } =
+    const { selectQueryBuilder, rowAccessPolicyApplied } =
       buildMutationQueryBuilder({
         repository: writeRepository,
         alias,
@@ -431,7 +431,7 @@ export abstract class CommonBaseQueryRunnerService<
 
     return writeRepository.runMutation({
       selectQueryBuilder,
-      rowLevelPermissionsApplied,
+      rowAccessPolicyApplied,
       kind,
       columnsToReturn,
       data: resolvedData,

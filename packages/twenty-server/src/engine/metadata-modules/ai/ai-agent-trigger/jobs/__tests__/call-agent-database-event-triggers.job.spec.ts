@@ -11,8 +11,6 @@ import {
 
 import { MessageQueue } from 'src/engine/core-modules/message-queue/message-queue.constants';
 import { getQueueToken } from 'src/engine/core-modules/message-queue/utils/get-queue-token.util';
-import { RecordAccessPolicyService } from 'src/engine/core-modules/record-share/services/record-access-policy.service';
-import { RecordShareStorageService } from 'src/engine/core-modules/record-share/services/record-share-storage.service';
 import { CallAgentDatabaseEventTriggersJob } from 'src/engine/metadata-modules/ai/ai-agent-trigger/jobs/call-agent-database-event-triggers.job';
 import { RunAgentTriggerJob } from 'src/engine/metadata-modules/ai/ai-agent-trigger/jobs/run-agent-trigger.job';
 import { AgentTriggerThrottlerService } from 'src/engine/metadata-modules/ai/ai-agent-trigger/services/agent-trigger-throttler.service';
@@ -21,7 +19,6 @@ import { createEmptyFlatEntityMaps } from 'src/engine/metadata-modules/flat-enti
 import { addFlatEntityToFlatEntityMapsOrThrow } from 'src/engine/metadata-modules/flat-entity/utils/add-flat-entity-to-flat-entity-maps-or-throw.util';
 import { getFlatFieldMetadataMock } from 'src/engine/metadata-modules/flat-field-metadata/__mocks__/get-flat-field-metadata.mock';
 import { getFlatObjectMetadataMock } from 'src/engine/metadata-modules/flat-object-metadata/__mocks__/get-flat-object-metadata.mock';
-import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
 import { type WorkspaceEventBatch } from 'src/engine/workspace-event-emitter/types/workspace-event-batch.type';
 
@@ -119,8 +116,6 @@ const buildRolesPermissions = (
       canSoftDeleteObjectRecords: false,
       canDestroyObjectRecords: false,
       restrictedFields: {},
-      rowLevelPermissionPredicates: [],
-      rowLevelPermissionPredicateGroups: [],
     },
   },
 });
@@ -164,9 +159,6 @@ describe('CallAgentDatabaseEventTriggersJob', () => {
         [AGENT_ID]: { agentId: AGENT_ID, roleId: AGENT_ROLE_ID },
       },
       rolesPermissions: buildRolesPermissions(),
-      roleIdsWithAllRecordsAccess: [],
-      flatRowLevelPermissionPredicateMaps: createEmptyFlatEntityMaps(),
-      flatRowLevelPermissionPredicateGroupMaps: createEmptyFlatEntityMaps(),
       flatFieldMetadataMaps,
       flatFieldMetadataMapsOrm: flatFieldMetadataMaps,
     };
@@ -184,7 +176,6 @@ describe('CallAgentDatabaseEventTriggersJob', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CallAgentDatabaseEventTriggersJob,
-        RecordAccessPolicyService,
         {
           provide: getQueueToken(MessageQueue.aiQueue),
           useValue: messageQueueService,
@@ -201,19 +192,6 @@ describe('CallAgentDatabaseEventTriggersJob', () => {
         {
           provide: AgentTriggerThrottlerService,
           useValue: agentTriggerThrottlerService,
-        },
-        {
-          provide: RecordShareStorageService,
-          useValue: { findByRecordIds: jest.fn().mockResolvedValue([]) },
-        },
-        {
-          provide: WorkspaceOrmManager,
-          useValue: {
-            getRepository: jest.fn(),
-            executeInWorkspaceContext: jest
-              .fn()
-              .mockImplementation((fn: () => unknown) => fn()),
-          },
         },
       ],
     }).compile();

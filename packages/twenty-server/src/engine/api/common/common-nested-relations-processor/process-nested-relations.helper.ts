@@ -519,7 +519,7 @@ export class ProcessNestedRelationsHelper {
       .select(`"${targetObjectNameSingular}"."id"`, 'id')
       .where(`${column} = "lateralParents"."parentId"`);
 
-    perParentRecordIdsQueryBuilder.applyRowLevelPermissions();
+    perParentRecordIdsQueryBuilder.applyRowAccessPolicy();
 
     const perParentRecordIdsSql = `${perParentRecordIdsQueryBuilder.getQuery()} LIMIT ${Number(perParentLimit)}`;
 

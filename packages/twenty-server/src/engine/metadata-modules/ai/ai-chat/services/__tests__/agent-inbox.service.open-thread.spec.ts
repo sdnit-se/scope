@@ -48,7 +48,7 @@ const buildService = () => {
         Promise.resolve(participantWorkspaceMemberIds),
       ),
   };
-  const sharingService = {
+  const threadAccessService = {
     getAuthContext: jest.fn().mockResolvedValue({}),
   };
   const messageRepository = {
@@ -60,7 +60,7 @@ const buildService = () => {
     messageRepository as never,
     {} as never,
     threadService as never,
-    sharingService as never,
+    threadAccessService as never,
     {} as never,
     {} as never,
   );
@@ -69,7 +69,7 @@ const buildService = () => {
     service,
     threadRepository,
     threadService,
-    sharingService,
+    threadAccessService,
     messageRepository,
   };
 };
@@ -123,7 +123,7 @@ describe('AgentInboxService.openThread', () => {
   });
 
   it('adds only the members the conversation does not have yet', async () => {
-    const { service, threadRepository, threadService, sharingService } =
+    const { service, threadRepository, threadService, threadAccessService } =
       buildService();
 
     threadRepository.findOne.mockResolvedValue({
@@ -147,17 +147,17 @@ describe('AgentInboxService.openThread', () => {
         participantWorkspaceMemberIds: ['third-member-id'],
       }),
     );
-    expect(sharingService.getAuthContext).toHaveBeenCalledTimes(1);
-    expect(sharingService.getAuthContext).toHaveBeenCalledWith({
+    expect(threadAccessService.getAuthContext).toHaveBeenCalledTimes(1);
+    expect(threadAccessService.getAuthContext).toHaveBeenCalledWith({
       workspaceId: 'workspace-id',
       workspaceMemberId: 'third-member-id',
     });
   });
 
   it('neither creates nor shares the conversation when a member cannot have it', async () => {
-    const { service, threadService, sharingService } = buildService();
+    const { service, threadService, threadAccessService } = buildService();
 
-    sharingService.getAuthContext.mockImplementation(
+    threadAccessService.getAuthContext.mockImplementation(
       ({ workspaceMemberId }: { workspaceMemberId: string }) =>
         workspaceMemberId === 'invalid-member-id'
           ? Promise.reject(

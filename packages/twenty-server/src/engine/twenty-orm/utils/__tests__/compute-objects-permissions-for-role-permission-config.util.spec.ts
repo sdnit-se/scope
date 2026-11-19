@@ -19,8 +19,6 @@ const FULL_ACCESS: ObjectPermissions = {
   canSoftDeleteObjectRecords: true,
   canDestroyObjectRecords: true,
   restrictedFields: {},
-  rowLevelPermissionPredicates: [],
-  rowLevelPermissionPredicateGroups: [],
 };
 
 const flatObjectMetadataMaps: FlatEntityMaps<FlatObjectMetadata> =

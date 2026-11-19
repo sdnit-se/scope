@@ -17,7 +17,6 @@ import {
   type ApplicationAuthorIdentifiersLoaderPayload,
   type ObjectMetadataLoaderPayload,
   type RelationLoaderPayload,
-  type RowLevelPermissionsByRoleIdLoaderPayload,
   type ViewFieldGroupsByViewIdLoaderPayload,
   type ViewFieldsByViewFieldGroupIdLoaderPayload,
   type ViewFieldsByViewIdLoaderPayload,
@@ -41,10 +40,7 @@ import { type RelationDTO } from 'src/engine/metadata-modules/field-metadata/dto
 import { type IndexFieldMetadataDTO } from 'src/engine/metadata-modules/index-metadata/dtos/index-field-metadata.dto';
 import { type IndexMetadataDTO } from 'src/engine/metadata-modules/index-metadata/dtos/index-metadata.dto';
 import { type ObjectMetadataDTO } from 'src/engine/metadata-modules/object-metadata/dtos/object-metadata.dto';
-import {
-  type ApiKeyForRoleDTO,
-  type RoleDTO,
-} from 'src/engine/metadata-modules/role/dtos/role.dto';
+import { type ApiKeyForRoleDTO } from 'src/engine/metadata-modules/role/dtos/role.dto';
 import { type SearchFieldMetadataDTO } from 'src/engine/metadata-modules/search-field-metadata/dtos/search-field-metadata.dto';
 import { type CursorConnection } from 'src/engine/metadata-modules/pagination/dtos/cursor-connection-type.factory';
 import { type ViewFieldGroupDTO } from 'src/engine/metadata-modules/view-field-group/dtos/view-field-group.dto';
@@ -197,15 +193,5 @@ export interface IDataloaders {
   apiKeysByRoleIdLoader: DataLoader<
     ApiKeysByRoleIdLoaderPayload,
     ApiKeyForRoleDTO[]
-  >;
-
-  rowLevelPermissionsByRoleIdLoader: DataLoader<
-    RowLevelPermissionsByRoleIdLoaderPayload,
-    Required<
-      Pick<
-        RoleDTO,
-        'rowLevelPermissionPredicates' | 'rowLevelPermissionPredicateGroups'
-      >
-    >
   >;
 }

@@ -60,8 +60,6 @@ import { WorkspaceModule } from 'src/engine/core-modules/workspace/workspace.mod
 import { AiModelsModule } from 'src/engine/metadata-modules/ai/ai-models/ai-models.module';
 import { PageLayoutModule } from 'src/engine/metadata-modules/page-layout/page-layout.module';
 import { RoleModule } from 'src/engine/metadata-modules/role/role.module';
-import { RowLevelPermissionModule } from 'src/engine/metadata-modules/row-level-permission-predicate/row-level-permission.module';
-import { RecordShareModule } from 'src/engine/core-modules/record-share/record-share.module';
 import { SubscriptionsModule } from 'src/engine/subscriptions/subscriptions.module';
 import { CodeInterpreterSessionCleanupModule } from 'src/engine/core-modules/code-interpreter/crons/code-interpreter-session-cleanup.module';
 import { TrashCleanupModule } from 'src/engine/trash-cleanup/trash-cleanup.module';
@@ -79,8 +77,6 @@ import { FileApiModule } from './file/file-api.module';
     ClientConfigModule,
     FeatureFlagModule,
     FileApiModule,
-    RecordShareModule,
-    RowLevelPermissionModule,
     OpenApiModule,
     WellKnownModule,
     ApplicationRegistrationModule,

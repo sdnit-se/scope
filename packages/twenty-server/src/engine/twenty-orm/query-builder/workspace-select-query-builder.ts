@@ -98,7 +98,7 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
   private offsetValue?: number;
   private includeDeleted = false;
   private explicitSelection?: string[];
-  private readonly aliasesWithRowLevelPermissionApplied = new Set<string>();
+  private readonly aliasesWithRowAccessPolicyApplied = new Set<string>();
 
   constructor(alias: string, context: QueryBuilderContext) {
     this.alias = alias;
@@ -156,8 +156,8 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
         ? undefined
         : [...this.explicitSelection];
 
-    for (const alias of this.aliasesWithRowLevelPermissionApplied) {
-      cloned.aliasesWithRowLevelPermissionApplied.add(alias);
+    for (const alias of this.aliasesWithRowAccessPolicyApplied) {
+      cloned.aliasesWithRowAccessPolicyApplied.add(alias);
     }
 
     return cloned;
@@ -670,7 +670,7 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
     return rows as T[];
   }
 
-  applyRowLevelPermissions(): this {
+  applyRowAccessPolicy(): this {
     this.context.onBeforeExecute(this);
 
     return this;
@@ -716,12 +716,12 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
     );
   }
 
-  markRowLevelPermissionApplied(alias: string): boolean {
-    if (this.aliasesWithRowLevelPermissionApplied.has(alias)) {
+  markRowAccessPolicyApplied(alias: string): boolean {
+    if (this.aliasesWithRowAccessPolicyApplied.has(alias)) {
       return false;
     }
 
-    this.aliasesWithRowLevelPermissionApplied.add(alias);
+    this.aliasesWithRowAccessPolicyApplied.add(alias);
 
     return true;
   }
@@ -776,7 +776,7 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
       );
     }
 
-    // Row-level permission predicates are injected on the select path only, so an EXISTS here would be unfiltered
+    // Row access conditions are injected on the select path only, so an EXISTS here would be unfiltered
     if (selectQueryBuilder.existsFilterClauses.length > 0) {
       throw new TwentyOrmException(
         `A mutation cannot carry a relation filter; rewrite the filter as an "id IN (subquery)" predicate first`,

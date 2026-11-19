@@ -14,7 +14,6 @@ import { type HttpTool } from 'src/engine/core-modules/tool/tools/http-tool/http
 import { type ExtractJsonPathsTool } from 'src/engine/core-modules/tool/tools/output-navigation-tool/extract-json-paths-tool';
 import { type SearchOutputTool } from 'src/engine/core-modules/tool/tools/output-navigation-tool/search-output-tool';
 import { type SearchHelpCenterTool } from 'src/engine/core-modules/tool/tools/search-help-center-tool/search-help-center-tool';
-import { type ShareRecordTool } from 'src/engine/core-modules/tool/tools/share-record-tool/share-record-tool';
 import { type PermissionsService } from 'src/engine/metadata-modules/permissions/permissions.service';
 import { type SaveCampaignTool } from 'src/modules/emailing/tools/save-campaign-tool';
 
@@ -40,16 +39,7 @@ const buildTool = <TTool>(): TTool =>
     execute: jest.fn().mockResolvedValue({ success: true, message: 'done' }),
   }) as unknown as TTool;
 
-const buildProvider = ({
-  isRecordSharingEnabled,
-}: {
-  isRecordSharingEnabled: boolean;
-}) => {
-  const shareRecordTool = {
-    ...buildTool<ShareRecordTool>(),
-    isEnabled: jest.fn().mockResolvedValue(isRecordSharingEnabled),
-  } as unknown as ShareRecordTool;
-
+const buildProvider = () => {
   const provider = new ActionToolProvider(
     buildTool<HttpTool>(),
     buildTool<SendEmailTool>(),
@@ -63,7 +53,6 @@ const buildProvider = ({
     buildTool<ExtractJsonPathsTool>(),
     buildTool<SearchOutputTool>(),
     buildTool<SaveCampaignTool>(),
-    shareRecordTool,
     { isEnabled: () => false } as unknown as CodeInterpreterService,
     {
       checkRolesPermissions: jest.fn().mockResolvedValue(false),
@@ -73,7 +62,7 @@ const buildProvider = ({
     } as unknown as I18nService,
   );
 
-  return { provider, shareRecordTool };
+  return { provider };
 };
 
 const getToolNames = async (provider: ActionToolProvider) =>
@@ -83,43 +72,11 @@ const getToolNames = async (provider: ActionToolProvider) =>
 
 describe('ActionToolProvider', () => {
   it('does not offer or execute the retired navigation tool', async () => {
-    const { provider } = buildProvider({ isRecordSharingEnabled: true });
+    const { provider } = buildProvider();
 
     expect(await getToolNames(provider)).not.toContain('navigate_app');
     await expect(
       provider.executeStaticTool('navigate_app', {}, CONTEXT),
     ).rejects.toThrow('Unknown action tool "navigate_app"');
-  });
-
-  it('lists share_record when record sharing is enabled', async () => {
-    const { provider, shareRecordTool } = buildProvider({
-      isRecordSharingEnabled: true,
-    });
-
-    expect(await getToolNames(provider)).toContain('share_record');
-    expect(shareRecordTool.isEnabled).toHaveBeenCalledWith(WORKSPACE_ID);
-  });
-
-  it('hides share_record when record sharing is disabled', async () => {
-    const { provider } = buildProvider({ isRecordSharingEnabled: false });
-
-    expect(await getToolNames(provider)).not.toContain('share_record');
-  });
-
-  it('passes the auth context of the caller to share_record', async () => {
-    const { provider, shareRecordTool } = buildProvider({
-      isRecordSharingEnabled: true,
-    });
-    const args = { objectNameSingular: 'company' };
-
-    await provider.executeStaticTool('share_record', args, CONTEXT);
-
-    expect(shareRecordTool.execute).toHaveBeenCalledWith(
-      args,
-      expect.objectContaining({
-        workspaceId: WORKSPACE_ID,
-        authContext: USER_AUTH_CONTEXT,
-      }),
-    );
   });
 });

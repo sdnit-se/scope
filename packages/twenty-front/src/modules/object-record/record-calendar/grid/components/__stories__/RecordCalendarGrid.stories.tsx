@@ -140,8 +140,6 @@ const meta: Meta<typeof RecordCalendarGrid> = {
                         canSoftDeleteObjectRecords: true,
                         canDestroyObjectRecords: true,
                         restrictedFields: {},
-                        rowLevelPermissionPredicates: [],
-                        rowLevelPermissionPredicateGroups: [],
                       },
                     }}
                   >

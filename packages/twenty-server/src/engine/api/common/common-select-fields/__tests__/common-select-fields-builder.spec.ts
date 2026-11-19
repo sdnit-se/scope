@@ -109,8 +109,6 @@ describe('CommonSelectFieldsBuilder', () => {
         canSoftDeleteObjectRecords: true,
         canDestroyObjectRecords: true,
         restrictedFields: options.restrictedFields || {},
-        rowLevelPermissionPredicates: [],
-        rowLevelPermissionPredicateGroups: [],
       };
 
       return acc;

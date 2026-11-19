@@ -28,8 +28,6 @@ describe('commandMenuTargetObjectPermissionsSelector', () => {
           canSoftDeleteObjectRecords: false,
           canDestroyObjectRecords: false,
           restrictedFields: {},
-          rowLevelPermissionPredicates: [],
-          rowLevelPermissionPredicateGroups: [],
         },
         {
           objectMetadataId: getMockObjectMetadataItemOrThrow('opportunity').id,
@@ -38,8 +36,6 @@ describe('commandMenuTargetObjectPermissionsSelector', () => {
           canSoftDeleteObjectRecords: false,
           canDestroyObjectRecords: false,
           restrictedFields: {},
-          rowLevelPermissionPredicates: [],
-          rowLevelPermissionPredicateGroups: [],
         },
       ],
       isImpersonating: false,

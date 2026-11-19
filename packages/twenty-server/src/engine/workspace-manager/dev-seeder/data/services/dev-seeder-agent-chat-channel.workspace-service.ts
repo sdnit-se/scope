@@ -3,7 +3,6 @@ import { Injectable } from '@nestjs/common';
 import { isDefined } from 'twenty-shared/utils';
 import { v5 } from 'uuid';
 
-import { AgentChatChannelGrantService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-channel-grant.service';
 import { AgentMessageRole } from 'src/engine/metadata-modules/ai/ai-history/enums/agent-message-role.enum';
 import { AgentTurnStatus } from 'src/engine/metadata-modules/ai/ai-history/enums/agent-turn-status.enum';
 import { AgentHistoryRepository } from 'src/engine/metadata-modules/ai/ai-history/repositories/agent-history-repository';
@@ -77,7 +76,6 @@ export class DevSeederAgentChatChannelWorkspaceService {
     @InjectAgentHistoryRepository('agentChatThread')
     private readonly threadRepository: AgentHistoryRepository<AgentChatThreadWorkspaceEntity>,
     private readonly conversationWriterService: AgentConversationWriterService,
-    private readonly channelGrantService: AgentChatChannelGrantService,
     private readonly flatEntityMapsCacheService: WorkspaceManyOrAllFlatEntityMapsCacheService,
   ) {}
 
@@ -106,11 +104,6 @@ export class DevSeederAgentChatChannelWorkspaceService {
         conversation,
       });
     }
-
-    await this.channelGrantService.rewriteChannelGrants({
-      workspaceId,
-      channelId: generalChannelId,
-    });
   }
 
   private async seedConversation({

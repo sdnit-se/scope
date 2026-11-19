@@ -37,12 +37,6 @@ export const objectPermissionsByObjectMetadataIdSelector =
               restrictedFields:
                 objectPermissions.restrictedFields ??
                 defaultObjectPermissions.restrictedFields,
-              rowLevelPermissionPredicates:
-                objectPermissions.rowLevelPermissionPredicates ??
-                defaultObjectPermissions.rowLevelPermissionPredicates,
-              rowLevelPermissionPredicateGroups:
-                objectPermissions.rowLevelPermissionPredicateGroups ??
-                defaultObjectPermissions.rowLevelPermissionPredicateGroups,
             },
           ];
         }),

@@ -55,8 +55,6 @@ describe('validateOperationIsPermittedOrThrow - system objects permissions', () 
     canSoftDeleteObjectRecords: true,
     canDestroyObjectRecords: true,
     restrictedFields: {},
-    rowLevelPermissionPredicates: [],
-    rowLevelPermissionPredicateGroups: [],
   };
 
   const executeValidation = ({

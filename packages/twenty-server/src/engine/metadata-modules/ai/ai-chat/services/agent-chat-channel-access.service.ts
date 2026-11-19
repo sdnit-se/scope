@@ -1,15 +1,17 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 
-import { RecordSharePrincipalType } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
+import { Repository } from 'typeorm';
 
-import { RecordSharePrincipalService } from 'src/engine/core-modules/record-share/services/record-share-principal.service';
+import { UserWorkspaceEntity } from 'src/engine/core-modules/user-workspace/user-workspace.entity';
 import { AgentChatChannelMetadataService } from 'src/engine/metadata-modules/agent-chat-channel/services/agent-chat-channel-metadata.service';
 import { type FlatAgentChatChannelWithRoleIds } from 'src/engine/metadata-modules/agent-chat-channel/types/flat-agent-chat-channel-with-role-ids.type';
 import { findFlatEntityByIdInFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-id-in-flat-entity-maps.util';
 import { type FlatRole } from 'src/engine/metadata-modules/flat-role/types/flat-role.type';
 import { type AgentChatChannelAccessArgs } from 'src/engine/metadata-modules/ai/ai-chat/types/agent-chat-channel-access-args.type';
 import { type AgentChatThreadAccessArgs } from 'src/engine/metadata-modules/ai/ai-chat/types/agent-chat-thread-access-args.type';
+import { findActiveWorkspaceMemberRoleIds } from 'src/engine/metadata-modules/ai/ai-chat/utils/find-active-workspace-member-role-ids.util';
 import { isAgentChatChannelOpenToRole } from 'src/engine/metadata-modules/ai/ai-chat/utils/is-agent-chat-channel-open-to-role.util';
 import { throwAgentChatChannelNotFound } from 'src/engine/metadata-modules/ai/ai-chat/utils/throw-agent-chat-channel-not-found.util';
 import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
@@ -20,8 +22,9 @@ type MemberArgs = Omit<AgentChatThreadAccessArgs, 'threadId'>;
 export class AgentChatChannelAccessService {
   constructor(
     private readonly channelMetadataService: AgentChatChannelMetadataService,
-    private readonly recordSharePrincipalService: RecordSharePrincipalService,
     private readonly workspaceCacheService: WorkspaceCacheService,
+    @InjectRepository(UserWorkspaceEntity)
+    private readonly userWorkspaceRepository: Repository<UserWorkspaceEntity>,
   ) {}
 
   async findAccessibleChannels(
@@ -60,18 +63,16 @@ export class AgentChatChannelAccessService {
     workspaceId,
     workspaceMemberId,
   }: MemberArgs): Promise<FlatRole | undefined> {
-    const [[roleId], { flatRoleMaps }] = await Promise.all([
-      this.recordSharePrincipalService.resolveRoleIds({
+    const [roleIdByMemberId, { flatRoleMaps }] = await Promise.all([
+      findActiveWorkspaceMemberRoleIds({
         workspaceId,
-        principals: [
-          {
-            principalType: RecordSharePrincipalType.WORKSPACE_MEMBER,
-            principalId: workspaceMemberId,
-          },
-        ],
+        memberIds: [workspaceMemberId],
+        workspaceCacheService: this.workspaceCacheService,
+        userWorkspaceRepository: this.userWorkspaceRepository,
       }),
       this.workspaceCacheService.getOrRecompute(workspaceId, ['flatRoleMaps']),
     ]);
+    const roleId = roleIdByMemberId.get(workspaceMemberId);
 
     return isDefined(roleId)
       ? findFlatEntityByIdInFlatEntityMaps({

@@ -13,8 +13,6 @@ describe('getObjectPermissionsForObject', () => {
       canSoftDeleteObjectRecords: true,
       canDestroyObjectRecords: true,
       restrictedFields: {},
-      rowLevelPermissionPredicates: [],
-      rowLevelPermissionPredicateGroups: [],
     });
   });
 
@@ -30,8 +28,6 @@ describe('getObjectPermissionsForObject', () => {
       restrictedFields: {
         'field-metadata-id': { canRead: false, canUpdate: false },
       },
-      rowLevelPermissionPredicates: [],
-      rowLevelPermissionPredicateGroups: [],
     };
 
     expect(
