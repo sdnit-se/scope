@@ -43,8 +43,6 @@ const ROLE_STATE_GQL_FIELDS = `
   permissionFlags { flag }
   objectPermissions { objectMetadataId }
   fieldPermissions { fieldMetadataId }
-  rowLevelPermissionPredicates { id }
-  rowLevelPermissionPredicateGroups { id }
 `;
 
 const readCustomApplicationRoleState = async () =>

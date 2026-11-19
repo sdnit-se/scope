@@ -7,6 +7,7 @@ import {
   FieldMetadataType,
   MetadataReadability,
   type ObjectsPermissionsByRoleId,
+  type RestrictedFieldsPermissions,
 } from 'twenty-shared/types';
 
 import { MessageQueue } from 'src/engine/core-modules/message-queue/message-queue.constants';
@@ -26,6 +27,7 @@ const WORKSPACE_ID = 'workspace-id';
 const OBJECT_METADATA_ID = 'company-object-id';
 const NAME_FIELD_ID = 'name-field-id';
 const CITY_FIELD_ID = 'city-field-id';
+const UPDATED_BY_FIELD_ID = 'updated-by-field-id';
 const APPLICATION_ID = 'application-id';
 const AGENT_ID = 'agent-id';
 const AGENT_ROLE_ID = 'agent-role-id';
@@ -61,7 +63,21 @@ const flatFieldMetadataMaps = buildMaps([
     type: FieldMetadataType.TEXT,
     name: 'city',
   }),
+  getFlatFieldMetadataMock({
+    id: UPDATED_BY_FIELD_ID,
+    universalIdentifier: UPDATED_BY_FIELD_ID,
+    objectMetadataId: OBJECT_METADATA_ID,
+    type: FieldMetadataType.ACTOR,
+    name: 'updatedBy',
+  }),
 ]);
+
+const AGENT_ACTOR = {
+  source: FieldActorSource.AGENT,
+  workspaceMemberId: null,
+  name: 'Enricher',
+  context: { agentId: AGENT_ID },
+};
 
 const buildTrigger = (
   settings: Partial<
@@ -108,6 +124,7 @@ const buildEvent = (
 
 const buildRolesPermissions = (
   canReadObjectRecords = true,
+  restrictedFields: RestrictedFieldsPermissions = {},
 ): ObjectsPermissionsByRoleId => ({
   [AGENT_ROLE_ID]: {
     [OBJECT_METADATA_ID]: {
@@ -115,7 +132,7 @@ const buildRolesPermissions = (
       canUpdateObjectRecords: false,
       canSoftDeleteObjectRecords: false,
       canDestroyObjectRecords: false,
-      restrictedFields: {},
+      restrictedFields,
     },
   },
 });
@@ -138,8 +155,12 @@ describe('CallAgentDatabaseEventTriggersJob', () => {
       namePlural: 'companies',
       applicationId: 'other-application-id',
       readability: MetadataReadability.OPEN,
-      fieldIds: [NAME_FIELD_ID, CITY_FIELD_ID],
-      fieldUniversalIdentifiers: [NAME_FIELD_ID, CITY_FIELD_ID],
+      fieldIds: [NAME_FIELD_ID, CITY_FIELD_ID, UPDATED_BY_FIELD_ID],
+      fieldUniversalIdentifiers: [
+        NAME_FIELD_ID,
+        CITY_FIELD_ID,
+        UPDATED_BY_FIELD_ID,
+      ],
     }),
     events,
   });
@@ -263,14 +284,25 @@ describe('CallAgentDatabaseEventTriggersJob', () => {
   it('should skip updates the agent made itself', async () => {
     await job.handle(
       buildBatch([
-        buildEvent('record-1', {
-          updatedBy: {
-            source: FieldActorSource.AGENT,
-            workspaceMemberId: null,
-            name: 'Enricher',
-            context: { agentId: AGENT_ID },
-          },
-        }),
+        buildEvent('record-1', { updatedBy: AGENT_ACTOR }),
+        buildEvent('record-2'),
+      ]),
+    );
+
+    expect(enqueuedJobs()).toHaveLength(1);
+    expect(enqueuedJobs()[0].payload).toMatchObject({
+      events: [{ recordId: 'record-2' }],
+    });
+  });
+
+  it('should skip updates the agent made itself even when its role cannot read who made them', async () => {
+    cacheData.rolesPermissions = buildRolesPermissions(true, {
+      [UPDATED_BY_FIELD_ID]: { canRead: false, canUpdate: false },
+    });
+
+    await job.handle(
+      buildBatch([
+        buildEvent('record-1', { updatedBy: AGENT_ACTOR }),
         buildEvent('record-2'),
       ]),
     );

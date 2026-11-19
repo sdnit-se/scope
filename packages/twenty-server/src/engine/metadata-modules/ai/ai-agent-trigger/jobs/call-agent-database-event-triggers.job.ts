@@ -71,14 +71,8 @@ export class CallAgentDatabaseEventTriggersJob {
         continue;
       }
 
-      const admittedEvents = resolveEventsReadableByRole({
-        roleId: agentRoleId,
-        owningApplicationId: flatAgent.applicationId,
-        workspaceEventBatch,
-        rolesPermissions,
-        flatFieldMetadataMaps,
-        flatObjectMetadataMaps,
-      }).filter(
+      // Checked before masking: the attribution fields may be hidden from the agent's role
+      const eventsNotCausedByAgent = workspaceEventBatch.events.filter(
         (event) =>
           !isDatabaseEventCausedByAgent({
             event,
@@ -86,6 +80,18 @@ export class CallAgentDatabaseEventTriggersJob {
             agentId: flatAgent.id,
           }),
       );
+
+      const admittedEvents = resolveEventsReadableByRole({
+        roleId: agentRoleId,
+        owningApplicationId: flatAgent.applicationId,
+        workspaceEventBatch: {
+          ...workspaceEventBatch,
+          events: eventsNotCausedByAgent,
+        },
+        rolesPermissions,
+        flatFieldMetadataMaps,
+        flatObjectMetadataMaps,
+      });
 
       const eventsToRunOn = filterEventsByUpdatedFields({
         events: admittedEvents,
