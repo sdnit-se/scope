@@ -19,7 +19,6 @@ import { useCanSendAgentChatMessage } from '@/ai/hooks/useCanSendAgentChatMessag
 import { useGetBrowsingContext } from '@/ai/hooks/useGetBrowsingContext';
 import { useOptimisticallyRestoreOnSend } from '@/ai/hooks/useOptimisticallyRestoreOnSend';
 import { useProjectAiChatThreadToUrl } from '@/ai/hooks/useProjectAiChatThreadToUrl';
-import { useRefreshAgentChatThreadPermissions } from '@/ai/hooks/useRefreshAgentChatThreadPermissions';
 import { useWarnAboutParticipantMentionsNotAdded } from '@/ai/hooks/useWarnAboutParticipantMentionsNotAdded';
 import { agentChatDraftsByThreadIdState } from '@/ai/states/agentChatDraftsByThreadIdState';
 import { agentChatLastSentBrowsingContextFamilyState } from '@/ai/states/agentChatLastSentBrowsingContextFamilyState';
@@ -62,8 +61,6 @@ export const useAgentChat = () => {
   const { projectAiChatThreadToUrl } = useProjectAiChatThreadToUrl({
     shouldPreserveClosedInbox: true,
   });
-  const { refreshAgentChatThreadPermissions } =
-    useRefreshAgentChatThreadPermissions();
   const store = useStore();
 
   const setAgentChatUploadedFiles = useSetAtomState(
@@ -253,10 +250,7 @@ export const useAgentChat = () => {
         removeOptimisticUserMessage();
       }
 
-      // The send created the thread. Its permissions load before it stops
-      // being the new chat, so its composer never shows as loading.
       if (isNewChat) {
-        await refreshAgentChatThreadPermissions([threadId]);
         store.set(newAiChatThreadIdState.atom, v4());
         store.set(agentChatNewThreadChannelIdState.atom, null);
 
@@ -296,7 +290,6 @@ export const useAgentChat = () => {
     enqueueToast,
     setCurrentAiChatThread,
     projectAiChatThreadToUrl,
-    refreshAgentChatThreadPermissions,
     apolloClient,
     applyOptimisticRestore,
     attachChatThreadToRecord,

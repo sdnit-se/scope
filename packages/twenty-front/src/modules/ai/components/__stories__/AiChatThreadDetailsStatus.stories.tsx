@@ -202,7 +202,7 @@ const seedStatusScenario = (scenario: StatusScenario) => {
     permissionFlags:
       (scenario.hasAiPermission ?? true) ? [PermissionFlagType.AI] : [],
   });
-  setAgentChatThreadPermissions(jotaiStore, THREAD_ID, {
+  setAgentChatThreadPermissions(jotaiStore, {
     canRead: scenario.hasReadAccess ?? true,
     canUpdate: !scenario.isReadOnly,
     canDelete: false,

@@ -62,7 +62,7 @@ const AiNavigationContent = () => {
 
   // Persisted auth atoms must hydrate before capturing the permission snapshot.
   useEffect(() => {
-    setAgentChatThreadPermissions(store, THREAD.id, THREAD_PERMISSIONS);
+    setAgentChatThreadPermissions(store, THREAD_PERMISSIONS);
   }, [store]);
 
   return (

@@ -197,7 +197,7 @@ const renderDetails = async ({
           },
         ],
       });
-      setAgentChatThreadPermissions(store, THREAD_ID, permissions);
+      setAgentChatThreadPermissions(store, permissions);
       store.set(recordStoreFamilyState.atomFamily(THREAD_ID), {
         __typename: 'AgentChatThread',
         id: THREAD_ID,

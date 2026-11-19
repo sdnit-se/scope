@@ -5,14 +5,11 @@ import { isDefined } from 'twenty-shared/utils';
 import { useAddAgentChatThreadParticipants } from '@/ai/hooks/useAddAgentChatThreadParticipants';
 import { useApplyAgentChatThreadUpdate } from '@/ai/hooks/useApplyAgentChatThreadUpdate';
 import { useFetchAgentChatThreadsPage } from '@/ai/hooks/useFetchAgentChatThreadsPage';
-import { useRefreshAgentChatThreadPermissions } from '@/ai/hooks/useRefreshAgentChatThreadPermissions';
 import { agentChatThreadRecordUpdateCountState } from '@/ai/states/agentChatThreadRecordUpdateCountState';
 
 // Chats a server view lists may be past the loaded pages
 export const useLoadAgentChatThreadsByIds = () => {
   const store = useStore();
-  const { refreshAgentChatThreadPermissions } =
-    useRefreshAgentChatThreadPermissions();
   const { addAgentChatThread } = useApplyAgentChatThreadUpdate();
   const { fetchAgentChatThreadsPage } = useFetchAgentChatThreadsPage();
   const { addAgentChatThreadParticipants } =
@@ -37,10 +34,6 @@ export const useLoadAgentChatThreadsByIds = () => {
           return undefined;
         }
 
-        await refreshAgentChatThreadPermissions(
-          page.threads.map(({ id }) => id),
-        );
-
         if (
           store.get(agentChatThreadRecordUpdateCountState.atom) !==
           updateCountBeforeRequest
@@ -62,7 +55,6 @@ export const useLoadAgentChatThreadsByIds = () => {
       addAgentChatThread,
       addAgentChatThreadParticipants,
       fetchAgentChatThreadsPage,
-      refreshAgentChatThreadPermissions,
       store,
     ],
   );

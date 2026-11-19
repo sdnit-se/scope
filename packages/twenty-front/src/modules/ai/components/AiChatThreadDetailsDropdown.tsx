@@ -25,7 +25,7 @@ import { useAiChatThreadRecordTargets } from '@/ai/hooks/useAiChatThreadRecordTa
 import { useChatTargetNavigation } from '@/ai/hooks/useChatTargetNavigation';
 import { useIsAiChatArtifactSurface } from '@/ai/hooks/useIsAiChatArtifactSurface';
 import { agentChatThreadRecordFamilySelector } from '@/ai/states/selectors/agentChatThreadRecordFamilySelector';
-import { agentChatThreadPermissionsFamilySelector } from '@/ai/states/selectors/agentChatThreadPermissionsFamilySelector';
+import { agentChatThreadPermissionsSelector } from '@/ai/states/selectors/agentChatThreadPermissionsSelector';
 import { useOpenAssignAiChatInSidePanel } from '@/side-panel/hooks/useOpenAssignAiChatInSidePanel';
 import { RecordChip } from '@/object-record/components/RecordChip';
 import { MultipleRecordPicker } from '@/object-record/record-picker/multiple-record-picker/components/MultipleRecordPicker';
@@ -78,12 +78,12 @@ export const AiChatThreadDetailsDropdown = ({
     agentChatThreadRecordFamilySelector,
     threadId,
   );
-  const permissions = useAtomFamilySelectorValue(
-    agentChatThreadPermissionsFamilySelector,
-    threadId,
+  const agentChatThreadPermissions = useAtomStateValue(
+    agentChatThreadPermissionsSelector,
   );
   const canChangeAssignee =
-    (permissions?.canUpdate ?? false) && !isDefined(thread?.deletedAt);
+    (agentChatThreadPermissions?.canUpdate ?? false) &&
+    !isDefined(thread?.deletedAt);
   const { openAssignAiChatInSidePanel } = useOpenAssignAiChatInSidePanel();
   const currentWorkspaceMembers = useAtomStateValue(
     currentWorkspaceMembersState,
