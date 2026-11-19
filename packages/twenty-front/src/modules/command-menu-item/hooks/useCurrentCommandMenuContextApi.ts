@@ -115,8 +115,25 @@ export const useCurrentCommandMenuContextApi = (): CommandMenuContextApi => {
     },
   );
 
+  const currentObjectPermissions = useObjectPermissionsForObject(
+    objectMetadataItem?.id ?? '',
+  );
+  const objectPermissions = isDefined(objectMetadataItem)
+    ? currentObjectPermissions
+    : EMPTY_COMMAND_MENU_CONTEXT_API.objectPermissions;
+
+  // Availability expressions read a record's permissions, which its object's
+  // role permissions decide for every record alike
+  const recordPermissions = {
+    canRead: objectPermissions.canReadObjectRecords,
+    canUpdate: objectPermissions.canUpdateObjectRecords,
+    canSoftDelete: objectPermissions.canSoftDeleteObjectRecords,
+    canDelete: objectPermissions.canDestroyObjectRecords,
+  };
+
   const selectedRecords = storedSelectedRecords.map((record): ObjectRecord => ({
     ...record,
+    recordPermissions,
     ...(isDefined(agentChatThreadInboxStatusByThreadId[record.id]) && {
       inboxStatus: agentChatThreadInboxStatusByThreadId[record.id],
     }),
@@ -126,13 +143,6 @@ export const useCurrentCommandMenuContextApi = (): CommandMenuContextApi => {
 
   const dashboardPageLayoutIdForCommandMenu =
     selectedRecords[0]?.pageLayoutId ?? currentPageLayoutId ?? '';
-
-  const currentObjectPermissions = useObjectPermissionsForObject(
-    objectMetadataItem?.id ?? '',
-  );
-  const objectPermissions = isDefined(objectMetadataItem)
-    ? currentObjectPermissions
-    : EMPTY_COMMAND_MENU_CONTEXT_API.objectPermissions;
 
   const contextStoreCurrentViewId = useAtomComponentStateValue(
     contextStoreCurrentViewIdComponentState,
