@@ -1,6 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 
-import { AvailableWorkspaces } from 'src/engine/core-modules/auth/dto/available-workspaces.dto';
+import { AvailableWorkspacesDTO } from 'src/engine/core-modules/workspace/dtos/available-workspace.dto';
 
 import { AuthTokenPair } from './auth-token-pair.dto';
 
@@ -9,6 +9,6 @@ export class AvailableWorkspacesAndAccessTokensDTO {
   @Field(() => AuthTokenPair)
   tokens: AuthTokenPair;
 
-  @Field(() => AvailableWorkspaces)
-  availableWorkspaces: AvailableWorkspaces;
+  @Field(() => AvailableWorkspacesDTO)
+  availableWorkspaces: AvailableWorkspacesDTO;
 }

@@ -608,7 +608,6 @@ export interface AuthProviders {
     magicLink: Scalars['Boolean']
     microsoft: Scalars['Boolean']
     password: Scalars['Boolean']
-    sso: SSOIdentityProvider[]
     __typename: 'AuthProviders'
 }
 
@@ -647,7 +646,6 @@ export interface AvailableWorkspace {
     loginToken?: Scalars['String']
     logo?: Scalars['String']
     personalInviteToken?: Scalars['String']
-    sso: SSOConnection[]
     workspaceUrls: WorkspaceUrls
     __typename: 'AvailableWorkspace'
 }
@@ -1246,11 +1244,6 @@ export interface CreditUsedItem {
 /** Database Event Action */
 export type DatabaseEventAction = 'CREATED' | 'DELETED' | 'DESTROYED' | 'RESTORED' | 'UPDATED' | 'UPSERTED'
 
-export interface DeleteSso {
-    identityProviderId: Scalars['UUID']
-    __typename: 'DeleteSso'
-}
-
 export interface DeleteTwoFactorAuthenticationMethod {
     /** Boolean that confirms query was dispatched */
     success: Scalars['Boolean']
@@ -1291,15 +1284,6 @@ export interface DuplicatedMessageList {
     position: Scalars['Float']
     updatedAt: Scalars['String']
     __typename: 'DuplicatedMessageList'
-}
-
-export interface EditSso {
-    id: Scalars['UUID']
-    issuer: Scalars['String']
-    name: Scalars['String']
-    status: SSOIdentityProviderStatus
-    type: IdentityProviderType
-    __typename: 'EditSso'
 }
 
 export type EmailConnectionSecurity = 'NONE' | 'SSL_TLS' | 'STARTTLS'
@@ -1494,16 +1478,6 @@ export interface FilesConfiguration {
     __typename: 'FilesConfiguration'
 }
 
-export interface FindAvailableSSOIDP {
-    id: Scalars['UUID']
-    issuer: Scalars['String']
-    name: Scalars['String']
-    status: SSOIdentityProviderStatus
-    type: IdentityProviderType
-    workspace: WorkspaceNameAndId
-    __typename: 'FindAvailableSSOIDP'
-}
-
 export interface FormFieldConfiguration {
     configurationType: WidgetConfigurationType
     fieldMetadataId: Scalars['String']
@@ -1553,13 +1527,6 @@ export interface FullName {
     __typename: 'FullName'
 }
 
-export interface GetAuthorizationUrlForSSO {
-    authorizationURL: Scalars['String']
-    id: Scalars['UUID']
-    type: Scalars['String']
-    __typename: 'GetAuthorizationUrlForSSO'
-}
-
 
 /** Order by options for graph widgets */
 export type GraphOrderBy = 'FIELD_ASC' | 'FIELD_DESC' | 'FIELD_POSITION_ASC' | 'FIELD_POSITION_DESC' | 'MANUAL' | 'VALUE_ASC' | 'VALUE_DESC'
@@ -1571,8 +1538,6 @@ export interface GridPosition {
     rowSpan: Scalars['Float']
     __typename: 'GridPosition'
 }
-
-export type IdentityProviderType = 'OIDC' | 'SAML'
 
 export interface IframeConfiguration {
     configurationType: WidgetConfigurationType
@@ -2087,7 +2052,6 @@ export interface Mutation {
     createMcpServer: McpServer
     createNavigationMenuItem: NavigationMenuItem
     createNewWorkspaceLogoUpload: FileUploadTarget
-    createOIDCIdentityProvider: SetupSso
     createObjectEvent: Analytics
     createOneAgent: Agent
     createOneField: Field
@@ -2098,7 +2062,6 @@ export interface Mutation {
     createPageLayout: PageLayout
     createPageLayoutTab: PageLayoutTab
     createPageLayoutWidget: PageLayoutWidget
-    createSAMLIdentityProvider: SetupSso
     createSkill: Skill
     createSubscriptionPaymentIntent: BillingPaymentIntent
     createUsageLimit: UsageLimit
@@ -2132,7 +2095,6 @@ export interface Mutation {
     deleteOneObject: Object
     deleteOneRole: Scalars['String']
     deleteQueuedChatMessage: Scalars['Boolean']
-    deleteSSOIdentityProvider: DeleteSso
     deleteSkill: Skill
     deleteTwoFactorAuthenticationMethod: DeleteTwoFactorAuthenticationMethod
     deleteUsageLimit: Scalars['Boolean']
@@ -2162,7 +2124,6 @@ export interface Mutation {
     disconnectConnectedAccount: ConnectedAccountPublicDTO
     duplicateDashboard: DuplicatedDashboard
     duplicateMessageList: DuplicatedMessageList
-    editSSOIdentityProvider: EditSso
     emailPasswordResetLink: EmailPasswordResetLink
     endSubscriptionTrialPeriod: BillingEndTrialPeriod
     /** @deprecated Use enqueueJobs instead. */
@@ -2179,7 +2140,6 @@ export interface Mutation {
     getAuthTokensFromOTP: AuthTokens
     getAuthTokensFromSSOExchangeToken: AuthTokens
     getAuthTokensFromTwoFactorAuthenticationRecoveryCode: TwoFactorAuthenticationRecoveryCodeRedemption
-    getAuthorizationUrlForSSO: GetAuthorizationUrlForSSO
     getLoginTokenFromCredentials: LoginToken
     goBackToPreviousOnboardingStep: OnboardingStepNavigation
     grantApplicationCapabilities: ApplicationCapabilityGrant
@@ -2831,7 +2791,6 @@ export interface Query {
     getResourceCreditUsage: BillingResourceCreditUsage[]
     getRole: Role
     getRoles: Role[]
-    getSSOIdentityProviders: FindAvailableSSOIDP[]
     getToolIndex: ToolIndexEntry[]
     getToolInputSchema?: Scalars['JSON']
     getUsageAnalytics: UsageAnalytics
@@ -3083,26 +3042,6 @@ export interface RunAgentResult {
     __typename: 'RunAgentResult'
 }
 
-export interface SSOConnection {
-    id: Scalars['UUID']
-    issuer: Scalars['String']
-    name: Scalars['String']
-    status: SSOIdentityProviderStatus
-    type: IdentityProviderType
-    __typename: 'SSOConnection'
-}
-
-export interface SSOIdentityProvider {
-    id: Scalars['UUID']
-    issuer: Scalars['String']
-    name: Scalars['String']
-    status: SSOIdentityProviderStatus
-    type: IdentityProviderType
-    __typename: 'SSOIdentityProvider'
-}
-
-export type SSOIdentityProviderStatus = 'Active' | 'Error' | 'Inactive'
-
 export interface SdkClientChecksums {
     core?: Scalars['String']
     metadata: Scalars['String']
@@ -3176,15 +3115,6 @@ export interface SettingsMenuItem {
 }
 
 export type SettingsMenuItemScope = 'USER' | 'WORKSPACE'
-
-export interface SetupSso {
-    id: Scalars['UUID']
-    issuer: Scalars['String']
-    name: Scalars['String']
-    status: SSOIdentityProviderStatus
-    type: IdentityProviderType
-    __typename: 'SetupSso'
-}
 
 export interface SignUp {
     loginToken: AuthToken
@@ -3942,12 +3872,6 @@ export interface WorkspaceMigration {
     __typename: 'WorkspaceMigration'
 }
 
-export interface WorkspaceNameAndId {
-    displayName?: Scalars['String']
-    id: Scalars['UUID']
-    __typename: 'WorkspaceNameAndId'
-}
-
 export type WorkspacePersonEnrichmentOutcome = 'matched' | 'transientError' | 'unavailable'
 
 export type WorkspaceSetupChatOutcome = 'ALREADY_STARTED' | 'STARTED' | 'UNAVAILABLE'
@@ -4595,7 +4519,6 @@ export interface AuthProvidersGenqlSelection{
     magicLink?: boolean | number
     microsoft?: boolean | number
     password?: boolean | number
-    sso?: SSOIdentityProviderGenqlSelection
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -4640,7 +4563,6 @@ export interface AvailableWorkspaceGenqlSelection{
     loginToken?: boolean | number
     logo?: boolean | number
     personalInviteToken?: boolean | number
-    sso?: SSOConnectionGenqlSelection
     workspaceUrls?: WorkspaceUrlsGenqlSelection
     __typename?: boolean | number
     __scalar?: boolean | number
@@ -5366,14 +5288,6 @@ export interface DeleteOneObjectInput {
 /** The id of the record to delete. */
 id: Scalars['UUID']}
 
-export interface DeleteSsoGenqlSelection{
-    identityProviderId?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface DeleteSsoInput {identityProviderId: Scalars['UUID']}
-
 export interface DeleteTwoFactorAuthenticationMethodGenqlSelection{
     /** Boolean that confirms query was dispatched */
     success?: boolean | number
@@ -5460,18 +5374,6 @@ export interface DuplicatedMessageListGenqlSelection{
     __typename?: boolean | number
     __scalar?: boolean | number
 }
-
-export interface EditSsoGenqlSelection{
-    id?: boolean | number
-    issuer?: boolean | number
-    name?: boolean | number
-    status?: boolean | number
-    type?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface EditSsoInput {id: Scalars['UUID'],status: SSOIdentityProviderStatus}
 
 export interface EmailAccountConnectionParameters {CALDAV?: (ConnectionParametersInput | null),IMAP?: (ConnectionParametersInput | null),SMTP?: (ConnectionParametersInput | null),name?: (Scalars['String'] | null)}
 
@@ -5689,17 +5591,6 @@ export interface FilesConfigurationGenqlSelection{
     __scalar?: boolean | number
 }
 
-export interface FindAvailableSSOIDPGenqlSelection{
-    id?: boolean | number
-    issuer?: boolean | number
-    name?: boolean | number
-    status?: boolean | number
-    type?: boolean | number
-    workspace?: WorkspaceNameAndIdGenqlSelection
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
 export interface FormFieldConfigurationGenqlSelection{
     configurationType?: boolean | number
     fieldMetadataId?: boolean | number
@@ -5755,16 +5646,6 @@ export interface FullNameGenqlSelection{
 }
 
 export interface GetApiKeyInput {id: Scalars['UUID']}
-
-export interface GetAuthorizationUrlForSSOGenqlSelection{
-    authorizationURL?: boolean | number
-    id?: boolean | number
-    type?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface GetAuthorizationUrlForSSOInput {identityProviderId: Scalars['UUID'],workspaceInviteHash?: (Scalars['String'] | null)}
 
 export interface GrantApplicationCapabilitiesInput {applicationId: Scalars['UUID'],capabilities: Scalars['String'][]}
 
@@ -6307,7 +6188,6 @@ export interface MutationGenqlSelection{
     createMcpServer?: (McpServerGenqlSelection & { __args: {input: CreateMcpServerInput} })
     createNavigationMenuItem?: (NavigationMenuItemGenqlSelection & { __args: {input: CreateNavigationMenuItemInput} })
     createNewWorkspaceLogoUpload?: (FileUploadTargetGenqlSelection & { __args: {filename: Scalars['String'], size: Scalars['Float'], workspaceId: Scalars['String']} })
-    createOIDCIdentityProvider?: (SetupSsoGenqlSelection & { __args: {input: SetupOIDCSsoInput} })
     createObjectEvent?: (AnalyticsGenqlSelection & { __args: {event: Scalars['String'], objectMetadataId: Scalars['UUID'], properties?: (Scalars['JSON'] | null), recordId: Scalars['UUID']} })
     createOneAgent?: (AgentGenqlSelection & { __args: {input: CreateAgentInput} })
     createOneField?: (FieldGenqlSelection & { __args: {input: CreateOneFieldMetadataInput} })
@@ -6318,7 +6198,6 @@ export interface MutationGenqlSelection{
     createPageLayout?: (PageLayoutGenqlSelection & { __args: {input: CreatePageLayoutInput} })
     createPageLayoutTab?: (PageLayoutTabGenqlSelection & { __args: {input: CreatePageLayoutTabInput} })
     createPageLayoutWidget?: (PageLayoutWidgetGenqlSelection & { __args: {input: CreatePageLayoutWidgetInput} })
-    createSAMLIdentityProvider?: (SetupSsoGenqlSelection & { __args: {input: SetupSAMLSsoInput} })
     createSkill?: (SkillGenqlSelection & { __args: {input: CreateSkillInput} })
     createSubscriptionPaymentIntent?: (BillingPaymentIntentGenqlSelection & { __args: {idempotencyKey: Scalars['String'], plan: BillingPlanKey, recurringInterval: SubscriptionInterval, requirePaymentMethod: Scalars['Boolean'], successUrlPath?: (Scalars['String'] | null)} })
     createUsageLimit?: (UsageLimitGenqlSelection & { __args: {input: CreateUsageLimitInput} })
@@ -6352,7 +6231,6 @@ export interface MutationGenqlSelection{
     deleteOneObject?: (ObjectGenqlSelection & { __args: {input: DeleteOneObjectInput} })
     deleteOneRole?: { __args: {roleId: Scalars['UUID']} }
     deleteQueuedChatMessage?: { __args: {messageId: Scalars['UUID']} }
-    deleteSSOIdentityProvider?: (DeleteSsoGenqlSelection & { __args: {input: DeleteSsoInput} })
     deleteSkill?: (SkillGenqlSelection & { __args: {id: Scalars['UUID']} })
     deleteTwoFactorAuthenticationMethod?: (DeleteTwoFactorAuthenticationMethodGenqlSelection & { __args: {twoFactorAuthenticationMethodId: Scalars['UUID']} })
     deleteUsageLimit?: { __args: {usageLimitId: Scalars['UUID']} }
@@ -6382,7 +6260,6 @@ export interface MutationGenqlSelection{
     disconnectConnectedAccount?: (ConnectedAccountPublicDTOGenqlSelection & { __args: {id: Scalars['UUID']} })
     duplicateDashboard?: (DuplicatedDashboardGenqlSelection & { __args: {id: Scalars['UUID']} })
     duplicateMessageList?: (DuplicatedMessageListGenqlSelection & { __args: {id: Scalars['UUID']} })
-    editSSOIdentityProvider?: (EditSsoGenqlSelection & { __args: {input: EditSsoInput} })
     emailPasswordResetLink?: (EmailPasswordResetLinkGenqlSelection & { __args: {captchaToken?: (Scalars['String'] | null), email: Scalars['String'], workspaceId?: (Scalars['UUID'] | null)} })
     endSubscriptionTrialPeriod?: BillingEndTrialPeriodGenqlSelection
     /** @deprecated Use enqueueJobs instead. */
@@ -6399,7 +6276,6 @@ export interface MutationGenqlSelection{
     getAuthTokensFromOTP?: (AuthTokensGenqlSelection & { __args: {captchaToken?: (Scalars['String'] | null), loginToken: Scalars['String'], origin: Scalars['String'], otp: Scalars['String']} })
     getAuthTokensFromSSOExchangeToken?: (AuthTokensGenqlSelection & { __args: {ssoExchangeToken: Scalars['String']} })
     getAuthTokensFromTwoFactorAuthenticationRecoveryCode?: (TwoFactorAuthenticationRecoveryCodeRedemptionGenqlSelection & { __args: {captchaToken?: (Scalars['String'] | null), loginToken: Scalars['String'], origin: Scalars['String'], recoveryCode: Scalars['String']} })
-    getAuthorizationUrlForSSO?: (GetAuthorizationUrlForSSOGenqlSelection & { __args: {input: GetAuthorizationUrlForSSOInput} })
     getLoginTokenFromCredentials?: (LoginTokenGenqlSelection & { __args: {captchaToken?: (Scalars['String'] | null), email: Scalars['String'], locale?: (Scalars['String'] | null), origin: Scalars['String'], password: Scalars['String'], verifyEmailRedirectPath?: (Scalars['String'] | null)} })
     goBackToPreviousOnboardingStep?: OnboardingStepNavigationGenqlSelection
     grantApplicationCapabilities?: (ApplicationCapabilityGrantGenqlSelection & { __args: {input: GrantApplicationCapabilitiesInput} })
@@ -7089,7 +6965,6 @@ export interface QueryGenqlSelection{
     getResourceCreditUsage?: BillingResourceCreditUsageGenqlSelection
     getRole?: (RoleGenqlSelection & { __args: {id: Scalars['UUID']} })
     getRoles?: RoleGenqlSelection
-    getSSOIdentityProviders?: FindAvailableSSOIDPGenqlSelection
     getToolIndex?: ToolIndexEntryGenqlSelection
     getToolInputSchema?: { __args: {toolName: Scalars['String']} }
     getUsageAnalytics?: (UsageAnalyticsGenqlSelection & { __args?: {input?: (UsageAnalyticsInput | null)} })
@@ -7368,26 +7243,6 @@ export interface RunAgentResultGenqlSelection{
 
 export interface RunAgentThreadInput {key: Scalars['String'],title?: (Scalars['String'] | null)}
 
-export interface SSOConnectionGenqlSelection{
-    id?: boolean | number
-    issuer?: boolean | number
-    name?: boolean | number
-    status?: boolean | number
-    type?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface SSOIdentityProviderGenqlSelection{
-    id?: boolean | number
-    issuer?: boolean | number
-    name?: boolean | number
-    status?: boolean | number
-    type?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
 export interface SdkClientChecksumsGenqlSelection{
     core?: boolean | number
     metadata?: boolean | number
@@ -7477,20 +7332,6 @@ export interface SettingsMenuItemGenqlSelection{
     title?: boolean | number
     universalIdentifier?: boolean | number
     updatedAt?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface SetupOIDCSsoInput {clientID: Scalars['String'],clientSecret: Scalars['String'],issuer: Scalars['String'],name: Scalars['String']}
-
-export interface SetupSAMLSsoInput {certificate: Scalars['String'],fingerprint?: (Scalars['String'] | null),id: Scalars['UUID'],issuer: Scalars['String'],name: Scalars['String'],ssoURL: Scalars['String']}
-
-export interface SetupSsoGenqlSelection{
-    id?: boolean | number
-    issuer?: boolean | number
-    name?: boolean | number
-    status?: boolean | number
-    type?: boolean | number
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -8545,13 +8386,6 @@ export interface WorkspaceMigrationGenqlSelection{
     __scalar?: boolean | number
 }
 
-export interface WorkspaceNameAndIdGenqlSelection{
-    displayName?: boolean | number
-    id?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
 export interface WorkspaceUrlsGenqlSelection{
     customUrl?: boolean | number
     subdomainUrl?: boolean | number
@@ -9455,14 +9289,6 @@ export interface WorkspaceUrlsAndIdGenqlSelection{
     
 
 
-    const DeleteSso_possibleTypes: string[] = ['DeleteSso']
-    export const isDeleteSso = (obj?: { __typename?: any } | null): obj is DeleteSso => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isDeleteSso"')
-      return DeleteSso_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
     const DeleteTwoFactorAuthenticationMethod_possibleTypes: string[] = ['DeleteTwoFactorAuthenticationMethod']
     export const isDeleteTwoFactorAuthenticationMethod = (obj?: { __typename?: any } | null): obj is DeleteTwoFactorAuthenticationMethod => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isDeleteTwoFactorAuthenticationMethod"')
@@ -9499,14 +9325,6 @@ export interface WorkspaceUrlsAndIdGenqlSelection{
     export const isDuplicatedMessageList = (obj?: { __typename?: any } | null): obj is DuplicatedMessageList => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isDuplicatedMessageList"')
       return DuplicatedMessageList_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
-    const EditSso_possibleTypes: string[] = ['EditSso']
-    export const isEditSso = (obj?: { __typename?: any } | null): obj is EditSso => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isEditSso"')
-      return EditSso_possibleTypes.includes(obj.__typename)
     }
     
 
@@ -9671,14 +9489,6 @@ export interface WorkspaceUrlsAndIdGenqlSelection{
     
 
 
-    const FindAvailableSSOIDP_possibleTypes: string[] = ['FindAvailableSSOIDP']
-    export const isFindAvailableSSOIDP = (obj?: { __typename?: any } | null): obj is FindAvailableSSOIDP => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isFindAvailableSSOIDP"')
-      return FindAvailableSSOIDP_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
     const FormFieldConfiguration_possibleTypes: string[] = ['FormFieldConfiguration']
     export const isFormFieldConfiguration = (obj?: { __typename?: any } | null): obj is FormFieldConfiguration => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isFormFieldConfiguration"')
@@ -9715,14 +9525,6 @@ export interface WorkspaceUrlsAndIdGenqlSelection{
     export const isFullName = (obj?: { __typename?: any } | null): obj is FullName => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isFullName"')
       return FullName_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
-    const GetAuthorizationUrlForSSO_possibleTypes: string[] = ['GetAuthorizationUrlForSSO']
-    export const isGetAuthorizationUrlForSSO = (obj?: { __typename?: any } | null): obj is GetAuthorizationUrlForSSO => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isGetAuthorizationUrlForSSO"')
-      return GetAuthorizationUrlForSSO_possibleTypes.includes(obj.__typename)
     }
     
 
@@ -10503,22 +10305,6 @@ export interface WorkspaceUrlsAndIdGenqlSelection{
     
 
 
-    const SSOConnection_possibleTypes: string[] = ['SSOConnection']
-    export const isSSOConnection = (obj?: { __typename?: any } | null): obj is SSOConnection => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isSSOConnection"')
-      return SSOConnection_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
-    const SSOIdentityProvider_possibleTypes: string[] = ['SSOIdentityProvider']
-    export const isSSOIdentityProvider = (obj?: { __typename?: any } | null): obj is SSOIdentityProvider => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isSSOIdentityProvider"')
-      return SSOIdentityProvider_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
     const SdkClientChecksums_possibleTypes: string[] = ['SdkClientChecksums']
     export const isSdkClientChecksums = (obj?: { __typename?: any } | null): obj is SdkClientChecksums => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isSdkClientChecksums"')
@@ -10587,14 +10373,6 @@ export interface WorkspaceUrlsAndIdGenqlSelection{
     export const isSettingsMenuItem = (obj?: { __typename?: any } | null): obj is SettingsMenuItem => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isSettingsMenuItem"')
       return SettingsMenuItem_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
-    const SetupSso_possibleTypes: string[] = ['SetupSso']
-    export const isSetupSso = (obj?: { __typename?: any } | null): obj is SetupSso => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isSetupSso"')
-      return SetupSso_possibleTypes.includes(obj.__typename)
     }
     
 
@@ -11143,14 +10921,6 @@ export interface WorkspaceUrlsAndIdGenqlSelection{
     
 
 
-    const WorkspaceNameAndId_possibleTypes: string[] = ['WorkspaceNameAndId']
-    export const isWorkspaceNameAndId = (obj?: { __typename?: any } | null): obj is WorkspaceNameAndId => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isWorkspaceNameAndId"')
-      return WorkspaceNameAndId_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
     const WorkspaceUrls_possibleTypes: string[] = ['WorkspaceUrls']
     export const isWorkspaceUrls = (obj?: { __typename?: any } | null): obj is WorkspaceUrls => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isWorkspaceUrls"')
@@ -11600,11 +11370,6 @@ export const enumGraphOrderBy = {
    VALUE_DESC: 'VALUE_DESC' as const
 }
 
-export const enumIdentityProviderType = {
-   OIDC: 'OIDC' as const,
-   SAML: 'SAML' as const
-}
-
 export const enumIndexType = {
    BTREE: 'BTREE' as const,
    GIN: 'GIN' as const
@@ -11883,12 +11648,6 @@ export const enumRowLevelPermissionPredicateOperand = {
 export const enumRunAgentMessageRole = {
    assistant: 'assistant' as const,
    user: 'user' as const
-}
-
-export const enumSsoIdentityProviderStatus = {
-   Active: 'Active' as const,
-   Error: 'Error' as const,
-   Inactive: 'Inactive' as const
 }
 
 export const enumSettingsMenuItemScope = {

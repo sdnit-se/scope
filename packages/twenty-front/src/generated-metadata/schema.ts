@@ -771,7 +771,6 @@ export type AuthProviders = {
   magicLink: Scalars['Boolean']['output'];
   microsoft: Scalars['Boolean']['output'];
   password: Scalars['Boolean']['output'];
-  sso: Array<SsoIdentityProvider>;
 };
 
 export type AuthToken = {
@@ -810,7 +809,6 @@ export type AvailableWorkspace = {
   loginToken?: Maybe<Scalars['String']['output']>;
   logo?: Maybe<Scalars['String']['output']>;
   personalInviteToken?: Maybe<Scalars['String']['output']>;
-  sso: Array<SsoConnection>;
   workspaceUrls: WorkspaceUrls;
 };
 
@@ -1905,15 +1903,6 @@ export type DeleteOneObjectInput = {
   id: Scalars['UUID']['input'];
 };
 
-export type DeleteSso = {
-  __typename?: 'DeleteSso';
-  identityProviderId: Scalars['UUID']['output'];
-};
-
-export type DeleteSsoInput = {
-  identityProviderId: Scalars['UUID']['input'];
-};
-
 export type DeleteTwoFactorAuthenticationMethod = {
   __typename?: 'DeleteTwoFactorAuthenticationMethod';
   /** Boolean that confirms query was dispatched */
@@ -2004,20 +1993,6 @@ export type DuplicatedMessageList = {
   name?: Maybe<Scalars['String']['output']>;
   position: Scalars['Float']['output'];
   updatedAt: Scalars['String']['output'];
-};
-
-export type EditSso = {
-  __typename?: 'EditSso';
-  id: Scalars['UUID']['output'];
-  issuer: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  status: SsoIdentityProviderStatus;
-  type: IdentityProviderType;
-};
-
-export type EditSsoInput = {
-  id: Scalars['UUID']['input'];
-  status: SsoIdentityProviderStatus;
 };
 
 export type EmailAccountConnectionParameters = {
@@ -2419,16 +2394,6 @@ export type FilesConfiguration = {
   configurationType: WidgetConfigurationType;
 };
 
-export type FindAvailableSsoidp = {
-  __typename?: 'FindAvailableSSOIDP';
-  id: Scalars['UUID']['output'];
-  issuer: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  status: SsoIdentityProviderStatus;
-  type: IdentityProviderType;
-  workspace: WorkspaceNameAndId;
-};
-
 export type FormFieldConfiguration = {
   __typename?: 'FormFieldConfiguration';
   configurationType: WidgetConfigurationType;
@@ -2482,18 +2447,6 @@ export type GetApiKeyInput = {
   id: Scalars['UUID']['input'];
 };
 
-export type GetAuthorizationUrlForSso = {
-  __typename?: 'GetAuthorizationUrlForSSO';
-  authorizationURL: Scalars['String']['output'];
-  id: Scalars['UUID']['output'];
-  type: Scalars['String']['output'];
-};
-
-export type GetAuthorizationUrlForSsoInput = {
-  identityProviderId: Scalars['UUID']['input'];
-  workspaceInviteHash?: InputMaybe<Scalars['String']['input']>;
-};
-
 export type GrantApplicationCapabilitiesInput = {
   applicationId: Scalars['UUID']['input'];
   capabilities: Array<Scalars['String']['input']>;
@@ -2517,11 +2470,6 @@ export type GridPosition = {
   row: Scalars['Float']['output'];
   rowSpan: Scalars['Float']['output'];
 };
-
-export enum IdentityProviderType {
-  OIDC = 'OIDC',
-  SAML = 'SAML'
-}
 
 export type IframeConfiguration = {
   __typename?: 'IframeConfiguration';
@@ -3180,7 +3128,6 @@ export type Mutation = {
   createMcpServer: McpServer;
   createNavigationMenuItem: NavigationMenuItem;
   createNewWorkspaceLogoUpload: FileUploadTarget;
-  createOIDCIdentityProvider: SetupSso;
   createObjectEvent: Analytics;
   createOneAgent: Agent;
   createOneField: Field;
@@ -3191,7 +3138,6 @@ export type Mutation = {
   createPageLayout: PageLayout;
   createPageLayoutTab: PageLayoutTab;
   createPageLayoutWidget: PageLayoutWidget;
-  createSAMLIdentityProvider: SetupSso;
   createSkill: Skill;
   createSubscriptionPaymentIntent: BillingPaymentIntent;
   createUsageLimit: UsageLimit;
@@ -3225,7 +3171,6 @@ export type Mutation = {
   deleteOneObject: Object;
   deleteOneRole: Scalars['String']['output'];
   deleteQueuedChatMessage: Scalars['Boolean']['output'];
-  deleteSSOIdentityProvider: DeleteSso;
   deleteSkill: Skill;
   deleteTwoFactorAuthenticationMethod: DeleteTwoFactorAuthenticationMethod;
   deleteUsageLimit: Scalars['Boolean']['output'];
@@ -3255,7 +3200,6 @@ export type Mutation = {
   disconnectConnectedAccount: ConnectedAccountPublicDto;
   duplicateDashboard: DuplicatedDashboard;
   duplicateMessageList: DuplicatedMessageList;
-  editSSOIdentityProvider: EditSso;
   emailPasswordResetLink: EmailPasswordResetLink;
   endSubscriptionTrialPeriod: BillingEndTrialPeriod;
   /** @deprecated Use enqueueJobs instead. */
@@ -3272,7 +3216,6 @@ export type Mutation = {
   getAuthTokensFromOTP: AuthTokens;
   getAuthTokensFromSSOExchangeToken: AuthTokens;
   getAuthTokensFromTwoFactorAuthenticationRecoveryCode: TwoFactorAuthenticationRecoveryCodeRedemption;
-  getAuthorizationUrlForSSO: GetAuthorizationUrlForSso;
   getLoginTokenFromCredentials: LoginToken;
   goBackToPreviousOnboardingStep: OnboardingStepNavigation;
   grantApplicationCapabilities: ApplicationCapabilityGrant;
@@ -3638,11 +3581,6 @@ export type MutationCreateNewWorkspaceLogoUploadArgs = {
 };
 
 
-export type MutationCreateOidcIdentityProviderArgs = {
-  input: SetupOidcSsoInput;
-};
-
-
 export type MutationCreateObjectEventArgs = {
   event: Scalars['String']['input'];
   objectMetadataId: Scalars['UUID']['input'];
@@ -3693,11 +3631,6 @@ export type MutationCreatePageLayoutTabArgs = {
 
 export type MutationCreatePageLayoutWidgetArgs = {
   input: CreatePageLayoutWidgetInput;
-};
-
-
-export type MutationCreateSamlIdentityProviderArgs = {
-  input: SetupSamlSsoInput;
 };
 
 
@@ -3867,11 +3800,6 @@ export type MutationDeleteQueuedChatMessageArgs = {
 };
 
 
-export type MutationDeleteSsoIdentityProviderArgs = {
-  input: DeleteSsoInput;
-};
-
-
 export type MutationDeleteSkillArgs = {
   id: Scalars['UUID']['input'];
 };
@@ -4012,11 +3940,6 @@ export type MutationDuplicateMessageListArgs = {
 };
 
 
-export type MutationEditSsoIdentityProviderArgs = {
-  input: EditSsoInput;
-};
-
-
 export type MutationEmailPasswordResetLinkArgs = {
   captchaToken?: InputMaybe<Scalars['String']['input']>;
   email: Scalars['String']['input'];
@@ -4080,11 +4003,6 @@ export type MutationGetAuthTokensFromTwoFactorAuthenticationRecoveryCodeArgs = {
   loginToken: Scalars['String']['input'];
   origin: Scalars['String']['input'];
   recoveryCode: Scalars['String']['input'];
-};
-
-
-export type MutationGetAuthorizationUrlForSsoArgs = {
-  input: GetAuthorizationUrlForSsoInput;
 };
 
 
@@ -5440,7 +5358,6 @@ export type Query = {
   getResourceCreditUsage: Array<BillingResourceCreditUsage>;
   getRole: Role;
   getRoles: Array<Role>;
-  getSSOIdentityProviders: Array<FindAvailableSsoidp>;
   getToolIndex: Array<ToolIndexEntry>;
   getToolInputSchema?: Maybe<Scalars['JSON']['output']>;
   getUsageAnalytics: UsageAnalytics;
@@ -6314,30 +6231,6 @@ export type RunAgentThreadInput = {
   title?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type SsoConnection = {
-  __typename?: 'SSOConnection';
-  id: Scalars['UUID']['output'];
-  issuer: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  status: SsoIdentityProviderStatus;
-  type: IdentityProviderType;
-};
-
-export type SsoIdentityProvider = {
-  __typename?: 'SSOIdentityProvider';
-  id: Scalars['UUID']['output'];
-  issuer: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  status: SsoIdentityProviderStatus;
-  type: IdentityProviderType;
-};
-
-export enum SsoIdentityProviderStatus {
-  Active = 'Active',
-  Error = 'Error',
-  Inactive = 'Inactive'
-}
-
 export type SdkClientChecksums = {
   __typename?: 'SdkClientChecksums';
   core?: Maybe<Scalars['String']['output']>;
@@ -6460,31 +6353,6 @@ export enum SettingsMenuItemScope {
   USER = 'USER',
   WORKSPACE = 'WORKSPACE'
 }
-
-export type SetupOidcSsoInput = {
-  clientID: Scalars['String']['input'];
-  clientSecret: Scalars['String']['input'];
-  issuer: Scalars['String']['input'];
-  name: Scalars['String']['input'];
-};
-
-export type SetupSamlSsoInput = {
-  certificate: Scalars['String']['input'];
-  fingerprint?: InputMaybe<Scalars['String']['input']>;
-  id: Scalars['UUID']['input'];
-  issuer: Scalars['String']['input'];
-  name: Scalars['String']['input'];
-  ssoURL: Scalars['String']['input'];
-};
-
-export type SetupSso = {
-  __typename?: 'SetupSso';
-  id: Scalars['UUID']['output'];
-  issuer: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  status: SsoIdentityProviderStatus;
-  type: IdentityProviderType;
-};
 
 export type SignUp = {
   __typename?: 'SignUp';
@@ -8153,12 +8021,6 @@ export type WorkspaceMigration = {
   __typename?: 'WorkspaceMigration';
   actions: Scalars['JSON']['output'];
   applicationUniversalIdentifier: Scalars['String']['output'];
-};
-
-export type WorkspaceNameAndId = {
-  __typename?: 'WorkspaceNameAndId';
-  displayName?: Maybe<Scalars['String']['output']>;
-  id: Scalars['UUID']['output'];
 };
 
 export enum WorkspacePersonEnrichmentOutcome {

@@ -1140,10 +1140,7 @@ export class AuthService {
     workspaceId: string;
     userId: string;
     handle: string;
-    authProvider:
-      | AuthProviderEnum.Google
-      | AuthProviderEnum.Microsoft
-      | AuthProviderEnum.SSO;
+    authProvider: AuthProviderEnum.Google | AuthProviderEnum.Microsoft;
     oidcTokenClaims?: Record<string, unknown>;
     connectedAccountProvider?: ConnectedAccountProvider;
   }): Promise<void> {
@@ -1166,18 +1163,13 @@ export class AuthService {
   }
 
   private mapAuthProviderToConnectedAccountProvider(
-    authProvider:
-      | AuthProviderEnum.Google
-      | AuthProviderEnum.Microsoft
-      | AuthProviderEnum.SSO,
+    authProvider: AuthProviderEnum.Google | AuthProviderEnum.Microsoft,
   ): ConnectedAccountProvider {
     switch (authProvider) {
       case AuthProviderEnum.Google:
         return ConnectedAccountProvider.GOOGLE;
       case AuthProviderEnum.Microsoft:
         return ConnectedAccountProvider.MICROSOFT;
-      case AuthProviderEnum.SSO:
-        return ConnectedAccountProvider.OIDC;
       default:
         throw new Error(
           `Unsupported auth provider: ${authProvider satisfies never}`,
