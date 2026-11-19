@@ -499,77 +499,6 @@ export interface ApplicationHealthCheckResult {
 
 export type ApplicationHealthStatus = 'ERROR' | 'INFO' | 'NEUTRAL' | 'OK' | 'SUCCESS' | 'UNKNOWN' | 'WARNING'
 
-export interface ApplicationMonitoring {
-    activity: ApplicationMonitoringActivityBucket[]
-    bucketSizeInSeconds: Scalars['Int']
-    creditUsage?: ApplicationMonitoringCreditBucket[]
-    creditsUsed?: Scalars['Float']
-    failedRunCount: Scalars['Int']
-    functions: ApplicationMonitoringFunction[]
-    issues: ApplicationMonitoringIssue[]
-    lifecycle: ApplicationMonitoringLifecycleBucket[]
-    lifecycleFailureCount: Scalars['Int']
-    lookbackInHours: Scalars['Int']
-    periodEnd: Scalars['DateTime']
-    periodStart: Scalars['DateTime']
-    rateLimitEventCount: Scalars['Int']
-    runCount: Scalars['Int']
-    versions: ApplicationMonitoringVersion[]
-    __typename: 'ApplicationMonitoring'
-}
-
-export interface ApplicationMonitoringActivityBucket {
-    bucketStart: Scalars['DateTime']
-    errorCount: Scalars['Int']
-    rateLimitedJobCount: Scalars['Int']
-    rateLimitedRequestCount: Scalars['Int']
-    __typename: 'ApplicationMonitoringActivityBucket'
-}
-
-export interface ApplicationMonitoringCreditBucket {
-    bucketStart: Scalars['DateTime']
-    creditsUsed: Scalars['Float']
-    operationType: Scalars['String']
-    __typename: 'ApplicationMonitoringCreditBucket'
-}
-
-export interface ApplicationMonitoringFunction {
-    failedRunCount: Scalars['Int']
-    logicFunctionName: Scalars['String']
-    p95DurationMs: Scalars['Float']
-    runCount: Scalars['Int']
-    __typename: 'ApplicationMonitoringFunction'
-}
-
-export interface ApplicationMonitoringIssue {
-    affectedInstallCount: Scalars['Int']
-    errorCode: Scalars['String']
-    eventCount: Scalars['Int']
-    lastSeenAt: Scalars['DateTime']
-    level: Scalars['String']
-    logicFunctionName: Scalars['String']
-    source: Scalars['String']
-    versions: Scalars['String'][]
-    __typename: 'ApplicationMonitoringIssue'
-}
-
-export interface ApplicationMonitoringLifecycleBucket {
-    bucketStart: Scalars['DateTime']
-    failedCount: Scalars['Int']
-    installCount: Scalars['Int']
-    uninstallCount: Scalars['Int']
-    upgradeCount: Scalars['Int']
-    __typename: 'ApplicationMonitoringLifecycleBucket'
-}
-
-export interface ApplicationMonitoringVersion {
-    activeInstallCount: Scalars['Int']
-    failedRunCount: Scalars['Int']
-    runCount: Scalars['Int']
-    version: Scalars['String']
-    __typename: 'ApplicationMonitoringVersion'
-}
-
 export interface ApplicationPreferences {
     applicationId: Scalars['UUID']
     connectionProviders: ApplicationConnectionProvider[]
@@ -1479,34 +1408,6 @@ export interface EnterpriseSubscriptionStatusDTO {
     status: Scalars['String']
     __typename: 'EnterpriseSubscriptionStatusDTO'
 }
-
-export type EventLogFilterOperand = 'IS' | 'IS_NOT'
-
-export interface EventLogPageInfo {
-    endCursor?: Scalars['String']
-    hasNextPage: Scalars['Boolean']
-    __typename: 'EventLogPageInfo'
-}
-
-export interface EventLogQueryResult {
-    pageInfo: EventLogPageInfo
-    records: EventLogRecord[]
-    totalCount: Scalars['Int']
-    __typename: 'EventLogQueryResult'
-}
-
-export interface EventLogRecord {
-    event: Scalars['String']
-    isCustom?: Scalars['Boolean']
-    objectMetadataId?: Scalars['String']
-    properties?: Scalars['JSON']
-    recordId?: Scalars['String']
-    timestamp: Scalars['DateTime']
-    userId?: Scalars['String']
-    __typename: 'EventLogRecord'
-}
-
-export type EventLogTable = 'APPLICATION_LOG' | 'OBJECT_EVENT' | 'PAGEVIEW' | 'USAGE_EVENT' | 'WORKSPACE_EVENT'
 
 export interface EventSubscription {
     eventStreamId: Scalars['String']
@@ -2994,13 +2895,11 @@ export interface Query {
     enterpriseCheckoutSession?: Scalars['String']
     enterprisePortalSession?: Scalars['String']
     enterpriseSubscriptionStatus?: EnterpriseSubscriptionStatusDTO
-    eventLogs: EventLogQueryResult
     exportApplication: ApplicationExport
     field: Field
     fields: FieldConnection
     findApplicationRegistrationByClientId?: PublicApplicationRegistration
     findApplicationRegistrationByUniversalIdentifier?: ApplicationRegistration
-    findApplicationRegistrationMonitoring: ApplicationMonitoring
     findApplicationRegistrationStats: ApplicationRegistrationStats
     findApplicationRegistrationVariables: ApplicationRegistrationVariable[]
     findClaimableApplicationRegistration?: ClaimableApplicationRegistration
@@ -3476,7 +3375,6 @@ export interface SubdomainAvailabilityDTO {
 }
 
 export interface Subscription {
-    eventLogsLive?: EventLogRecord[]
     exportRecords: RecordExport
     logicFunctionLogs: LogicFunctionLogs
     onAgentChatEvent: AgentChatEvent
@@ -4082,7 +3980,6 @@ export interface Workspace {
     deletedAt?: Scalars['DateTime']
     displayName?: Scalars['String']
     editableProfileFields?: Scalars['String'][]
-    eventLogRetentionDays: Scalars['Float']
     featureFlags?: FeatureFlag[]
     hasValidEnterpriseValidityToken: Scalars['Boolean']
     hasValidSignedEnterpriseKey: Scalars['Boolean']
@@ -4745,84 +4642,6 @@ export interface ApplicationHealthCheckResultGenqlSelection{
     description?: boolean | number
     status?: boolean | number
     title?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface ApplicationMonitoringGenqlSelection{
-    activity?: ApplicationMonitoringActivityBucketGenqlSelection
-    bucketSizeInSeconds?: boolean | number
-    creditUsage?: ApplicationMonitoringCreditBucketGenqlSelection
-    creditsUsed?: boolean | number
-    failedRunCount?: boolean | number
-    functions?: ApplicationMonitoringFunctionGenqlSelection
-    issues?: ApplicationMonitoringIssueGenqlSelection
-    lifecycle?: ApplicationMonitoringLifecycleBucketGenqlSelection
-    lifecycleFailureCount?: boolean | number
-    lookbackInHours?: boolean | number
-    periodEnd?: boolean | number
-    periodStart?: boolean | number
-    rateLimitEventCount?: boolean | number
-    runCount?: boolean | number
-    versions?: ApplicationMonitoringVersionGenqlSelection
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface ApplicationMonitoringActivityBucketGenqlSelection{
-    bucketStart?: boolean | number
-    errorCount?: boolean | number
-    rateLimitedJobCount?: boolean | number
-    rateLimitedRequestCount?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface ApplicationMonitoringCreditBucketGenqlSelection{
-    bucketStart?: boolean | number
-    creditsUsed?: boolean | number
-    operationType?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface ApplicationMonitoringFunctionGenqlSelection{
-    failedRunCount?: boolean | number
-    logicFunctionName?: boolean | number
-    p95DurationMs?: boolean | number
-    runCount?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface ApplicationMonitoringIssueGenqlSelection{
-    affectedInstallCount?: boolean | number
-    errorCode?: boolean | number
-    eventCount?: boolean | number
-    lastSeenAt?: boolean | number
-    level?: boolean | number
-    logicFunctionName?: boolean | number
-    source?: boolean | number
-    versions?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface ApplicationMonitoringLifecycleBucketGenqlSelection{
-    bucketStart?: boolean | number
-    failedCount?: boolean | number
-    installCount?: boolean | number
-    uninstallCount?: boolean | number
-    upgradeCount?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface ApplicationMonitoringVersionGenqlSelection{
-    activeInstallCount?: boolean | number
-    failedRunCount?: boolean | number
-    runCount?: boolean | number
-    version?: boolean | number
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -5944,41 +5763,6 @@ export interface EnterpriseSubscriptionStatusDTOGenqlSelection{
     isCancellationScheduled?: boolean | number
     licensee?: boolean | number
     status?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface EventLogDateRangeInput {end?: (Scalars['DateTime'] | null),start?: (Scalars['DateTime'] | null)}
-
-export interface EventLogFieldFilterInput {field: Scalars['String'],operand: EventLogFilterOperand,values: Scalars['String'][]}
-
-export interface EventLogFiltersInput {dateRange?: (EventLogDateRangeInput | null),eventType?: (Scalars['String'] | null),fieldFilters?: (EventLogFieldFilterInput[] | null),objectMetadataId?: (Scalars['String'] | null),recordId?: (Scalars['String'] | null),userWorkspaceId?: (Scalars['String'] | null)}
-
-export interface EventLogPageInfoGenqlSelection{
-    endCursor?: boolean | number
-    hasNextPage?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface EventLogQueryInput {after?: (Scalars['String'] | null),filters?: (EventLogFiltersInput | null),first?: (Scalars['Int'] | null),table: EventLogTable}
-
-export interface EventLogQueryResultGenqlSelection{
-    pageInfo?: EventLogPageInfoGenqlSelection
-    records?: EventLogRecordGenqlSelection
-    totalCount?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface EventLogRecordGenqlSelection{
-    event?: boolean | number
-    isCustom?: boolean | number
-    objectMetadataId?: boolean | number
-    properties?: boolean | number
-    recordId?: boolean | number
-    timestamp?: boolean | number
-    userId?: boolean | number
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -7546,7 +7330,6 @@ export interface QueryGenqlSelection{
     enterpriseCheckoutSession?: { __args: {billingInterval?: (Scalars['String'] | null)} } | boolean | number
     enterprisePortalSession?: { __args: {returnUrlPath?: (Scalars['String'] | null)} } | boolean | number
     enterpriseSubscriptionStatus?: EnterpriseSubscriptionStatusDTOGenqlSelection
-    eventLogs?: (EventLogQueryResultGenqlSelection & { __args: {input: EventLogQueryInput} })
     exportApplication?: (ApplicationExportGenqlSelection & { __args: {shouldIncludeDependencies?: (Scalars['Boolean'] | null), universalIdentifier: Scalars['UUID']} })
     field?: (FieldGenqlSelection & { __args: {
     /** The id of the record to find. */
@@ -7558,7 +7341,6 @@ export interface QueryGenqlSelection{
     paging: CursorPaging} })
     findApplicationRegistrationByClientId?: (PublicApplicationRegistrationGenqlSelection & { __args: {clientId: Scalars['String']} })
     findApplicationRegistrationByUniversalIdentifier?: (ApplicationRegistrationGenqlSelection & { __args: {universalIdentifier: Scalars['String']} })
-    findApplicationRegistrationMonitoring?: (ApplicationMonitoringGenqlSelection & { __args: {id: Scalars['String'], periodEnd?: (Scalars['DateTime'] | null), periodStart?: (Scalars['DateTime'] | null)} })
     findApplicationRegistrationStats?: (ApplicationRegistrationStatsGenqlSelection & { __args: {id: Scalars['String'], periodEnd?: (Scalars['DateTime'] | null), periodStart?: (Scalars['DateTime'] | null)} })
     findApplicationRegistrationVariables?: (ApplicationRegistrationVariableGenqlSelection & { __args: {applicationRegistrationId: Scalars['String']} })
     findClaimableApplicationRegistration?: (ClaimableApplicationRegistrationGenqlSelection & { __args?: {sourcePackage?: (Scalars['String'] | null), universalIdentifier?: (Scalars['String'] | null)} })
@@ -8100,7 +7882,6 @@ export interface SubdomainAvailabilityDTOGenqlSelection{
 }
 
 export interface SubscriptionGenqlSelection{
-    eventLogsLive?: (EventLogRecordGenqlSelection & { __args: {fieldFilters?: (EventLogFieldFilterInput[] | null), table: EventLogTable} })
     exportRecords?: (RecordExportGenqlSelection & { __args: {input: CreateRecordExportInput} })
     logicFunctionLogs?: (LogicFunctionLogsGenqlSelection & { __args: {input: LogicFunctionLogsInput} })
     onAgentChatEvent?: (AgentChatEventGenqlSelection & { __args: {threadId: Scalars['UUID']} })
@@ -8444,7 +8225,7 @@ export interface UpdateWebhookInputUpdates {description?: (Scalars['String'] | n
 
 export interface UpdateWorkspaceAllowedIframeOriginsInput {operation: Scalars['String'],origin: Scalars['String']}
 
-export interface UpdateWorkspaceInput {aiAdditionalInstructions?: (Scalars['String'] | null),aiAgentModelTier?: (AiModelTier | null),aiChatModelTier?: (AiModelTier | null),aiEvaluationModelId?: (Scalars['String'] | null),aiModelIdByTier?: (Scalars['JSON'] | null),allowImpersonation?: (Scalars['Boolean'] | null),customDomain?: (Scalars['String'] | null),defaultRoleId?: (Scalars['UUID'] | null),displayName?: (Scalars['String'] | null),editableProfileFields?: (Scalars['String'][] | null),eventLogRetentionDays?: (Scalars['Float'] | null),inviteHash?: (Scalars['String'] | null),isAutoModelSelectionEnabled?: (Scalars['Boolean'] | null),isCampaignClickTrackingEnabled?: (Scalars['Boolean'] | null),isCampaignOpenTrackingEnabled?: (Scalars['Boolean'] | null),isGoogleAuthBypassEnabled?: (Scalars['Boolean'] | null),isGoogleAuthEnabled?: (Scalars['Boolean'] | null),isInternalMessagesImportEnabled?: (Scalars['Boolean'] | null),isMicrosoftAuthBypassEnabled?: (Scalars['Boolean'] | null),isMicrosoftAuthEnabled?: (Scalars['Boolean'] | null),isPasswordAuthBypassEnabled?: (Scalars['Boolean'] | null),isPasswordAuthEnabled?: (Scalars['Boolean'] | null),isPublicInviteLinkEnabled?: (Scalars['Boolean'] | null),isTwoFactorAuthenticationEnforced?: (Scalars['Boolean'] | null),logo?: (Scalars['String'] | null),subdomain?: (Scalars['String'] | null),trashRetentionDays?: (Scalars['Float'] | null),workspaceDiscoverability?: (WorkspaceDiscoverability | null)}
+export interface UpdateWorkspaceInput {aiAdditionalInstructions?: (Scalars['String'] | null),aiAgentModelTier?: (AiModelTier | null),aiChatModelTier?: (AiModelTier | null),aiEvaluationModelId?: (Scalars['String'] | null),aiModelIdByTier?: (Scalars['JSON'] | null),allowImpersonation?: (Scalars['Boolean'] | null),customDomain?: (Scalars['String'] | null),defaultRoleId?: (Scalars['UUID'] | null),displayName?: (Scalars['String'] | null),editableProfileFields?: (Scalars['String'][] | null),inviteHash?: (Scalars['String'] | null),isAutoModelSelectionEnabled?: (Scalars['Boolean'] | null),isCampaignClickTrackingEnabled?: (Scalars['Boolean'] | null),isCampaignOpenTrackingEnabled?: (Scalars['Boolean'] | null),isGoogleAuthBypassEnabled?: (Scalars['Boolean'] | null),isGoogleAuthEnabled?: (Scalars['Boolean'] | null),isInternalMessagesImportEnabled?: (Scalars['Boolean'] | null),isMicrosoftAuthBypassEnabled?: (Scalars['Boolean'] | null),isMicrosoftAuthEnabled?: (Scalars['Boolean'] | null),isPasswordAuthBypassEnabled?: (Scalars['Boolean'] | null),isPasswordAuthEnabled?: (Scalars['Boolean'] | null),isPublicInviteLinkEnabled?: (Scalars['Boolean'] | null),isTwoFactorAuthenticationEnforced?: (Scalars['Boolean'] | null),logo?: (Scalars['String'] | null),subdomain?: (Scalars['String'] | null),trashRetentionDays?: (Scalars['Float'] | null),workspaceDiscoverability?: (WorkspaceDiscoverability | null)}
 
 export interface UpdateWorkspaceMemberSettingsInput {update: Scalars['JSON'],workspaceMemberId: Scalars['UUID']}
 
@@ -9001,7 +8782,6 @@ export interface WorkspaceGenqlSelection{
     deletedAt?: boolean | number
     displayName?: boolean | number
     editableProfileFields?: boolean | number
-    eventLogRetentionDays?: boolean | number
     featureFlags?: FeatureFlagGenqlSelection
     hasValidEnterpriseValidityToken?: boolean | number
     hasValidSignedEnterpriseKey?: boolean | number
@@ -9458,62 +9238,6 @@ export interface WorkspaceUrlsAndIdGenqlSelection{
     export const isApplicationHealthCheckResult = (obj?: { __typename?: any } | null): obj is ApplicationHealthCheckResult => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isApplicationHealthCheckResult"')
       return ApplicationHealthCheckResult_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
-    const ApplicationMonitoring_possibleTypes: string[] = ['ApplicationMonitoring']
-    export const isApplicationMonitoring = (obj?: { __typename?: any } | null): obj is ApplicationMonitoring => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isApplicationMonitoring"')
-      return ApplicationMonitoring_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
-    const ApplicationMonitoringActivityBucket_possibleTypes: string[] = ['ApplicationMonitoringActivityBucket']
-    export const isApplicationMonitoringActivityBucket = (obj?: { __typename?: any } | null): obj is ApplicationMonitoringActivityBucket => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isApplicationMonitoringActivityBucket"')
-      return ApplicationMonitoringActivityBucket_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
-    const ApplicationMonitoringCreditBucket_possibleTypes: string[] = ['ApplicationMonitoringCreditBucket']
-    export const isApplicationMonitoringCreditBucket = (obj?: { __typename?: any } | null): obj is ApplicationMonitoringCreditBucket => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isApplicationMonitoringCreditBucket"')
-      return ApplicationMonitoringCreditBucket_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
-    const ApplicationMonitoringFunction_possibleTypes: string[] = ['ApplicationMonitoringFunction']
-    export const isApplicationMonitoringFunction = (obj?: { __typename?: any } | null): obj is ApplicationMonitoringFunction => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isApplicationMonitoringFunction"')
-      return ApplicationMonitoringFunction_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
-    const ApplicationMonitoringIssue_possibleTypes: string[] = ['ApplicationMonitoringIssue']
-    export const isApplicationMonitoringIssue = (obj?: { __typename?: any } | null): obj is ApplicationMonitoringIssue => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isApplicationMonitoringIssue"')
-      return ApplicationMonitoringIssue_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
-    const ApplicationMonitoringLifecycleBucket_possibleTypes: string[] = ['ApplicationMonitoringLifecycleBucket']
-    export const isApplicationMonitoringLifecycleBucket = (obj?: { __typename?: any } | null): obj is ApplicationMonitoringLifecycleBucket => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isApplicationMonitoringLifecycleBucket"')
-      return ApplicationMonitoringLifecycleBucket_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
-    const ApplicationMonitoringVersion_possibleTypes: string[] = ['ApplicationMonitoringVersion']
-    export const isApplicationMonitoringVersion = (obj?: { __typename?: any } | null): obj is ApplicationMonitoringVersion => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isApplicationMonitoringVersion"')
-      return ApplicationMonitoringVersion_possibleTypes.includes(obj.__typename)
     }
     
 
@@ -10234,30 +9958,6 @@ export interface WorkspaceUrlsAndIdGenqlSelection{
     export const isEnterpriseSubscriptionStatusDTO = (obj?: { __typename?: any } | null): obj is EnterpriseSubscriptionStatusDTO => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isEnterpriseSubscriptionStatusDTO"')
       return EnterpriseSubscriptionStatusDTO_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
-    const EventLogPageInfo_possibleTypes: string[] = ['EventLogPageInfo']
-    export const isEventLogPageInfo = (obj?: { __typename?: any } | null): obj is EventLogPageInfo => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isEventLogPageInfo"')
-      return EventLogPageInfo_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
-    const EventLogQueryResult_possibleTypes: string[] = ['EventLogQueryResult']
-    export const isEventLogQueryResult = (obj?: { __typename?: any } | null): obj is EventLogQueryResult => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isEventLogQueryResult"')
-      return EventLogQueryResult_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
-    const EventLogRecord_possibleTypes: string[] = ['EventLogRecord']
-    export const isEventLogRecord = (obj?: { __typename?: any } | null): obj is EventLogRecord => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isEventLogRecord"')
-      return EventLogRecord_possibleTypes.includes(obj.__typename)
     }
     
 
@@ -12310,19 +12010,6 @@ export const enumEngineComponentKey = {
    UPDATE_MULTIPLE_RECORDS: 'UPDATE_MULTIPLE_RECORDS' as const,
    USE_AS_DRAFT_WORKFLOW_VERSION: 'USE_AS_DRAFT_WORKFLOW_VERSION' as const,
    VIEW_PREVIOUS_AI_CHATS: 'VIEW_PREVIOUS_AI_CHATS' as const
-}
-
-export const enumEventLogFilterOperand = {
-   IS: 'IS' as const,
-   IS_NOT: 'IS_NOT' as const
-}
-
-export const enumEventLogTable = {
-   APPLICATION_LOG: 'APPLICATION_LOG' as const,
-   OBJECT_EVENT: 'OBJECT_EVENT' as const,
-   PAGEVIEW: 'PAGEVIEW' as const,
-   USAGE_EVENT: 'USAGE_EVENT' as const,
-   WORKSPACE_EVENT: 'WORKSPACE_EVENT' as const
 }
 
 export const enumFeatureFlagKey = {

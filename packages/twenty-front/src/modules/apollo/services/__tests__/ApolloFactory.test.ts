@@ -90,7 +90,6 @@ const mockWorkspace = {
   },
   isTwoFactorAuthenticationEnforced: false,
   trashRetentionDays: 14,
-  eventLogRetentionDays: 365 * 3,
   aiChatModelTier: AiModelTier.fast,
   aiAgentModelTier: AiModelTier.fast,
   isAutoModelSelectionEnabled: true,

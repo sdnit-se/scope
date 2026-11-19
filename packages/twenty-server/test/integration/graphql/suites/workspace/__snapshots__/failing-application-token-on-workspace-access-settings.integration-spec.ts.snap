@@ -60,16 +60,6 @@ exports[`Workspace access settings with an application token should fail with a 
 }
 `;
 
-exports[`Workspace access settings with an application token should fail with a user-bound application token should refuse to update eventLogRetentionDays, which stays unchanged 1`] = `
-{
-  "extensions": {
-    "code": "FORBIDDEN",
-    "userFriendlyMessage": "You do not have permission to perform this action.",
-  },
-  "message": "This endpoint is not available to this caller",
-}
-`;
-
 exports[`Workspace access settings with an application token should fail with a user-bound application token should refuse to update inviteHash, which stays unchanged 1`] = `
 {
   "extensions": {
@@ -181,16 +171,6 @@ exports[`Workspace access settings with an application token should fail with an
 `;
 
 exports[`Workspace access settings with an application token should fail with an application token without user binding should refuse to update editableProfileFields, which stays unchanged 1`] = `
-{
-  "extensions": {
-    "code": "FORBIDDEN",
-    "userFriendlyMessage": "You do not have permission to perform this action.",
-  },
-  "message": "This endpoint is not available to this caller",
-}
-`;
-
-exports[`Workspace access settings with an application token should fail with an application token without user binding should refuse to update eventLogRetentionDays, which stays unchanged 1`] = `
 {
   "extensions": {
     "code": "FORBIDDEN",

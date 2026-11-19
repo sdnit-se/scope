@@ -13,5 +13,4 @@ export const WORKSPACE_FIELDS_NOT_UPDATABLE_BY_APPLICATIONS = {
   editableProfileFields: true,
   subdomain: true,
   customDomain: true,
-  eventLogRetentionDays: true,
 } as const satisfies Partial<Record<keyof WorkspaceEntity, true>>;

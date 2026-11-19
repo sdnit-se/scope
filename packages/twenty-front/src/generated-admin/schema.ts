@@ -47,27 +47,6 @@ export type AdminAiModels = {
   models: Array<AdminAiModelConfig>;
 };
 
-export type AdminApplicationMonitoring = {
-  __typename?: 'AdminApplicationMonitoring';
-  activeWorkspaceCount: Scalars['Int']['output'];
-  activity: Array<ApplicationMonitoringActivityBucket>;
-  bucketSizeInSeconds: Scalars['Int']['output'];
-  creditUsage?: Maybe<Array<ApplicationMonitoringCreditBucket>>;
-  creditsUsed?: Maybe<Scalars['Float']['output']>;
-  failedRunCount: Scalars['Int']['output'];
-  functions: Array<ApplicationMonitoringFunction>;
-  issues: Array<ApplicationMonitoringIssue>;
-  lifecycle: Array<ApplicationMonitoringLifecycleBucket>;
-  lifecycleFailureCount: Scalars['Int']['output'];
-  lookbackInHours: Scalars['Int']['output'];
-  periodEnd: Scalars['DateTime']['output'];
-  periodStart: Scalars['DateTime']['output'];
-  rateLimitEventCount: Scalars['Int']['output'];
-  runCount: Scalars['Int']['output'];
-  versions: Array<ApplicationMonitoringVersion>;
-  workspaces: Array<ApplicationMonitoringWorkspace>;
-};
-
 export type AdminApplicationRegistrationClaim = {
   __typename?: 'AdminApplicationRegistrationClaim';
   workspaceDisplayName?: Maybe<Scalars['String']['output']>;
@@ -286,70 +265,6 @@ export enum AiModelTier {
   fast = 'fast',
   smart = 'smart'
 }
-
-export type ApplicationMonitoringActivityBucket = {
-  __typename?: 'ApplicationMonitoringActivityBucket';
-  bucketStart: Scalars['DateTime']['output'];
-  errorCount: Scalars['Int']['output'];
-  rateLimitedJobCount: Scalars['Int']['output'];
-  rateLimitedRequestCount: Scalars['Int']['output'];
-};
-
-export type ApplicationMonitoringCreditBucket = {
-  __typename?: 'ApplicationMonitoringCreditBucket';
-  bucketStart: Scalars['DateTime']['output'];
-  creditsUsed: Scalars['Float']['output'];
-  operationType: Scalars['String']['output'];
-};
-
-export type ApplicationMonitoringFunction = {
-  __typename?: 'ApplicationMonitoringFunction';
-  failedRunCount: Scalars['Int']['output'];
-  logicFunctionName: Scalars['String']['output'];
-  p95DurationMs: Scalars['Float']['output'];
-  runCount: Scalars['Int']['output'];
-};
-
-export type ApplicationMonitoringIssue = {
-  __typename?: 'ApplicationMonitoringIssue';
-  affectedInstallCount: Scalars['Int']['output'];
-  errorCode: Scalars['String']['output'];
-  eventCount: Scalars['Int']['output'];
-  lastSeenAt: Scalars['DateTime']['output'];
-  level: Scalars['String']['output'];
-  logicFunctionName: Scalars['String']['output'];
-  source: Scalars['String']['output'];
-  versions: Array<Scalars['String']['output']>;
-};
-
-export type ApplicationMonitoringLifecycleBucket = {
-  __typename?: 'ApplicationMonitoringLifecycleBucket';
-  bucketStart: Scalars['DateTime']['output'];
-  failedCount: Scalars['Int']['output'];
-  installCount: Scalars['Int']['output'];
-  uninstallCount: Scalars['Int']['output'];
-  upgradeCount: Scalars['Int']['output'];
-};
-
-export type ApplicationMonitoringVersion = {
-  __typename?: 'ApplicationMonitoringVersion';
-  activeInstallCount: Scalars['Int']['output'];
-  failedRunCount: Scalars['Int']['output'];
-  runCount: Scalars['Int']['output'];
-  version: Scalars['String']['output'];
-};
-
-export type ApplicationMonitoringWorkspace = {
-  __typename?: 'ApplicationMonitoringWorkspace';
-  applicationVersion: Scalars['String']['output'];
-  failedRunCount: Scalars['Int']['output'];
-  lastEventAt: Scalars['DateTime']['output'];
-  rateLimitEventCount: Scalars['Int']['output'];
-  runCount: Scalars['Int']['output'];
-  workspaceId: Scalars['String']['output'];
-  workspaceLogoUrl?: Maybe<Scalars['String']['output']>;
-  workspaceName?: Maybe<Scalars['String']['output']>;
-};
 
 export type ApplicationRegistration = {
   __typename?: 'ApplicationRegistration';
@@ -846,7 +761,6 @@ export type Query = {
   adminPanelTopWorkspaces: Array<AdminPanelTopWorkspace>;
   findAdminApplicationRegistrationClaims: Array<AdminApplicationRegistrationClaim>;
   findAdminApplicationRegistrationInstalledWorkspaces: ApplicationRegistrationInstalledWorkspaces;
-  findAdminApplicationRegistrationMonitoring: AdminApplicationMonitoring;
   findAdminApplicationRegistrationStats: ApplicationRegistrationStats;
   findAdminApplicationRegistrationVariables: Array<ApplicationRegistrationVariable>;
   findAllApplicationRegistrations: PaginatedApplicationRegistrations;
@@ -896,14 +810,6 @@ export type QueryFindAdminApplicationRegistrationClaimsArgs = {
 
 export type QueryFindAdminApplicationRegistrationInstalledWorkspacesArgs = {
   input: FindApplicationRegistrationInstalledWorkspacesInput;
-};
-
-
-export type QueryFindAdminApplicationRegistrationMonitoringArgs = {
-  id: Scalars['String']['input'];
-  periodEnd?: InputMaybe<Scalars['DateTime']['input']>;
-  periodStart?: InputMaybe<Scalars['DateTime']['input']>;
-  workspaceId?: InputMaybe<Scalars['String']['input']>;
 };
 
 

@@ -175,14 +175,6 @@ const fieldTestCases: EachTestingContext<FieldTestContext>[] = [
       }),
     },
   },
-  {
-    title: 'eventLogRetentionDays',
-    context: {
-      update: ({ settings }) => ({
-        eventLogRetentionDays: settings.eventLogRetentionDays + 1,
-      }),
-    },
-  },
 ];
 
 const readWorkspaceAccessSettings =

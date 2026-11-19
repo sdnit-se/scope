@@ -114,7 +114,6 @@ export const USER_QUERY_FRAGMENT = gql`
       aiAdditionalInstructions
       isTwoFactorAuthenticationEnforced
       trashRetentionDays
-      eventLogRetentionDays
       editableProfileFields
       isInternalMessagesImportEnabled
     }

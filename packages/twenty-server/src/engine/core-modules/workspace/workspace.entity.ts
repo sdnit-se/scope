@@ -158,7 +158,6 @@ export class WorkspaceEntity {
   @Column({ type: 'integer', default: 14 })
   trashRetentionDays: number;
 
-  @Field()
   @Column({ type: 'integer', default: EVENT_LOG_RETENTION.defaultInDays })
   eventLogRetentionDays: number;
 

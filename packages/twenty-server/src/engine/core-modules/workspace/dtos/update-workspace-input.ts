@@ -2,7 +2,6 @@ import { Field, InputType } from '@nestjs/graphql';
 
 import GraphQLJSON from 'graphql-type-json';
 import { type AiModelTier } from 'twenty-shared/ai';
-import { EVENT_LOG_RETENTION } from 'twenty-shared/constants';
 
 import {
   IsArray,
@@ -14,7 +13,6 @@ import {
   IsString,
   IsUUID,
   Matches,
-  Max,
   Min,
 } from 'class-validator';
 
@@ -122,13 +120,6 @@ export class UpdateWorkspaceInput {
   @Min(0)
   @IsOptional()
   trashRetentionDays?: number;
-
-  @Field({ nullable: true })
-  @IsInt()
-  @Min(EVENT_LOG_RETENTION.minInDays)
-  @Max(EVENT_LOG_RETENTION.maxInDays)
-  @IsOptional()
-  eventLogRetentionDays?: number;
 
   @Field(() => AiModelTierEnum, { nullable: true })
   @IsEnum(AiModelTierEnum)
