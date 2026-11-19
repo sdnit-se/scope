@@ -42,6 +42,6 @@ export const SETTINGS_ADMIN_FEATURE_FLAG_METADATA: Record<
   },
   [FeatureFlagKey.IS_RELATED_RECORD_PATHS_ENABLED]: {
     label: msg`Related record paths`,
-    description: msg`Define the relations along which a record's permissions extend to related records.`,
+    description: msg`Removed from Scope. Turning this on has no effect.`,
   },
 };
