@@ -588,14 +588,6 @@ export const mockedMinimalMetadata: MinimalMetadata =
       "hash": "8156da76-42b3-4880-bdd3-97e9b6caf03c"
     },
     {
-      "collectionName": "rowLevelPermissionPredicate",
-      "hash": "ec22cbc1-0ebf-494e-b52a-bf59f62bb97a"
-    },
-    {
-      "collectionName": "rowLevelPermissionPredicateGroup",
-      "hash": "96e8fc06-10a4-4ce0-938a-ecdeaac27051"
-    },
-    {
       "collectionName": "viewFilterGroup",
       "hash": "6e555972-170e-4ede-a24e-6becebbb0f35"
     },

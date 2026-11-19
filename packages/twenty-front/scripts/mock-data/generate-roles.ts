@@ -70,29 +70,6 @@ const GET_ROLES_QUERY = `
         canSoftDeleteObjectRecords
         canDestroyObjectRecords
         restrictedFields
-        rowLevelPermissionPredicates {
-          __typename
-          id
-          fieldMetadataId
-          objectMetadataId
-          operand
-          subFieldName
-          workspaceMemberFieldMetadataId
-          workspaceMemberSubFieldName
-          rowLevelPermissionPredicateGroupId
-          positionInRowLevelPermissionPredicateGroup
-          roleId
-          value
-        }
-        rowLevelPermissionPredicateGroups {
-          __typename
-          id
-          parentRowLevelPermissionPredicateGroupId
-          logicalOperator
-          positionInRowLevelPermissionPredicateGroup
-          roleId
-          objectMetadataId
-        }
       }
       fieldPermissions {
         __typename
@@ -102,29 +79,6 @@ const GET_ROLES_QUERY = `
         canUpdateFieldValue
         id
         roleId
-      }
-      rowLevelPermissionPredicates {
-        __typename
-        id
-        fieldMetadataId
-        objectMetadataId
-        operand
-        subFieldName
-        workspaceMemberFieldMetadataId
-        workspaceMemberSubFieldName
-        rowLevelPermissionPredicateGroupId
-        positionInRowLevelPermissionPredicateGroup
-        roleId
-        value
-      }
-      rowLevelPermissionPredicateGroups {
-        __typename
-        id
-        parentRowLevelPermissionPredicateGroupId
-        logicalOperator
-        positionInRowLevelPermissionPredicateGroup
-        roleId
-        objectMetadataId
       }
     }
   }

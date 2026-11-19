@@ -335,8 +335,6 @@ export enum AllMetadataName {
   role = 'role',
   rolePermissionFlag = 'rolePermissionFlag',
   roleTarget = 'roleTarget',
-  rowLevelPermissionPredicate = 'rowLevelPermissionPredicate',
-  rowLevelPermissionPredicateGroup = 'rowLevelPermissionPredicateGroup',
   searchFieldMetadata = 'searchFieldMetadata',
   settingsMenuItem = 'settingsMenuItem',
   skill = 'skill',

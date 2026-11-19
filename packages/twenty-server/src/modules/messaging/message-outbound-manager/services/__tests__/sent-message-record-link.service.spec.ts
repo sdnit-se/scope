@@ -75,7 +75,7 @@ describe('SentMessageRecordLinkService', () => {
     expect(messageThreadTargetRepository.insert).not.toHaveBeenCalled();
   });
 
-  it('checks the sender access to the record itself, row-level rules included', async () => {
+  it('checks the sender access to the record itself', async () => {
     const { service, recordPermissionsService } = buildService({});
 
     await service.linkSentMessageThreadToRecord(LINK_ARGS);

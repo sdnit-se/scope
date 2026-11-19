@@ -13,10 +13,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
-env:
-  # Lower this as each area is removed; it reaches 0 when the work is done.
-  ENTERPRISE_FILES_MAX: 321
-
 jobs:
   enterprise-code:
     if: github.repository == 'sdnit-se/scope'
@@ -28,7 +24,7 @@ jobs:
         with:
           version: 2026.10.23
           install: false
-      - run: mise run enterprise:check --max "$ENTERPRISE_FILES_MAX"
+      - run: mise run enterprise:check
 
   check:
     if: github.repository == 'sdnit-se/scope'

@@ -25,17 +25,6 @@ import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/works
 import { type WorkspaceEventBatch } from 'src/engine/workspace-event-emitter/types/workspace-event-batch.type';
 import { ObjectRecordEventPublisher } from 'src/engine/subscriptions/object-record-event/object-record-event-publisher';
 
-jest.mock(
-  'src/engine/twenty-orm/utils/is-record-matching-rls-row-level-permission-predicate.util',
-  () => ({
-    isRecordMatchingRLSRowLevelPermissionPredicate: jest.fn(),
-  }),
-);
-
-const {
-  isRecordMatchingRLSRowLevelPermissionPredicate,
-} = require('src/engine/twenty-orm/utils/is-record-matching-rls-row-level-permission-predicate.util');
-
 type MockObjectRecordEvent = {
   recordId: string;
   userId?: string;
@@ -99,11 +88,7 @@ describe('ObjectRecordEventPublisher', () => {
     workspaceId,
   });
 
-  const rowLevelPermissionFilteredFields = [
-    'status',
-    'assigneeId',
-    'locale',
-  ].map((name) =>
+  const otherCompanyFields = ['status', 'assigneeId', 'locale'].map((name) =>
     getFlatFieldMetadataMock({
       objectMetadataId: COMPANY_FLAT_OBJECT_MOCK.id,
       type: FieldMetadataType.TEXT,
@@ -114,7 +99,7 @@ describe('ObjectRecordEventPublisher', () => {
     }),
   );
 
-  const companyFields = [companyNameField, ...rowLevelPermissionFilteredFields];
+  const companyFields = [companyNameField, ...otherCompanyFields];
 
   const companyObjectMetadata: FlatObjectMetadata = {
     ...COMPANY_FLAT_OBJECT_MOCK,
@@ -269,10 +254,6 @@ describe('ObjectRecordEventPublisher', () => {
       } as never),
     };
 
-    (
-      isRecordMatchingRLSRowLevelPermissionPredicate as jest.Mock
-    ).mockReturnValue(true);
-
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ObjectRecordEventPublisher,
@@ -422,11 +403,7 @@ describe('ObjectRecordEventPublisher', () => {
       ).not.toHaveBeenCalled();
     });
 
-    it('should not publish events when record does not match the query filter', async () => {
-      (
-        isRecordMatchingRLSRowLevelPermissionPredicate as jest.Mock
-      ).mockReturnValue(false);
-
+    it('should publish to every live query on the object, whatever its filter', async () => {
       const streamDataWithFilter: EventStreamData = {
         ...mockStreamData,
         queries: {
@@ -455,112 +432,13 @@ describe('ObjectRecordEventPublisher', () => {
 
       await service.publish(eventBatch as WorkspaceEventBatch<never>);
 
-      expect(
-        mockSubscriptionService.publishToEventStream,
-      ).not.toHaveBeenCalled();
-    });
-
-    it('should publish update events when only the BEFORE state matches the filter (record leaving the view)', async () => {
-      (
-        isRecordMatchingRLSRowLevelPermissionPredicate as jest.Mock
-      ).mockImplementation(
-        ({ record }: { record: { name?: string } }) =>
-          record.name === 'Open Company',
-      );
-
-      const streamDataWithFilter: EventStreamData = {
-        ...mockStreamData,
-        queries: {
-          'query-1': {
-            objectNameSingular: 'company',
-            variables: {
-              filter: { name: { eq: 'Open Company' } },
-            },
-          },
-        },
-      };
-
-      mockEventStreamService.getStreamsData.mockResolvedValue(
-        new Map([[streamChannelId, streamDataWithFilter]]) as Map<
-          string,
-          EventStreamData | undefined
-        >,
-      );
-
-      const eventBatch: WorkspaceEventBatch<MockObjectRecordEvent> = {
-        name: 'company.updated',
-        workspaceId,
-        objectMetadata: companyObjectMetadata,
-        events: [
-          createMockEvent({
-            properties: {
-              before: { id: 'record-1', name: 'Open Company' },
-              after: { id: 'record-1', name: 'Done Company' },
-            } as MockObjectRecordEvent['properties'],
-          }),
-        ],
-      };
-
-      await service.publish(eventBatch as WorkspaceEventBatch<never>);
-
-      expect(
-        mockSubscriptionService.publishToEventStream,
-      ).toHaveBeenCalledTimes(1);
       const publishCall = (
         mockSubscriptionService.publishToEventStream as jest.Mock
       ).mock.calls[0][0];
 
-      expect(publishCall.payload.objectRecordEventsWithQueryIds).toHaveLength(
-        1,
-      );
       expect(
         publishCall.payload.objectRecordEventsWithQueryIds[0].queryIds,
       ).toEqual(['query-1']);
-    });
-
-    it('should not publish update events when neither state matches the filter', async () => {
-      (
-        isRecordMatchingRLSRowLevelPermissionPredicate as jest.Mock
-      ).mockReturnValue(false);
-
-      const streamDataWithFilter: EventStreamData = {
-        ...mockStreamData,
-        queries: {
-          'query-1': {
-            objectNameSingular: 'company',
-            variables: {
-              filter: { name: { eq: 'Open Company' } },
-            },
-          },
-        },
-      };
-
-      mockEventStreamService.getStreamsData.mockResolvedValue(
-        new Map([[streamChannelId, streamDataWithFilter]]) as Map<
-          string,
-          EventStreamData | undefined
-        >,
-      );
-
-      const eventBatch: WorkspaceEventBatch<MockObjectRecordEvent> = {
-        name: 'company.updated',
-        workspaceId,
-        objectMetadata: companyObjectMetadata,
-        events: [
-          createMockEvent({
-            properties: {
-              before: { id: 'record-1', name: 'Unrelated A' },
-              after: { id: 'record-1', name: 'Unrelated B' },
-            } as MockObjectRecordEvent['properties'],
-          }),
-        ],
-      };
-
-      await service.publish(eventBatch as WorkspaceEventBatch<never>);
-
-      expect(
-        mockSubscriptionService.publishToEventStream,
-      ).not.toHaveBeenCalled();
     });
 
     it('should filter restricted fields from events', async () => {
@@ -1088,16 +966,13 @@ describe('ObjectRecordEventPublisher', () => {
 
       await service.publish(eventBatch as WorkspaceEventBatch<never>);
 
+      const publishCall = (
+        mockSubscriptionService.publishToEventStream as jest.Mock
+      ).mock.calls[0][0];
+
       expect(
-        isRecordMatchingRLSRowLevelPermissionPredicate,
-      ).toHaveBeenCalledWith(
-        expect.objectContaining({
-          record: expect.objectContaining({
-            id: 'record-1',
-            name: 'Deleted Company',
-          }),
-        }),
-      );
+        publishCall.payload.objectRecordEventsWithQueryIds[0].queryIds,
+      ).toEqual(['query-1']);
     });
 
     describe('subscribers without valid authentication', () => {

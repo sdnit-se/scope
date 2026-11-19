@@ -26,8 +26,6 @@ export const mockedRoles: Role[] =
     "permissionFlags": [],
     "objectPermissions": [],
     "fieldPermissions": [],
-    "rowLevelPermissionPredicates": [],
-    "rowLevelPermissionPredicateGroups": [],
     "agents": [],
     "apiKeys": [
       {
@@ -71,8 +69,6 @@ export const mockedRoles: Role[] =
     "permissionFlags": [],
     "objectPermissions": [],
     "fieldPermissions": [],
-    "rowLevelPermissionPredicates": [],
-    "rowLevelPermissionPredicateGroups": [],
     "agents": [],
     "apiKeys": [],
     "workspaceMembers": [
@@ -114,9 +110,7 @@ export const mockedRoles: Role[] =
         "canUpdateObjectRecords": false,
         "canSoftDeleteObjectRecords": false,
         "canDestroyObjectRecords": false,
-        "restrictedFields": null,
-        "rowLevelPermissionPredicates": null,
-        "rowLevelPermissionPredicateGroups": null
+        "restrictedFields": null
       },
       {
         "__typename": "ObjectPermission",
@@ -125,9 +119,7 @@ export const mockedRoles: Role[] =
         "canUpdateObjectRecords": false,
         "canSoftDeleteObjectRecords": false,
         "canDestroyObjectRecords": false,
-        "restrictedFields": null,
-        "rowLevelPermissionPredicates": null,
-        "rowLevelPermissionPredicateGroups": null
+        "restrictedFields": null
       }
     ],
     "fieldPermissions": [
@@ -150,8 +142,6 @@ export const mockedRoles: Role[] =
         "roleId": "1e5b6baf-cd29-4d78-a3f1-55fb1fd27a81"
       }
     ],
-    "rowLevelPermissionPredicates": [],
-    "rowLevelPermissionPredicateGroups": [],
     "workspaceMembers": [
       {
         "__typename": "WorkspaceMember",
@@ -187,8 +177,6 @@ export const mockedRoles: Role[] =
     "permissionFlags": [],
     "objectPermissions": [],
     "fieldPermissions": [],
-    "rowLevelPermissionPredicates": [],
-    "rowLevelPermissionPredicateGroups": [],
     "workspaceMembers": [
       {
         "__typename": "WorkspaceMember",

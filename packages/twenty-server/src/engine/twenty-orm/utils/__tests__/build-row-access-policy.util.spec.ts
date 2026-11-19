@@ -3,10 +3,8 @@ import { MetadataReadability } from 'twenty-shared/types';
 import { getFlatObjectMetadataMock } from 'src/engine/metadata-modules/flat-object-metadata/__mocks__/get-flat-object-metadata.mock';
 import { type FlatObjectMetadata } from 'src/engine/metadata-modules/flat-object-metadata/types/flat-object-metadata.type';
 import { type OperationType } from 'src/engine/twenty-orm/repository/permissions.utils';
-import {
-  buildRowAccessPolicy,
-  type RowAccessSubject,
-} from 'src/engine/twenty-orm/utils/build-row-access-policy.util';
+import { buildRowAccessPolicy } from 'src/engine/twenty-orm/utils/build-row-access-policy.util';
+import { type RowAccessSubject } from 'src/engine/twenty-orm/types/row-access-policy.type';
 
 const APPLICATION_ID = 'application-id';
 

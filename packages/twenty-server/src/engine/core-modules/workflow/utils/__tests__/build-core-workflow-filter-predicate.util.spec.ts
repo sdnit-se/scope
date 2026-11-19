@@ -647,7 +647,7 @@ describe('buildCoreWorkflowFilterPredicate', () => {
       });
     });
 
-    it('should join a row level rule and a status rule with OR', () => {
+    it('should join a name rule and a status rule with OR', () => {
       expect(
         buildPredicate(
           [nameRule, statusRule],

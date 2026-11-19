@@ -33,7 +33,7 @@ type FilterValueSchemasMap = {
 };
 
 // The reader drops a relation filter resolving to no record id, which turns a
-// row level permission rule into no restriction at all rather than no match.
+// filter rule into no restriction at all rather than no match.
 const relationFilterValueSchema = jsonRelationFilterValueSchema
   .refine(
     ({ selectedRecordIds }) =>

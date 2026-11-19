@@ -254,24 +254,6 @@ describe('computeOrderedMigrationActions', () => {
       earlier: ['navigationMenuItem', 'update'],
       later: ['navigationMenuItem', 'delete'],
     },
-    {
-      title:
-        'rowLevelPermissionPredicateGroup creates before rowLevelPermissionPredicate updates',
-      earlier: ['rowLevelPermissionPredicateGroup', 'create'],
-      later: ['rowLevelPermissionPredicate', 'update'],
-    },
-    {
-      title:
-        'rowLevelPermissionPredicate updates before rowLevelPermissionPredicateGroup deletes',
-      earlier: ['rowLevelPermissionPredicate', 'update'],
-      later: ['rowLevelPermissionPredicateGroup', 'delete'],
-    },
-    {
-      title:
-        'rowLevelPermissionPredicateGroup updates before rowLevelPermissionPredicateGroup deletes',
-      earlier: ['rowLevelPermissionPredicateGroup', 'update'],
-      later: ['rowLevelPermissionPredicateGroup', 'delete'],
-    },
   ])('should run $title', ({ earlier, later }) => {
     const orchestratorActionsReport = createEmptyOrchestratorActionsReport();
     const [earlierAction, laterAction] = [earlier, later].map(

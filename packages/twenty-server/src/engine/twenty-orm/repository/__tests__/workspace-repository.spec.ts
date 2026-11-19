@@ -78,11 +78,6 @@ const tableShape: WorkspaceTableShape = {
   hasDeletedAtColumn: true,
 };
 
-const EMPTY_FLAT_ENTITY_MAPS = {
-  byUniversalIdentifier: {},
-  universalIdentifierById: {},
-  universalIdentifiersByApplicationId: {},
-};
 const API_KEY_ID = 'api-key-id';
 const ROLE_ID = 'role-id';
 
@@ -109,8 +104,6 @@ const buildRepository = ({
       userWorkspaceRoleMap: {},
       apiKeyRoleMap: { [API_KEY_ID]: ROLE_ID },
       roleIdsWithAllRecordsAccess: [ROLE_ID],
-      flatRowLevelPermissionPredicateMaps: EMPTY_FLAT_ENTITY_MAPS,
-      flatRowLevelPermissionPredicateGroupMaps: EMPTY_FLAT_ENTITY_MAPS,
     },
     authContext: { type: 'apiKey', apiKey: { id: API_KEY_ID } },
     executor: {

@@ -481,29 +481,12 @@ describe('writeDefineFile', () => {
     );
   });
 
-  it('should write the row-level predicates, predicate groups and system permission flags of a role as enum members', () => {
+  it('should write the system permission flags of a role as enum members', () => {
     const { content: file } = writeDefineFile({
       definer: 'defineRole',
       config: {
         universalIdentifier: 'role-uid',
         label: 'Auditor',
-        rowLevelPermissionPredicateGroups: [
-          {
-            universalIdentifier: 'predicate-group-uid',
-            objectUniversalIdentifier: 'object-uid',
-            logicalOperator: 'OR',
-          },
-        ],
-        rowLevelPermissionPredicates: [
-          {
-            universalIdentifier: 'predicate-uid',
-            objectUniversalIdentifier: 'object-uid',
-            fieldUniversalIdentifier: 'field-uid',
-            operand: 'CONTAINS',
-            value: 'Rex',
-            predicateGroupUniversalIdentifier: 'predicate-group-uid',
-          },
-        ],
         permissionFlagUniversalIdentifiers: [
           SystemPermissionFlag.WORKSPACE,
           'application-permission-flag-uid',
@@ -514,20 +497,9 @@ describe('writeDefineFile', () => {
 
     expect(
       file.startsWith(
-        'import {\n' +
-          '  defineRole,\n' +
-          '  RowLevelPermissionPredicateGroupLogicalOperator,\n' +
-          '  RowLevelPermissionPredicateOperand,\n' +
-          '  SystemPermissionFlag,\n' +
-          "} from 'twenty-sdk/define';\n",
+        "import { defineRole, SystemPermissionFlag } from 'twenty-sdk/define';\n",
       ),
     ).toBe(true);
-    expect(file).toContain(
-      'logicalOperator: RowLevelPermissionPredicateGroupLogicalOperator.OR,',
-    );
-    expect(file).toContain(
-      'operand: RowLevelPermissionPredicateOperand.CONTAINS,',
-    );
     expect(file).toContain('SystemPermissionFlag.WORKSPACE');
     expect(file).toContain("'application-permission-flag-uid'");
   });

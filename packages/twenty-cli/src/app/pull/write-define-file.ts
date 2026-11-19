@@ -16,8 +16,6 @@ import {
   PageLayoutType,
   RelationOnDeleteAction,
   RelationType,
-  RowLevelPermissionPredicateGroupLogicalOperator,
-  RowLevelPermissionPredicateOperand,
   ViewCalendarLayout,
   ViewFilterGroupLogicalOperator,
   ViewFilterOperand,
@@ -94,16 +92,6 @@ export const INDEX_ENUM_BINDINGS: EnumBinding[] = [
 export const buildRoleEnumBindings = (
   systemPermissionFlag: Record<string, string>,
 ): EnumBinding[] => [
-  {
-    path: ['rowLevelPermissionPredicateGroups', '[]', 'logicalOperator'],
-    symbol: 'RowLevelPermissionPredicateGroupLogicalOperator',
-    members: RowLevelPermissionPredicateGroupLogicalOperator,
-  },
-  {
-    path: ['rowLevelPermissionPredicates', '[]', 'operand'],
-    symbol: 'RowLevelPermissionPredicateOperand',
-    members: RowLevelPermissionPredicateOperand,
-  },
   {
     path: ['permissionFlagUniversalIdentifiers', '[]'],
     symbol: 'SystemPermissionFlag',

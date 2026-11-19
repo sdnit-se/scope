@@ -7,14 +7,12 @@ import {
   ObjectRecord,
   type ObjectsPermissions,
   type ObjectsPermissionsByRoleId,
-  type RecordGqlOperationSignature,
 } from 'twenty-shared/types';
 import { isDefined, isRecordGqlOperationSignature } from 'twenty-shared/utils';
 import { FindOptionsRelations, ObjectLiteral } from 'typeorm';
 
 import { ProcessNestedRelationsHelper } from 'src/engine/api/common/common-nested-relations-processor/process-nested-relations.helper';
 import { CommonSelectFieldsBuilder } from 'src/engine/api/common/common-select-fields/common-select-fields-builder';
-import { DatabaseEventAction } from 'src/engine/api/graphql/graphql-query-runner/enums/database-event-action';
 import { GraphqlQueryParser } from 'src/engine/api/graphql/graphql-query-runner/graphql-query-parsers/graphql-query.parser';
 import { type FlatApplicationCacheMaps } from 'src/engine/core-modules/application/types/flat-application-cache-maps.type';
 import { findActiveFlatApplicationById } from 'src/engine/core-modules/application/utils/find-active-flat-application-by-id.util';
@@ -39,7 +37,6 @@ import {
   RoleIdsBySource,
 } from 'src/engine/twenty-orm/types/role-permission-config.type';
 import { computePermissionIntersection } from 'src/engine/twenty-orm/utils/compute-permission-intersection.util';
-import { isRecordMatchingRLSRowLevelPermissionPredicate } from 'src/engine/twenty-orm/utils/is-record-matching-rls-row-level-permission-predicate.util';
 import { buildUserRoleIdsBySource } from 'src/engine/twenty-orm/utils/build-user-role-ids-by-source.util';
 import { getRoleIdsToIntersect } from 'src/engine/twenty-orm/utils/get-role-ids-to-intersect.util';
 import { buildRowAccessPolicy } from 'src/engine/twenty-orm/utils/build-row-access-policy.util';
@@ -211,8 +208,6 @@ export class ObjectRecordEventPublisher {
       const matchedQueryIds = this.getMatchingObjectRecordQueryIds({
         queries: streamData.queries,
         event: filteredEvent,
-        objectMetadata: workspaceEventBatch.objectMetadata,
-        flatFieldMetadataMaps: permissionsContext.flatFieldMetadataMaps,
       });
 
       if (matchedQueryIds.length === 0) {
@@ -397,86 +392,28 @@ export class ObjectRecordEventPublisher {
   private getMatchingObjectRecordQueryIds({
     queries,
     event,
-    objectMetadata,
-    flatFieldMetadataMaps,
   }: {
     queries: Record<string, RecordOrMetadataGqlOperationSignature>;
     event: ObjectRecordSubscriptionEvent;
-    objectMetadata: FlatObjectMetadata;
-    flatFieldMetadataMaps: FlatEntityMaps<FlatFieldMetadata>;
   }): string[] {
-    const matchedQueryIds: string[] = [];
-
-    for (const [queryId, operationSignature] of Object.entries(queries)) {
-      if (!isRecordGqlOperationSignature(operationSignature)) {
-        continue;
-      }
-
-      if (
-        this.isQueryMatchingObjectRecordEvent({
-          operationSignature,
-          event,
-          objectMetadata,
-          flatFieldMetadataMaps,
-        })
-      ) {
-        matchedQueryIds.push(queryId);
-      }
-    }
-
-    return matchedQueryIds;
-  }
-
-  private isQueryMatchingObjectRecordEvent({
-    operationSignature,
-    event,
-    objectMetadata,
-    flatFieldMetadataMaps,
-  }: {
-    operationSignature: RecordGqlOperationSignature;
-    event: ObjectRecordSubscriptionEvent;
-    objectMetadata: FlatObjectMetadata;
-    flatFieldMetadataMaps: FlatEntityMaps<FlatFieldMetadata>;
-  }): boolean {
-    if (operationSignature.objectNameSingular !== event.objectNameSingular) {
-      return false;
-    }
-
     const properties = event.properties as {
       after?: object;
       before?: object;
     };
 
-    const deliveredRecord = properties?.after ?? properties?.before;
-
-    if (!isDefined(deliveredRecord)) {
-      return false;
+    if (!isDefined(properties?.after ?? properties?.before)) {
+      return [];
     }
 
-    const shouldIgnoreSoftDeleteDefaultFilter =
-      event.action === DatabaseEventAction.DELETED ||
-      event.action === DatabaseEventAction.RESTORED;
-
-    const queryFilter = operationSignature.variables?.filter ?? {};
-
-    if (Object.keys(queryFilter).length === 0) {
-      return true;
-    }
-
-    const candidateRecords =
-      event.action === DatabaseEventAction.UPDATED
-        ? [properties?.after, properties?.before].filter(isDefined)
-        : [deliveredRecord];
-
-    return candidateRecords.some((record) =>
-      isRecordMatchingRLSRowLevelPermissionPredicate({
-        record,
-        filter: queryFilter,
-        flatObjectMetadata: objectMetadata,
-        flatFieldMetadataMaps,
-        shouldIgnoreSoftDeleteDefaultFilter,
-      }),
-    );
+    // Every live query on the object hears the change; the web app checks
+    // each record against the query's own filter when it applies it
+    return Object.entries(queries)
+      .filter(
+        ([, operationSignature]) =>
+          isRecordGqlOperationSignature(operationSignature) &&
+          operationSignature.objectNameSingular === event.objectNameSingular,
+      )
+      .map(([queryId]) => queryId);
   }
 
   private async fetchPermissionsContext(

@@ -7,7 +7,7 @@ description = "Install workspace dependencies"
 run = "yarn install --immutable"
 
 [tasks."enterprise:check"]
-description = "List files under Twenty's Enterprise licence; pass --max <count> to allow some"
+description = "Fail if any file carries Twenty's Enterprise licence header"
 run = "scripts/check-no-enterprise-code.sh"
 
 [tasks."shared:build"]

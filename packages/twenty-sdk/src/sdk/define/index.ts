@@ -182,14 +182,6 @@ export type { PermissionFlagPermissionType } from 'twenty-shared/application';
 
 export { defineApplicationRole } from '@/sdk/define/roles/define-application-role';
 export { defineRole } from '@/sdk/define/roles/define-role';
-export type {
-  RowLevelPermissionPredicateManifest,
-  RowLevelPermissionPredicateGroupManifest,
-} from '@/sdk/define/common/types/loose-shared-types.type';
-export {
-  RowLevelPermissionPredicateGroupLogicalOperator,
-  RowLevelPermissionPredicateOperand,
-} from 'twenty-shared/types';
 export { SystemPermissionFlag } from '@/sdk/define/roles/system-permission-flag.constant';
 
 export { defineSkill } from '@/sdk/define/skills/define-skill';

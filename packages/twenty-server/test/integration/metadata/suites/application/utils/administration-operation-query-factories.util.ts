@@ -360,25 +360,6 @@ export const ADMINISTRATION_OPERATION_QUERY_FACTORIES = {
       },
     },
   }),
-  upsertRowLevelPermissionPredicates: () => ({
-    query: gql`
-      mutation UpsertRowLevelPermissionPredicates(
-        $input: UpsertRowLevelPermissionPredicatesInput!
-      ) {
-        upsertRowLevelPermissionPredicates(input: $input) {
-          __typename
-        }
-      }
-    `,
-    variables: {
-      input: {
-        roleId: PLACEHOLDER_ID,
-        objectMetadataId: PLACEHOLDER_ID,
-        predicates: [],
-        predicateGroups: [],
-      },
-    },
-  }),
   assignRoleToAgent: () => ({
     query: gql`
       mutation AssignRoleToAgent($agentId: UUID!, $roleId: UUID!) {
@@ -463,96 +444,6 @@ export const ADMINISTRATION_OPERATION_QUERY_FACTORIES = {
       }
     `,
     variables: { input: { id: PLACEHOLDER_ID } },
-  }),
-  billingPortalSession: () => ({
-    query: gql`
-      query BillingPortalSession {
-        billingPortalSession {
-          __typename
-        }
-      }
-    `,
-    variables: {},
-  }),
-  createBillingPaymentMethodSetupIntent: () => ({
-    query: gql`
-      mutation CreateBillingPaymentMethodSetupIntent {
-        createBillingPaymentMethodSetupIntent {
-          __typename
-        }
-      }
-    `,
-    variables: {},
-  }),
-  switchSubscriptionInterval: () => ({
-    query: gql`
-      mutation SwitchSubscriptionInterval {
-        switchSubscriptionInterval {
-          __typename
-        }
-      }
-    `,
-    variables: {},
-  }),
-  switchBillingPlan: () => ({
-    query: gql`
-      mutation SwitchBillingPlan {
-        switchBillingPlan {
-          __typename
-        }
-      }
-    `,
-    variables: {},
-  }),
-  cancelSwitchBillingPlan: () => ({
-    query: gql`
-      mutation CancelSwitchBillingPlan {
-        cancelSwitchBillingPlan {
-          __typename
-        }
-      }
-    `,
-    variables: {},
-  }),
-  cancelSwitchBillingInterval: () => ({
-    query: gql`
-      mutation CancelSwitchBillingInterval {
-        cancelSwitchBillingInterval {
-          __typename
-        }
-      }
-    `,
-    variables: {},
-  }),
-  setResourceCreditSubscriptionPrice: () => ({
-    query: gql`
-      mutation SetResourceCreditSubscriptionPrice($priceId: String!) {
-        setResourceCreditSubscriptionPrice(priceId: $priceId) {
-          __typename
-        }
-      }
-    `,
-    variables: { priceId: PLACEHOLDER_TEXT },
-  }),
-  endSubscriptionTrialPeriod: () => ({
-    query: gql`
-      mutation EndSubscriptionTrialPeriod {
-        endSubscriptionTrialPeriod {
-          __typename
-        }
-      }
-    `,
-    variables: {},
-  }),
-  cancelSwitchResourceCreditPrice: () => ({
-    query: gql`
-      mutation CancelSwitchResourceCreditPrice {
-        cancelSwitchResourceCreditPrice {
-          __typename
-        }
-      }
-    `,
-    variables: {},
   }),
   sendInvitations: () => ({
     query: gql`

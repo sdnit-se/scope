@@ -1,17 +1,10 @@
-import {
-  FieldMetadataType,
-  RowLevelPermissionPredicateGroupLogicalOperator,
-  RowLevelPermissionPredicateOperand,
-} from 'twenty-shared/types';
-import { isDefined } from 'twenty-shared/utils';
+import { FieldMetadataType } from 'twenty-shared/types';
 
 import { fromFieldPermissionManifestToUniversalFlatFieldPermission } from 'src/engine/core-modules/application/application-manifest/converters/from-field-permission-manifest-to-universal-flat-field-permission.util';
 import { fromObjectPermissionManifestToUniversalFlatObjectPermission } from 'src/engine/core-modules/application/application-manifest/converters/from-object-permission-manifest-to-universal-flat-object-permission.util';
 import { fromPermissionFlagManifestToUniversalFlatPermissionFlag } from 'src/engine/core-modules/application/application-manifest/converters/from-permission-flag-manifest-to-universal-flat-permission-flag.util';
 import { fromPermissionFlagToUniversalFlatRolePermissionFlag } from 'src/engine/core-modules/application/application-manifest/converters/from-permission-flag-to-universal-flat-role-permission-flag.util';
 import { fromRoleManifestToUniversalFlatRole } from 'src/engine/core-modules/application/application-manifest/converters/from-role-manifest-to-universal-flat-role.util';
-import { fromRowLevelPermissionPredicateGroupManifestToUniversalFlatRowLevelPermissionPredicateGroup } from 'src/engine/core-modules/application/application-manifest/converters/from-row-level-permission-predicate-group-manifest-to-universal-flat-row-level-permission-predicate-group.util';
-import { fromRowLevelPermissionPredicateManifestToUniversalFlatRowLevelPermissionPredicate } from 'src/engine/core-modules/application/application-manifest/converters/from-row-level-permission-predicate-manifest-to-universal-flat-row-level-permission-predicate.util';
 import { addAllFlatEntitiesToFlatEntityMaps } from 'src/engine/core-modules/application/application-manifest/utils/__tests__/add-all-flat-entities-to-flat-entity-maps.test-util';
 import { reconstructRolesManifest } from 'src/engine/core-modules/application/application-manifest/utils/reconstruct-roles-manifest.util';
 import { ApplicationExportCoverageStatus } from 'src/engine/core-modules/application/enums/application-export-coverage-status.enum';
@@ -26,8 +19,6 @@ import { type FlatObjectPermission } from 'src/engine/metadata-modules/flat-obje
 import { type FlatPermissionFlag } from 'src/engine/metadata-modules/flat-permission-flag/types/flat-permission-flag.type';
 import { type FlatRolePermissionFlag } from 'src/engine/metadata-modules/flat-role-permission-flag/types/flat-role-permission-flag.type';
 import { type FlatRole } from 'src/engine/metadata-modules/flat-role/types/flat-role.type';
-import { type FlatRowLevelPermissionPredicateGroup } from 'src/engine/metadata-modules/row-level-permission-predicate/types/flat-row-level-permission-predicate-group.type';
-import { type FlatRowLevelPermissionPredicate } from 'src/engine/metadata-modules/row-level-permission-predicate/types/flat-row-level-permission-predicate.type';
 
 const APP_ID = 'application-id';
 const STANDARD_APP_ID = 'standard-application-id';
@@ -60,28 +51,6 @@ const WORKSPACE_ROLE_PERMISSION_FLAG_UID =
 const EXPORT_PETS_ROLE_PERMISSION_FLAG_UID =
   '80000000-0000-4000-8000-000000000002';
 const MISSING_ROLE_PERMISSION_FLAG_UID = '80000000-0000-4000-8000-000000000003';
-const ROOT_PREDICATE_GROUP_UID = '90000000-0000-4000-8000-000000000001';
-const CHILD_PREDICATE_GROUP_UID = '90000000-0000-4000-8000-000000000002';
-const TOY_PREDICATE_GROUP_UID = '90000000-0000-4000-8000-000000000003';
-const TOY_CHILD_PREDICATE_GROUP_UID = '90000000-0000-4000-8000-000000000004';
-const ORPHAN_PREDICATE_GROUP_UID = '90000000-0000-4000-8000-000000000005';
-const DELETED_PREDICATE_GROUP_UID = '90000000-0000-4000-8000-000000000006';
-const FIRST_CYCLIC_PREDICATE_GROUP_UID = '90000000-0000-4000-8000-000000000007';
-const SECOND_CYCLIC_PREDICATE_GROUP_UID =
-  '90000000-0000-4000-8000-000000000008';
-const OWNER_PREDICATE_GROUP_UID = '90000000-0000-4000-8000-000000000009';
-const CROSS_OBJECT_CHILD_PREDICATE_GROUP_UID =
-  '90000000-0000-4000-8000-00000000000a';
-const CHILD_GROUP_PREDICATE_UID = 'a0000000-0000-4000-8000-000000000001';
-const PET_SECRET_PREDICATE_UID = 'a0000000-0000-4000-8000-000000000002';
-const PET_SECRET_WORKSPACE_MEMBER_PREDICATE_UID =
-  'a0000000-0000-4000-8000-000000000003';
-const TOY_CHILD_GROUP_PREDICATE_UID = 'a0000000-0000-4000-8000-000000000004';
-const DELETED_GROUP_PREDICATE_UID = 'a0000000-0000-4000-8000-000000000005';
-const ADMIN_PREDICATE_UID = 'a0000000-0000-4000-8000-000000000006';
-const DELETED_PREDICATE_UID = 'a0000000-0000-4000-8000-000000000007';
-const CROSS_OBJECT_GROUP_PREDICATE_UID = 'a0000000-0000-4000-8000-000000000008';
-
 const withIds = <TUniversalFlatEntity extends { universalIdentifier: string }>(
   universalFlatEntity: TUniversalFlatEntity,
   applicationId = APP_ID,
@@ -210,69 +179,6 @@ const buildFlatRolePermissionFlag = (
     universalIdentifier,
   }) as FlatRolePermissionFlag;
 
-const buildFlatPredicateGroup = ({
-  universalIdentifier,
-  objectUniversalIdentifier = PET_UID,
-  parentPredicateGroupUniversalIdentifier,
-  deletedAt = null,
-}: {
-  universalIdentifier: string;
-  objectUniversalIdentifier?: string;
-  parentPredicateGroupUniversalIdentifier?: string;
-  deletedAt?: string | null;
-}): FlatRowLevelPermissionPredicateGroup =>
-  withIds({
-    ...fromRowLevelPermissionPredicateGroupManifestToUniversalFlatRowLevelPermissionPredicateGroup(
-      {
-        rowLevelPermissionPredicateGroupManifest: {
-          universalIdentifier,
-          objectUniversalIdentifier,
-          logicalOperator: RowLevelPermissionPredicateGroupLogicalOperator.AND,
-          parentPredicateGroupUniversalIdentifier,
-        },
-        roleUniversalIdentifier: SUPPORT_ROLE_UID,
-        applicationUniversalIdentifier: APP_UID,
-        now: NOW,
-      },
-    ),
-    deletedAt,
-  }) as FlatRowLevelPermissionPredicateGroup;
-
-const buildFlatPredicate = ({
-  universalIdentifier,
-  roleUniversalIdentifier = SUPPORT_ROLE_UID,
-  fieldUniversalIdentifier = PET_NAME_FIELD_UID,
-  workspaceMemberFieldUniversalIdentifier,
-  predicateGroupUniversalIdentifier,
-  deletedAt = null,
-}: {
-  universalIdentifier: string;
-  roleUniversalIdentifier?: string;
-  fieldUniversalIdentifier?: string;
-  workspaceMemberFieldUniversalIdentifier?: string;
-  predicateGroupUniversalIdentifier?: string;
-  deletedAt?: string | null;
-}): FlatRowLevelPermissionPredicate =>
-  withIds({
-    ...fromRowLevelPermissionPredicateManifestToUniversalFlatRowLevelPermissionPredicate(
-      {
-        rowLevelPermissionPredicateManifest: {
-          universalIdentifier,
-          objectUniversalIdentifier: PET_UID,
-          fieldUniversalIdentifier,
-          operand: RowLevelPermissionPredicateOperand.CONTAINS,
-          value: 'bug',
-          workspaceMemberFieldUniversalIdentifier,
-          predicateGroupUniversalIdentifier,
-        },
-        roleUniversalIdentifier,
-        applicationUniversalIdentifier: APP_UID,
-        now: NOW,
-      },
-    ),
-    deletedAt,
-  }) as FlatRowLevelPermissionPredicate;
-
 const buildMaps = ({
   objects = [],
   fields = [],
@@ -281,8 +187,6 @@ const buildMaps = ({
   objectPermissions = [],
   fieldPermissions = [],
   rolePermissionFlags = [],
-  predicateGroups = [],
-  predicates = [],
 }: {
   objects?: FlatObjectMetadata[];
   fields?: FlatFieldMetadata[];
@@ -291,8 +195,6 @@ const buildMaps = ({
   objectPermissions?: FlatObjectPermission[];
   fieldPermissions?: FlatFieldPermission[];
   rolePermissionFlags?: FlatRolePermissionFlag[];
-  predicateGroups?: FlatRowLevelPermissionPredicateGroup[];
-  predicates?: FlatRowLevelPermissionPredicate[];
 }): AllFlatEntityMaps => {
   const maps = createEmptyAllFlatEntityMaps();
 
@@ -325,15 +227,6 @@ const buildMaps = ({
     flatRolePermissionFlagMaps: addAllFlatEntitiesToFlatEntityMaps({
       flatEntities: rolePermissionFlags,
       flatEntityMaps: maps.flatRolePermissionFlagMaps,
-    }),
-    flatRowLevelPermissionPredicateGroupMaps:
-      addAllFlatEntitiesToFlatEntityMaps({
-        flatEntities: predicateGroups,
-        flatEntityMaps: maps.flatRowLevelPermissionPredicateGroupMaps,
-      }),
-    flatRowLevelPermissionPredicateMaps: addAllFlatEntitiesToFlatEntityMaps({
-      flatEntities: predicates,
-      flatEntityMaps: maps.flatRowLevelPermissionPredicateMaps,
     }),
   };
 };
@@ -403,80 +296,6 @@ const applicationRolePermissionFlags = [
   ),
   buildFlatRolePermissionFlag(MISSING_ROLE_PERMISSION_FLAG_UID, MISSING_UID),
 ];
-const applicationPredicateGroups = [
-  buildFlatPredicateGroup({ universalIdentifier: ROOT_PREDICATE_GROUP_UID }),
-  buildFlatPredicateGroup({
-    universalIdentifier: CHILD_PREDICATE_GROUP_UID,
-    parentPredicateGroupUniversalIdentifier: ROOT_PREDICATE_GROUP_UID,
-  }),
-  buildFlatPredicateGroup({
-    universalIdentifier: TOY_PREDICATE_GROUP_UID,
-    objectUniversalIdentifier: TOY_UID,
-  }),
-  buildFlatPredicateGroup({
-    universalIdentifier: TOY_CHILD_PREDICATE_GROUP_UID,
-    parentPredicateGroupUniversalIdentifier: TOY_PREDICATE_GROUP_UID,
-  }),
-  buildFlatPredicateGroup({
-    universalIdentifier: ORPHAN_PREDICATE_GROUP_UID,
-    parentPredicateGroupUniversalIdentifier: MISSING_UID,
-  }),
-  buildFlatPredicateGroup({
-    universalIdentifier: DELETED_PREDICATE_GROUP_UID,
-    deletedAt: NOW,
-  }),
-  buildFlatPredicateGroup({
-    universalIdentifier: FIRST_CYCLIC_PREDICATE_GROUP_UID,
-    parentPredicateGroupUniversalIdentifier: SECOND_CYCLIC_PREDICATE_GROUP_UID,
-  }),
-  buildFlatPredicateGroup({
-    universalIdentifier: SECOND_CYCLIC_PREDICATE_GROUP_UID,
-    parentPredicateGroupUniversalIdentifier: FIRST_CYCLIC_PREDICATE_GROUP_UID,
-  }),
-  buildFlatPredicateGroup({
-    universalIdentifier: OWNER_PREDICATE_GROUP_UID,
-    objectUniversalIdentifier: OWNER_UID,
-  }),
-  buildFlatPredicateGroup({
-    universalIdentifier: CROSS_OBJECT_CHILD_PREDICATE_GROUP_UID,
-    parentPredicateGroupUniversalIdentifier: OWNER_PREDICATE_GROUP_UID,
-  }),
-];
-const applicationPredicates = [
-  buildFlatPredicate({
-    universalIdentifier: CHILD_GROUP_PREDICATE_UID,
-    predicateGroupUniversalIdentifier: CHILD_PREDICATE_GROUP_UID,
-  }),
-  buildFlatPredicate({
-    universalIdentifier: PET_SECRET_PREDICATE_UID,
-    fieldUniversalIdentifier: PET_SECRET_FIELD_UID,
-  }),
-  buildFlatPredicate({
-    universalIdentifier: PET_SECRET_WORKSPACE_MEMBER_PREDICATE_UID,
-    workspaceMemberFieldUniversalIdentifier: PET_SECRET_FIELD_UID,
-  }),
-  buildFlatPredicate({
-    universalIdentifier: TOY_CHILD_GROUP_PREDICATE_UID,
-    predicateGroupUniversalIdentifier: TOY_CHILD_PREDICATE_GROUP_UID,
-  }),
-  buildFlatPredicate({
-    universalIdentifier: DELETED_GROUP_PREDICATE_UID,
-    predicateGroupUniversalIdentifier: DELETED_PREDICATE_GROUP_UID,
-  }),
-  buildFlatPredicate({
-    universalIdentifier: ADMIN_PREDICATE_UID,
-    roleUniversalIdentifier: ADMIN_ROLE_UID,
-  }),
-  buildFlatPredicate({
-    universalIdentifier: DELETED_PREDICATE_UID,
-    deletedAt: NOW,
-  }),
-  buildFlatPredicate({
-    universalIdentifier: CROSS_OBJECT_GROUP_PREDICATE_UID,
-    predicateGroupUniversalIdentifier: OWNER_PREDICATE_GROUP_UID,
-  }),
-];
-
 const applicationAllFlatEntityMaps = buildMaps({
   objects: applicationObjects,
   fields: applicationFields,
@@ -485,8 +304,6 @@ const applicationAllFlatEntityMaps = buildMaps({
   objectPermissions: applicationObjectPermissions,
   fieldPermissions: applicationFieldPermissions,
   rolePermissionFlags: applicationRolePermissionFlags,
-  predicateGroups: applicationPredicateGroups,
-  predicates: applicationPredicates,
 });
 
 const allFlatEntityMaps = buildMaps({
@@ -506,8 +323,6 @@ const allFlatEntityMaps = buildMaps({
   objectPermissions: applicationObjectPermissions,
   fieldPermissions: applicationFieldPermissions,
   rolePermissionFlags: applicationRolePermissionFlags,
-  predicateGroups: applicationPredicateGroups,
-  predicates: applicationPredicates,
 });
 
 const reconstruct = () =>
@@ -517,9 +332,6 @@ const reconstruct = () =>
     exportedObjectUniversalIdentifiers: new Set([PET_UID, OWNER_UID]),
     resolvableFieldUniversalIdentifiers: new Set([PET_NAME_FIELD_UID]),
   });
-
-const isSoftDeleted = ({ deletedAt }: { deletedAt: string | null }) =>
-  isDefined(deletedAt);
 
 describe('reconstructRolesManifest', () => {
   it('should export the permission flags the application declares', () => {
@@ -561,45 +373,6 @@ describe('reconstructRolesManifest', () => {
         permissionFlagUniversalIdentifiers: [
           EXPORT_PETS_FLAG_UID,
           WORKSPACE_FLAG_UID,
-        ],
-      }),
-    ]);
-  });
-
-  it('should nest the exported predicate groups and the predicates they contain under their role', () => {
-    expect(reconstruct().roles).toEqual([
-      expect.objectContaining({
-        universalIdentifier: SUPPORT_ROLE_UID,
-        rowLevelPermissionPredicateGroups: [
-          {
-            universalIdentifier: ROOT_PREDICATE_GROUP_UID,
-            objectUniversalIdentifier: PET_UID,
-            logicalOperator:
-              RowLevelPermissionPredicateGroupLogicalOperator.AND,
-          },
-          {
-            universalIdentifier: CHILD_PREDICATE_GROUP_UID,
-            objectUniversalIdentifier: PET_UID,
-            logicalOperator:
-              RowLevelPermissionPredicateGroupLogicalOperator.AND,
-            parentPredicateGroupUniversalIdentifier: ROOT_PREDICATE_GROUP_UID,
-          },
-          {
-            universalIdentifier: OWNER_PREDICATE_GROUP_UID,
-            objectUniversalIdentifier: OWNER_UID,
-            logicalOperator:
-              RowLevelPermissionPredicateGroupLogicalOperator.AND,
-          },
-        ],
-        rowLevelPermissionPredicates: [
-          {
-            universalIdentifier: CHILD_GROUP_PREDICATE_UID,
-            objectUniversalIdentifier: PET_UID,
-            fieldUniversalIdentifier: PET_NAME_FIELD_UID,
-            operand: RowLevelPermissionPredicateOperand.CONTAINS,
-            value: 'bug',
-            predicateGroupUniversalIdentifier: CHILD_PREDICATE_GROUP_UID,
-          },
         ],
       }),
     ]);
@@ -649,102 +422,7 @@ describe('reconstructRolesManifest', () => {
     );
   });
 
-  it('should report the predicate groups and predicates it cannot export with a reason', () => {
-    const groupNotExportedReason =
-      'row-level permission predicate group in a row-level permission predicate group that is not exported';
-    const predicateNotExportedReason =
-      'row-level permission predicate in a row-level permission predicate group that is not exported';
-
-    expect(reconstruct().coverage).toEqual(
-      expect.arrayContaining([
-        {
-          metadataName: 'rowLevelPermissionPredicateGroup',
-          universalIdentifier: TOY_PREDICATE_GROUP_UID,
-          status: ApplicationExportCoverageStatus.UNSUPPORTED,
-          reason:
-            'row-level permission predicate group on an unsupported object',
-        },
-        {
-          metadataName: 'rowLevelPermissionPredicateGroup',
-          universalIdentifier: TOY_CHILD_PREDICATE_GROUP_UID,
-          status: ApplicationExportCoverageStatus.UNSUPPORTED,
-          reason: groupNotExportedReason,
-        },
-        {
-          metadataName: 'rowLevelPermissionPredicateGroup',
-          universalIdentifier: ORPHAN_PREDICATE_GROUP_UID,
-          status: ApplicationExportCoverageStatus.UNSUPPORTED,
-          reason: groupNotExportedReason,
-        },
-        {
-          metadataName: 'rowLevelPermissionPredicateGroup',
-          universalIdentifier: FIRST_CYCLIC_PREDICATE_GROUP_UID,
-          status: ApplicationExportCoverageStatus.UNSUPPORTED,
-          reason: groupNotExportedReason,
-        },
-        {
-          metadataName: 'rowLevelPermissionPredicateGroup',
-          universalIdentifier: SECOND_CYCLIC_PREDICATE_GROUP_UID,
-          status: ApplicationExportCoverageStatus.UNSUPPORTED,
-          reason: groupNotExportedReason,
-        },
-        {
-          metadataName: 'rowLevelPermissionPredicate',
-          universalIdentifier: PET_SECRET_PREDICATE_UID,
-          status: ApplicationExportCoverageStatus.UNSUPPORTED,
-          reason: 'row-level permission predicate on an unsupported field',
-        },
-        {
-          metadataName: 'rowLevelPermissionPredicate',
-          universalIdentifier: PET_SECRET_WORKSPACE_MEMBER_PREDICATE_UID,
-          status: ApplicationExportCoverageStatus.UNSUPPORTED,
-          reason: 'row-level permission predicate on an unsupported field',
-        },
-        {
-          metadataName: 'rowLevelPermissionPredicate',
-          universalIdentifier: TOY_CHILD_GROUP_PREDICATE_UID,
-          status: ApplicationExportCoverageStatus.UNSUPPORTED,
-          reason: predicateNotExportedReason,
-        },
-        {
-          metadataName: 'rowLevelPermissionPredicate',
-          universalIdentifier: DELETED_GROUP_PREDICATE_UID,
-          status: ApplicationExportCoverageStatus.UNSUPPORTED,
-          reason: predicateNotExportedReason,
-        },
-        {
-          metadataName: 'rowLevelPermissionPredicate',
-          universalIdentifier: ADMIN_PREDICATE_UID,
-          status: ApplicationExportCoverageStatus.UNSUPPORTED,
-          reason:
-            'row-level permission predicate on a role outside the application',
-        },
-      ]),
-    );
-  });
-
-  it('should not export a predicate group or a predicate attached to an exported group on another object', () => {
-    expect(reconstruct().coverage).toEqual(
-      expect.arrayContaining([
-        {
-          metadataName: 'rowLevelPermissionPredicateGroup',
-          universalIdentifier: CROSS_OBJECT_CHILD_PREDICATE_GROUP_UID,
-          status: ApplicationExportCoverageStatus.UNSUPPORTED,
-          reason:
-            'row-level permission predicate group in a row-level permission predicate group that is not exported',
-        },
-        {
-          metadataName: 'rowLevelPermissionPredicate',
-          universalIdentifier: CROSS_OBJECT_GROUP_PREDICATE_UID,
-          status: ApplicationExportCoverageStatus.UNSUPPORTED,
-          reason:
-            'row-level permission predicate in a row-level permission predicate group that is not exported',
-        },
-      ]),
-    );
-  });
-
-  it('should cover every application-owned role, permission flag and permission exactly once and leave soft-deleted predicates to the classifier', () => {
+  it('should cover every application-owned role, permission flag and permission exactly once', () => {
     const coverageKeys = reconstruct().coverage.map(
       ({ metadataName, universalIdentifier }) =>
         `${metadataName}:${universalIdentifier}`,
@@ -766,18 +444,6 @@ describe('reconstructRolesManifest', () => {
           ({ universalIdentifier }) =>
             `rolePermissionFlag:${universalIdentifier}`,
         ),
-        ...applicationPredicateGroups
-          .filter((flatPredicateGroup) => !isSoftDeleted(flatPredicateGroup))
-          .map(
-            ({ universalIdentifier }) =>
-              `rowLevelPermissionPredicateGroup:${universalIdentifier}`,
-          ),
-        ...applicationPredicates
-          .filter((flatPredicate) => !isSoftDeleted(flatPredicate))
-          .map(
-            ({ universalIdentifier }) =>
-              `rowLevelPermissionPredicate:${universalIdentifier}`,
-          ),
       ]),
     );
   });

@@ -52,10 +52,6 @@ export const buildWorkspaceCustomApplicationFlatRole = ({
     rolePermissionFlagUniversalIdentifiers: [],
     fieldPermissionIds: [],
     fieldPermissionUniversalIdentifiers: [],
-    rowLevelPermissionPredicateIds: [],
-    rowLevelPermissionPredicateUniversalIdentifiers: [],
-    rowLevelPermissionPredicateGroupIds: [],
-    rowLevelPermissionPredicateGroupUniversalIdentifiers: [],
     agentChatChannelRoleIds: [],
     agentChatChannelRoleUniversalIdentifiers: [],
   };

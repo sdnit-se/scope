@@ -204,7 +204,7 @@ export class AgentChatChannelThreadsService {
     }));
   }
 
-  // Row level permissions inlined as a subquery so filtering and paging stay one query
+  // Thread access inlined as a subquery so filtering and paging stay one query
   private async queryReadableThreads<TRow extends Record<string, unknown>>({
     buildQuery,
     ...args

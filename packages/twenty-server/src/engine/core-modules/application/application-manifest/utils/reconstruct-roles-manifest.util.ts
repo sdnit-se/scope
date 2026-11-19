@@ -18,7 +18,6 @@ import { buildExportedCoverageEntry } from 'src/engine/core-modules/application/
 import { compareByCodePoint } from 'src/engine/core-modules/application/application-manifest/utils/compare-by-code-point.util';
 import { createChildDecider } from 'src/engine/core-modules/application/application-manifest/utils/create-child-decider.util';
 import { getUnresolvableReferenceReason } from 'src/engine/core-modules/application/application-manifest/utils/get-unresolvable-reference-reason.util';
-import { reconstructRowLevelPermissionPredicatesManifest } from 'src/engine/core-modules/application/application-manifest/utils/reconstruct-row-level-permission-predicates-manifest.util';
 import { sortFlatEntitiesByUniversalIdentifier } from 'src/engine/core-modules/application/application-manifest/utils/sort-flat-entities-by-universal-identifier.util';
 import { type AllFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/types/all-flat-entity-maps.type';
 import { type UniversalFlatFieldPermission } from 'src/engine/workspace-manager/workspace-migration/universal-flat-entity/types/universal-flat-field-permission.type';
@@ -215,20 +214,6 @@ export const reconstructRolesManifest = ({
     }
   }
 
-  const {
-    predicateGroupsByRoleUniversalIdentifier,
-    predicatesByRoleUniversalIdentifier,
-    coverage: rowLevelPermissionCoverage,
-  } = reconstructRowLevelPermissionPredicatesManifest({
-    applicationAllFlatEntityMaps,
-    allFlatEntityMaps,
-    exportedObjectUniversalIdentifiers,
-    resolvableFieldUniversalIdentifiers,
-    parentRoleStatusByUniversalIdentifier,
-  });
-
-  coverage.push(...rowLevelPermissionCoverage);
-
   const roles = flatRoles.map((flatRole) => {
     coverage.push(
       buildExportedCoverageEntry({
@@ -244,14 +229,6 @@ export const reconstructRolesManifest = ({
       children: {
         objectPermissions: children?.objectPermissions,
         fieldPermissions: children?.fieldPermissions,
-        rowLevelPermissionPredicateGroups:
-          predicateGroupsByRoleUniversalIdentifier.get(
-            flatRole.universalIdentifier,
-          ) ?? [],
-        rowLevelPermissionPredicates:
-          predicatesByRoleUniversalIdentifier.get(
-            flatRole.universalIdentifier,
-          ) ?? [],
         permissionFlagUniversalIdentifiers:
           children?.permissionFlagUniversalIdentifiers.sort(compareByCodePoint),
       },

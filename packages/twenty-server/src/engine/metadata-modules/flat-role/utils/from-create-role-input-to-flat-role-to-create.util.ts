@@ -61,11 +61,7 @@ export const fromCreateRoleInputToFlatRoleToCreate = ({
     rolePermissionFlagUniversalIdentifiers: [],
     fieldPermissionIds: [],
     fieldPermissionUniversalIdentifiers: [],
-    rowLevelPermissionPredicateIds: [],
     agentChatChannelRoleIds: [],
-    rowLevelPermissionPredicateUniversalIdentifiers: [],
     agentChatChannelRoleUniversalIdentifiers: [],
-    rowLevelPermissionPredicateGroupIds: [],
-    rowLevelPermissionPredicateGroupUniversalIdentifiers: [],
   };
 };

@@ -132,8 +132,6 @@ exports[`getMetadataRelatedMetadataNames should return related metadata names fo
   "objectPermission",
   "rolePermissionFlag",
   "fieldPermission",
-  "rowLevelPermissionPredicate",
-  "rowLevelPermissionPredicateGroup",
   "agentChatChannelRole",
 ]
 `;
@@ -149,24 +147,6 @@ exports[`getMetadataRelatedMetadataNames should return related metadata names fo
 [
   "role",
   "agent",
-]
-`;
-
-exports[`getMetadataRelatedMetadataNames should return related metadata names for rowLevelPermissionPredicate 1`] = `
-[
-  "role",
-  "fieldMetadata",
-  "objectMetadata",
-  "rowLevelPermissionPredicateGroup",
-]
-`;
-
-exports[`getMetadataRelatedMetadataNames should return related metadata names for rowLevelPermissionPredicateGroup 1`] = `
-[
-  "objectMetadata",
-  "role",
-  "rowLevelPermissionPredicateGroup",
-  "rowLevelPermissionPredicate",
 ]
 `;
 

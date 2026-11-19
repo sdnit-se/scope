@@ -83,11 +83,7 @@ export const createStandardRoleFlatMetadata = ({
     objectPermissionIds: [],
     roleTargetIds: [],
     roleTargetUniversalIdentifiers: [],
-    rowLevelPermissionPredicateIds: [],
     agentChatChannelRoleIds: [],
-    rowLevelPermissionPredicateGroupIds: [],
-    rowLevelPermissionPredicateGroupUniversalIdentifiers: [],
-    rowLevelPermissionPredicateUniversalIdentifiers: [],
     agentChatChannelRoleUniversalIdentifiers: [],
   };
 };

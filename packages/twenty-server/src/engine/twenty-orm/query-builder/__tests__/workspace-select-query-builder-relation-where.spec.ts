@@ -132,7 +132,7 @@ describe('WorkspaceSelectQueryBuilder relation-keyed where', () => {
     );
   });
 
-  it('should apply a row-level permission predicate inside the subquery', () => {
+  it('should apply an extra join condition inside the subquery', () => {
     const { queryBuilder } = buildQueryBuilder();
 
     queryBuilder

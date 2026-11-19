@@ -310,20 +310,6 @@ const CONTAINED_FLAT_ENTITY_SCANS: ContainedFlatEntityScan[] = [
     containerMetadataName: 'role',
     containerUniversalForeignKey: 'roleUniversalIdentifier',
   }),
-  buildContainedFlatEntityScan({
-    metadataName: 'rowLevelPermissionPredicate',
-    selectFlatEntityMaps: (allFlatEntityMaps) =>
-      allFlatEntityMaps.flatRowLevelPermissionPredicateMaps,
-    containerMetadataName: 'role',
-    containerUniversalForeignKey: 'roleUniversalIdentifier',
-  }),
-  buildContainedFlatEntityScan({
-    metadataName: 'rowLevelPermissionPredicateGroup',
-    selectFlatEntityMaps: (allFlatEntityMaps) =>
-      allFlatEntityMaps.flatRowLevelPermissionPredicateGroupMaps,
-    containerMetadataName: 'role',
-    containerUniversalForeignKey: 'roleUniversalIdentifier',
-  }),
 ];
 
 const compareCoverageEntries = (
