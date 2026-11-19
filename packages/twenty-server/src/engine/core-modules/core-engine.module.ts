@@ -32,7 +32,6 @@ import { CodeInterpreterModule } from 'src/engine/core-modules/code-interpreter/
 import { DnsManagerModule } from 'src/engine/core-modules/dns-manager/dns-manager.module';
 import { DpaModule } from 'src/engine/core-modules/dpa/dpa.module';
 import { EmailModule } from 'src/engine/core-modules/email/email.module';
-import { EmailingDomainModule } from 'src/engine/core-modules/emailing-domain/emailing-domain.module';
 import { EnvironmentModule } from 'src/engine/core-modules/environment/environment.module';
 import { ExceptionHandlerModule } from 'src/engine/core-modules/exception-handler/exception-handler.module';
 import { exceptionHandlerModuleFactory } from 'src/engine/core-modules/exception-handler/exception-handler.module-factory';
@@ -113,7 +112,6 @@ import { FileApiModule } from './file/file-api.module';
     WorkspaceInvitationModule,
     WorkspaceSsoModule,
     ApprovedAccessDomainModule,
-    EmailingDomainModule,
     PublicDomainModule,
     CloudflareModule,
     DnsManagerModule,

@@ -55,16 +55,6 @@ export class UpdateWorkspaceInput {
   @IsOptional()
   isPublicInviteLinkEnabled?: boolean;
 
-  @Field({ nullable: true })
-  @IsBoolean()
-  @IsOptional()
-  isCampaignClickTrackingEnabled?: boolean;
-
-  @Field({ nullable: true })
-  @IsBoolean()
-  @IsOptional()
-  isCampaignOpenTrackingEnabled?: boolean;
-
   @Field(() => WorkspaceDiscoverability, { nullable: true })
   @IsEnum(WorkspaceDiscoverability)
   @IsOptional()

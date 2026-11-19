@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client/react';
-import { type ConnectedAccountProvider } from 'twenty-shared/types';
+import { ConnectedAccountProvider } from 'twenty-shared/types';
 
 import {
   MyConnectedAccountsDocument,
@@ -21,7 +21,8 @@ export const useReplyConnectedAccount = (messageChannelId: string | null) => {
   const replyConnectedAccount =
     connectedAccountsData?.myConnectedAccounts.find(
       (connectedAccount) =>
-        connectedAccount.id === threadMessageChannel?.connectedAccountId,
+        connectedAccount.id === threadMessageChannel?.connectedAccountId &&
+        connectedAccount.provider !== ConnectedAccountProvider.EMAIL_GROUP,
     ) ?? null;
 
   return {

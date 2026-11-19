@@ -7,11 +7,8 @@ import {
   EmailingDomainDriverException,
   EmailingDomainDriverExceptionCode,
 } from 'src/engine/core-modules/emailing-domain/drivers/exceptions/emailing-domain-driver.exception';
-import { type ResendDomain } from 'src/engine/core-modules/emailing-domain/drivers/resend/types/resend-domain.type';
 import { type ResendErrorBody } from 'src/engine/core-modules/emailing-domain/drivers/resend/types/resend-error-body.type';
 import { type ResendReceivedEmail } from 'src/engine/core-modules/emailing-domain/drivers/resend/types/resend-received-email.type';
-import { type ResendSendEmailPayload } from 'src/engine/core-modules/emailing-domain/drivers/resend/types/resend-send-email-payload.type';
-import { type ResendSentEmail } from 'src/engine/core-modules/emailing-domain/drivers/resend/types/resend-sent-email.type';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
 
 const RESEND_API_BASE_URL = 'https://api.resend.com';
@@ -19,43 +16,6 @@ const RESEND_API_BASE_URL = 'https://api.resend.com';
 @Injectable()
 export class ResendApiClientService {
   constructor(private readonly twentyConfigService: TwentyConfigService) {}
-
-  async sendEmail(payload: ResendSendEmailPayload): Promise<{ id: string }> {
-    return this.requestJson<{ id: string }>('POST', '/emails', payload);
-  }
-
-  async sendEmailBatch(
-    payloads: ResendSendEmailPayload[],
-  ): Promise<{ data: { id: string }[] }> {
-    return this.requestJson<{ data: { id: string }[] }>(
-      'POST',
-      '/emails/batch',
-      payloads,
-    );
-  }
-
-  async createDomain(payload: {
-    name: string;
-    region?: string;
-  }): Promise<ResendDomain> {
-    return this.requestJson<ResendDomain>('POST', '/domains', payload);
-  }
-
-  async getDomain(domainId: string): Promise<ResendDomain> {
-    return this.requestJson<ResendDomain>('GET', `/domains/${domainId}`);
-  }
-
-  async listDomains(): Promise<{ data: ResendDomain[] }> {
-    return this.requestJson<{ data: ResendDomain[] }>('GET', '/domains');
-  }
-
-  async verifyDomain(domainId: string): Promise<void> {
-    await this.performRequest('POST', `/domains/${domainId}/verify`);
-  }
-
-  async getSentEmail(emailId: string): Promise<ResendSentEmail> {
-    return this.requestJson<ResendSentEmail>('GET', `/emails/${emailId}`);
-  }
 
   async getReceivedEmail(emailId: string): Promise<ResendReceivedEmail> {
     return this.requestJson<ResendReceivedEmail>(

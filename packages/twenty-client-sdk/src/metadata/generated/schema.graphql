@@ -1110,26 +1110,6 @@ type CallRecordingTranscriptConfiguration {
   configurationType: WidgetConfigurationType!
 }
 
-type CampaignAudiencePreviewDTO {
-  duplicateEmails: Int!
-  globallyUnsubscribed: Int!
-  hardSuppressed: Int!
-  sendable: Int!
-  topicUnsubscribed: Int!
-  totalMembers: Int!
-  trackingRefused: Int!
-  withoutEmail: Int!
-}
-
-input CancelMessageCampaignInput {
-  campaignId: String!
-}
-
-type CancelMessageCampaignOutputDTO {
-  campaignId: String!
-  canceledMessageCount: Int!
-}
-
 type Captcha {
   provider: CaptchaDriverType
   siteKey: String
@@ -1253,7 +1233,6 @@ type ClientConfig {
   isConfigVariablesInDbEnabled: Boolean!
   isCookieSessionEnabled: Boolean!
   isEmailVerificationRequired: Boolean!
-  isEmailingDomainInDemoMode: Boolean!
   isGoogleCalendarEnabled: Boolean!
   isGoogleMessagingEnabled: Boolean!
   isImapSmtpCaldavEnabled: Boolean!
@@ -1484,10 +1463,6 @@ type CreateEmailGroupChannelOutput {
   messageChannel: MessageChannel!
 }
 
-input CreateEmailingDomainInput {
-  domain: String!
-}
-
 input CreateFieldInput {
   defaultValue: JSON
   description: String
@@ -1555,11 +1530,6 @@ input CreateMcpServerInput {
   label: String!
   name: String!
   url: String!
-}
-
-input CreateMessageSuppressionInput {
-  emailAddress: String!
-  unsubscribeTopicId: UUID
 }
 
 input CreateNavigationMenuItemInput {
@@ -1670,12 +1640,6 @@ input CreateSkillInput {
   id: UUID
   label: String!
   name: String!
-}
-
-input CreateUnsubscribeTopicInput {
-  description: String
-  name: String!
-  visibility: UnsubscribeTopicVisibility
 }
 
 input CreateUsageLimitInput {
@@ -1990,31 +1954,6 @@ type EmailPasswordResetLink {
 
 type EmailThreadConfiguration {
   configurationType: WidgetConfigurationType!
-}
-
-type EmailingDomain {
-  createdAt: DateTime!
-  domain: String!
-  id: UUID!
-  status: EmailingDomainStatus!
-  tenantStatus: EmailingDomainTenantStatus!
-  unsubscribeHostnameStatus: UnsubscribeHostnameStatus
-  updatedAt: DateTime!
-  verificationRecords: [VerificationRecord!]
-  verifiedAt: DateTime
-}
-
-enum EmailingDomainStatus {
-  FAILED
-  PENDING
-  TEMPORARY_FAILURE
-  VERIFIED
-}
-
-enum EmailingDomainTenantStatus {
-  ACTIVE
-  PAUSED
-  SANDBOX
 }
 
 type EmailsConfiguration {
@@ -2384,14 +2323,6 @@ type FindAvailableSSOIDP {
   status: SSOIdentityProviderStatus!
   type: IdentityProviderType!
   workspace: WorkspaceNameAndId!
-}
-
-input FindMessageSuppressionsInput {
-  limit: Int! = 30
-  offset: Int! = 0
-  reason: MessageSuppressionReason
-  searchTerm: String
-  unsubscribeTopicId: UUID
 }
 
 type FormFieldConfiguration {
@@ -2870,11 +2801,6 @@ type MessageCampaignDetailsConfiguration {
   configurationType: WidgetConfigurationType!
 }
 
-type MessageCampaignSendBlockerDTO {
-  code: String!
-  message: String!
-}
-
 type MessageChannel {
   connectedAccount: ConnectedAccountPublicDTO
   connectedAccountId: UUID!
@@ -2977,32 +2903,6 @@ enum MessageParticipantRole {
   FROM
   REPLY_TO
   TO
-}
-
-type MessageSuppression {
-  createdAt: DateTime!
-  emailAddress: String!
-  id: UUID!
-  reason: MessageSuppressionReason!
-  source: MessageSuppressionSource!
-  unsubscribeTopicId: UUID
-}
-
-type MessageSuppressionList {
-  records: [MessageSuppression!]!
-  totalCount: Int!
-}
-
-enum MessageSuppressionReason {
-  BOUNCE
-  COMPLAINT
-  TRACKING
-  UNSUBSCRIBE
-}
-
-enum MessageSuppressionSource {
-  SYSTEM
-  WEBHOOK
 }
 
 type MetadataEvent {
@@ -3111,7 +3011,6 @@ type Mutation {
   assignRoleToApiKey(apiKeyId: UUID!, roleId: UUID!): Boolean!
   attachRecordToInboxThread(input: InboxThreadRecordInput!): Boolean!
   authorizeApp(clientId: String!, codeChallenge: String, issuer: String, redirectUrl: String!, scope: String, state: String): AuthorizeApp!
-  cancelMessageCampaign(input: CancelMessageCampaignInput!): CancelMessageCampaignOutputDTO!
   cancelSwitchBillingInterval: BillingUpdate!
   cancelSwitchBillingPlan: BillingUpdate!
   cancelSwitchResourceCreditPrice: BillingUpdate!
@@ -3138,7 +3037,6 @@ type Mutation {
   createCommandMenuItem(input: CreateCommandMenuItemInput!): CommandMenuItem!
   createDevelopmentApplication(name: String!, universalIdentifier: String!): DevelopmentApplication!
   createEmailGroupChannel(input: CreateEmailGroupChannelInput!): CreateEmailGroupChannelOutput!
-  createEmailingDomain(input: CreateEmailingDomainInput!): EmailingDomain!
   createFileUpload(fieldMetadataId: String, fieldMetadataUniversalIdentifier: String, fileFolder: FileFolder!, filename: String!, size: Float!): FileUploadTarget!
   createFrontComponent(input: CreateFrontComponentInput!): FrontComponent!
   createManyNavigationMenuItems(inputs: [CreateNavigationMenuItemInput!]!): [NavigationMenuItem!]!
@@ -3146,7 +3044,6 @@ type Mutation {
   createManyViewFields(inputs: [CreateViewFieldInput!]!): [ViewField!]!
   createManyViewGroups(inputs: [CreateViewGroupInput!]!): [ViewGroup!]!
   createMcpServer(input: CreateMcpServerInput!): McpServer!
-  createMessageSuppression(input: CreateMessageSuppressionInput!): MessageSuppression!
   createNavigationMenuItem(input: CreateNavigationMenuItemInput!): NavigationMenuItem!
   createNewWorkspaceLogoUpload(filename: String!, size: Float!, workspaceId: String!): FileUploadTarget!
   createOIDCIdentityProvider(input: SetupOIDCSsoInput!): SetupSso!
@@ -3165,7 +3062,6 @@ type Mutation {
   createSAMLIdentityProvider(input: SetupSAMLSsoInput!): SetupSso!
   createSkill(input: CreateSkillInput!): Skill!
   createSubscriptionPaymentIntent(idempotencyKey: String!, plan: BillingPlanKey!, recurringInterval: SubscriptionInterval!, requirePaymentMethod: Boolean! = true, successUrlPath: String): BillingPaymentIntent!
-  createUnsubscribeTopic(input: CreateUnsubscribeTopicInput!): UnsubscribeTopic!
   createUsageLimit(input: CreateUsageLimitInput!): UsageLimit!
   createValidationRule(input: CreateValidationRuleInput!): ValidationRule!
   createView(input: CreateViewInput!): View!
@@ -3186,11 +3082,9 @@ type Mutation {
   deleteConnectedAccount(id: UUID!): ConnectedAccountPublicDTO!
   deleteCurrentWorkspace: Workspace!
   deleteEmailGroupChannel(id: UUID!): MessageChannel!
-  deleteEmailingDomain(id: String!): Boolean!
   deleteFrontComponent(id: UUID!): FrontComponent!
   deleteManyNavigationMenuItems(ids: [UUID!]!): [NavigationMenuItem!]!
   deleteMcpServer(id: UUID!): McpServer!
-  deleteMessageSuppression(id: UUID!): Boolean!
   deleteNavigationMenuItem(id: UUID!): NavigationMenuItem!
   deleteOneAgent(input: AgentIdInput!): Agent!
   deleteOneField(input: DeleteOneFieldInput!): Field!
@@ -3204,7 +3098,6 @@ type Mutation {
   deleteSSOIdentityProvider(input: DeleteSsoInput!): DeleteSso!
   deleteSkill(id: UUID!): Skill!
   deleteTwoFactorAuthenticationMethod(twoFactorAuthenticationMethodId: UUID!): DeleteTwoFactorAuthenticationMethod!
-  deleteUnsubscribeTopic(id: String!): Boolean!
   deleteUsageLimit(usageLimitId: UUID!): Boolean!
   deleteUser: User!
   deleteUserFromWorkspace(workspaceMemberIdToDelete: String!): UserWorkspace!
@@ -3292,8 +3185,6 @@ type Mutation {
   sendEmail(input: SendEmailInput!): SendEmailOutput!
   sendInboxMessage(input: SendInboxMessageInput!): SendInboxMessageResult!
   sendInvitations(emails: [String!]!, roleId: UUID): SendInvitations!
-  sendMessageCampaign(input: SendMessageCampaignInput!): SendMessageCampaignOutputDTO!
-  sendMessageCampaignTest(input: SendMessageCampaignTestInput!): SendEmailViaDomainOutput!
   setAppKeyValue(input: SetAppKeyValueInput!): AppKeyValue!
   setEnterpriseKey(enterpriseKey: String!): EnterpriseLicenseInfoDTO!
   setRecordGeneralAccess(accessLevel: RecordShareAccessLevel!, target: RecordTargetInput!): RecordSharingDTO!
@@ -3358,7 +3249,6 @@ type Mutation {
   updatePasswordViaResetToken(newPassword: String!, passwordResetToken: String!): InvalidatePassword!
   updateSkill(input: UpdateSkillInput!): Skill!
   updateTimelineActivityType(input: UpdateTimelineActivityTypeInput!): TimelineActivityType!
-  updateUnsubscribeTopic(input: UpdateUnsubscribeTopicInput!): UnsubscribeTopic!
   updateUsageLimit(input: UpdateUsageLimitInput!): UsageLimit!
   updateUserCreditsFallback(userCreditsFallback: UserCreditsFallback!): BillingCustomer!
   updateUserEmail(newEmail: String!, verifyEmailRedirectPath: String): Boolean!
@@ -3391,7 +3281,6 @@ type Mutation {
   validateApprovedAccessDomain(input: ValidateApprovedAccessDomainInput!): ApprovedAccessDomain!
   verifyEmailAndGetLoginToken(captchaToken: String, email: String!, emailVerificationToken: String!, origin: String!): VerifyEmailAndGetLoginToken!
   verifyEmailAndGetWorkspaceAgnosticToken(captchaToken: String, email: String!, emailVerificationToken: String!): AvailableWorkspacesAndAccessTokens!
-  verifyEmailingDomain(id: String!): EmailingDomain!
   verifyTwoFactorAuthenticationMethodForAuthenticatedUser(otp: String!): VerifyTwoFactorAuthenticationMethod!
 }
 
@@ -3840,21 +3729,6 @@ type PlaceDetailsResult {
   street: String
 }
 
-input PreviewMessageCampaignAudienceInput {
-  listId: String!
-  unsubscribeTopicId: String
-}
-
-input PreviewMessageCampaignSendInput {
-  campaignId: String!
-  scheduledAt: DateTime
-}
-
-type PreviewMessageCampaignSendOutputDTO {
-  audience: CampaignAudiencePreviewDTO
-  blockers: [MessageCampaignSendBlockerDTO!]!
-}
-
 type PublicApplicationRegistration {
   id: UUID!
   logoUrl: String
@@ -3994,7 +3868,6 @@ type Query {
   getAutoCompleteAddress(address: String!, country: String, isFieldCity: Boolean, token: String!): [AutocompleteResult!]!
   getAvailablePackages(input: LogicFunctionIdInput!): JSON!
   getConnectedImapSmtpCaldavAccount(id: UUID!): ConnectedImapSmtpCaldavAccount!
-  getEmailingDomains: [EmailingDomain!]!
   getInviteSuggestions: [InviteSuggestion!]!
   getJobs(jobIds: [String!]!): [JobStatus!]!
   getLogicFunctionSourceCode(input: LogicFunctionIdInput!): String
@@ -4035,7 +3908,6 @@ type Query {
   listPlans: [BillingPlan!]! @deprecated(reason: "Use billingPlans instead.")
   mcpServer(id: UUID!): McpServer
   mcpServers: [McpServer!]!
-  messageSuppressions(input: FindMessageSuppressionsInput!): MessageSuppressionList!
   metadataTranslations(input: MetadataTranslationsInput!): [MetadataTranslation!]!
   minimalMetadata: MinimalMetadata!
   mostlyEmptyFieldMetadataIds(objectMetadataId: UUID!): [UUID!]!
@@ -4060,8 +3932,6 @@ type Query {
     paging: CursorPaging! = {first: 10}
   ): ObjectConnection!
   pieChartData(input: PieChartDataInput!): PieChartData!
-  previewMessageCampaignAudience(input: PreviewMessageCampaignAudienceInput!): CampaignAudiencePreviewDTO!
-  previewMessageCampaignSend(input: PreviewMessageCampaignSendInput!): PreviewMessageCampaignSendOutputDTO!
   publicMarketplaceAppDetail(universalIdentifier: String!): MarketplaceAppDetail!
   publicMarketplaceApps: [MarketplaceApp!]!
   recordPermissions(targets: [RecordTargetInput!]!): [RecordPermissionsResult!]!
@@ -4071,7 +3941,6 @@ type Query {
   skills: [Skill!]!
   timelineActivityTypes: [TimelineActivityType!]!
   twoFactorAuthenticationRecoveryStatus(userId: UUID!): TwoFactorAuthenticationRecoveryStatus!
-  unsubscribeTopics: [UnsubscribeTopic!]!
   usageLimits: [UsageLimit!]!
   usageQuotaDefinitions: UsageQuotaDefinitions!
   usageQuotaScopeConsumption(input: UsageQuotaScopeInput!): UsageQuotaScopeConsumption
@@ -4465,10 +4334,6 @@ input SendEmailTargetRecordInput {
   recordId: UUID!
 }
 
-type SendEmailViaDomainOutput {
-  messageId: String!
-}
-
 input SendInboxMessageInput {
   idempotencyKey: String!
   text: String!
@@ -4488,25 +4353,6 @@ type SendInvitations {
 
   """Boolean that confirms query was dispatched"""
   success: Boolean!
-}
-
-input SendMessageCampaignInput {
-  campaignId: String!
-  scheduledAt: DateTime
-}
-
-type SendMessageCampaignOutputDTO {
-  audience: CampaignAudiencePreviewDTO!
-  campaignId: String!
-  queuedCount: Int!
-}
-
-input SendMessageCampaignTestInput {
-  body: String!
-  fromAddress: String!
-  subject: String!
-  toAddress: String!
-  unsubscribeTopicId: String
 }
 
 type Sentry {
@@ -4793,26 +4639,6 @@ input UUIDFilterComparison {
   notILike: UUID
   notIn: [UUID!]
   notLike: UUID
-}
-
-enum UnsubscribeHostnameStatus {
-  ACTIVE
-  FAILED
-  PENDING
-}
-
-type UnsubscribeTopic {
-  createdAt: DateTime!
-  description: String
-  id: UUID!
-  name: String
-  updatedAt: DateTime!
-  visibility: UnsubscribeTopicVisibility!
-}
-
-enum UnsubscribeTopicVisibility {
-  PRIVATE
-  PUBLIC
 }
 
 input UpdateAgentChatChannelInput {
@@ -5162,13 +4988,6 @@ input UpdateTimelineActivityTypeInput {
   translations: [MetadataTranslationOverrideInput!]
 }
 
-input UpdateUnsubscribeTopicInput {
-  description: String
-  id: String!
-  name: String
-  visibility: UnsubscribeTopicVisibility
-}
-
 input UpdateUsageLimitInput {
   id: UUID!
   payload: CreateUsageLimitInput!
@@ -5333,8 +5152,6 @@ input UpdateWorkspaceInput {
   editableProfileFields: [String!]
   inviteHash: String
   isAutoModelSelectionEnabled: Boolean
-  isCampaignClickTrackingEnabled: Boolean
-  isCampaignOpenTrackingEnabled: Boolean
   isGoogleAuthBypassEnabled: Boolean
   isGoogleAuthEnabled: Boolean
   isInternalMessagesImportEnabled: Boolean
@@ -5759,14 +5576,6 @@ type ValidationRule {
   objectMetadataId: UUID!
 }
 
-type VerificationRecord {
-  key: String!
-  priority: Float
-  status: String
-  type: String!
-  value: String!
-}
-
 type VerifyEmailAndGetLoginToken {
   loginToken: AuthToken!
   workspaceUrls: WorkspaceUrls!
@@ -6087,8 +5896,6 @@ type Workspace {
   installedApplications: [Application!]!
   inviteHash: String
   isAutoModelSelectionEnabled: Boolean!
-  isCampaignClickTrackingEnabled: Boolean!
-  isCampaignOpenTrackingEnabled: Boolean!
   isCustomDomainEnabled: Boolean!
   isGoogleAuthBypassEnabled: Boolean!
   isGoogleAuthEnabled: Boolean!

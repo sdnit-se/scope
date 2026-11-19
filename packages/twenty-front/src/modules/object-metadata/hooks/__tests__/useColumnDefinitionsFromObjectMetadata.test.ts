@@ -38,8 +38,6 @@ describe('useColumnDefinitionsFromObjectMetadata', () => {
       isTrialAvailable: true,
       metadataVersion: 1,
       isPublicInviteLinkEnabled: false,
-      isCampaignClickTrackingEnabled: false,
-      isCampaignOpenTrackingEnabled: false,
       workspaceDiscoverability: WorkspaceDiscoverability.PUBLIC,
       isGoogleAuthEnabled: true,
       isMicrosoftAuthEnabled: false,

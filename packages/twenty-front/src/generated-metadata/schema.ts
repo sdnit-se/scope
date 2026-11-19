@@ -1203,28 +1203,6 @@ export type CallRecordingTranscriptConfiguration = {
   configurationType: WidgetConfigurationType;
 };
 
-export type CampaignAudiencePreviewDto = {
-  __typename?: 'CampaignAudiencePreviewDTO';
-  duplicateEmails: Scalars['Int']['output'];
-  globallyUnsubscribed: Scalars['Int']['output'];
-  hardSuppressed: Scalars['Int']['output'];
-  sendable: Scalars['Int']['output'];
-  topicUnsubscribed: Scalars['Int']['output'];
-  totalMembers: Scalars['Int']['output'];
-  trackingRefused: Scalars['Int']['output'];
-  withoutEmail: Scalars['Int']['output'];
-};
-
-export type CancelMessageCampaignInput = {
-  campaignId: Scalars['String']['input'];
-};
-
-export type CancelMessageCampaignOutputDto = {
-  __typename?: 'CancelMessageCampaignOutputDTO';
-  campaignId: Scalars['String']['output'];
-  canceledMessageCount: Scalars['Int']['output'];
-};
-
 export type Captcha = {
   __typename?: 'Captcha';
   provider?: Maybe<CaptchaDriverType>;
@@ -1360,7 +1338,6 @@ export type ClientConfig = {
   isConfigVariablesInDbEnabled: Scalars['Boolean']['output'];
   isCookieSessionEnabled: Scalars['Boolean']['output'];
   isEmailVerificationRequired: Scalars['Boolean']['output'];
-  isEmailingDomainInDemoMode: Scalars['Boolean']['output'];
   isGoogleCalendarEnabled: Scalars['Boolean']['output'];
   isGoogleMessagingEnabled: Scalars['Boolean']['output'];
   isImapSmtpCaldavEnabled: Scalars['Boolean']['output'];
@@ -1599,10 +1576,6 @@ export type CreateEmailGroupChannelOutput = {
   messageChannel: MessageChannel;
 };
 
-export type CreateEmailingDomainInput = {
-  domain: Scalars['String']['input'];
-};
-
 export type CreateFieldInput = {
   defaultValue?: InputMaybe<Scalars['JSON']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
@@ -1670,11 +1643,6 @@ export type CreateMcpServerInput = {
   label: Scalars['String']['input'];
   name: Scalars['String']['input'];
   url: Scalars['String']['input'];
-};
-
-export type CreateMessageSuppressionInput = {
-  emailAddress: Scalars['String']['input'];
-  unsubscribeTopicId?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 export type CreateNavigationMenuItemInput = {
@@ -1785,12 +1753,6 @@ export type CreateSkillInput = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   label: Scalars['String']['input'];
   name: Scalars['String']['input'];
-};
-
-export type CreateUnsubscribeTopicInput = {
-  description?: InputMaybe<Scalars['String']['input']>;
-  name: Scalars['String']['input'];
-  visibility?: InputMaybe<UnsubscribeTopicVisibility>;
 };
 
 export type CreateUsageLimitInput = {
@@ -2107,32 +2069,6 @@ export type EmailThreadConfiguration = {
   __typename?: 'EmailThreadConfiguration';
   configurationType: WidgetConfigurationType;
 };
-
-export type EmailingDomain = {
-  __typename?: 'EmailingDomain';
-  createdAt: Scalars['DateTime']['output'];
-  domain: Scalars['String']['output'];
-  id: Scalars['UUID']['output'];
-  status: EmailingDomainStatus;
-  tenantStatus: EmailingDomainTenantStatus;
-  unsubscribeHostnameStatus?: Maybe<UnsubscribeHostnameStatus>;
-  updatedAt: Scalars['DateTime']['output'];
-  verificationRecords?: Maybe<Array<VerificationRecord>>;
-  verifiedAt?: Maybe<Scalars['DateTime']['output']>;
-};
-
-export enum EmailingDomainStatus {
-  FAILED = 'FAILED',
-  PENDING = 'PENDING',
-  TEMPORARY_FAILURE = 'TEMPORARY_FAILURE',
-  VERIFIED = 'VERIFIED'
-}
-
-export enum EmailingDomainTenantStatus {
-  ACTIVE = 'ACTIVE',
-  PAUSED = 'PAUSED',
-  SANDBOX = 'SANDBOX'
-}
 
 export type EmailsConfiguration = {
   __typename?: 'EmailsConfiguration';
@@ -2517,14 +2453,6 @@ export type FindAvailableSsoidp = {
   status: SsoIdentityProviderStatus;
   type: IdentityProviderType;
   workspace: WorkspaceNameAndId;
-};
-
-export type FindMessageSuppressionsInput = {
-  limit?: Scalars['Int']['input'];
-  offset?: Scalars['Int']['input'];
-  reason?: InputMaybe<MessageSuppressionReason>;
-  searchTerm?: InputMaybe<Scalars['String']['input']>;
-  unsubscribeTopicId?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 export type FormFieldConfiguration = {
@@ -3029,12 +2957,6 @@ export type MessageCampaignDetailsConfiguration = {
   configurationType: WidgetConfigurationType;
 };
 
-export type MessageCampaignSendBlockerDto = {
-  __typename?: 'MessageCampaignSendBlockerDTO';
-  code: Scalars['String']['output'];
-  message: Scalars['String']['output'];
-};
-
 export type MessageChannel = {
   __typename?: 'MessageChannel';
   connectedAccount?: Maybe<ConnectedAccountPublicDto>;
@@ -3139,34 +3061,6 @@ export enum MessageParticipantRole {
   FROM = 'FROM',
   REPLY_TO = 'REPLY_TO',
   TO = 'TO'
-}
-
-export type MessageSuppression = {
-  __typename?: 'MessageSuppression';
-  createdAt: Scalars['DateTime']['output'];
-  emailAddress: Scalars['String']['output'];
-  id: Scalars['UUID']['output'];
-  reason: MessageSuppressionReason;
-  source: MessageSuppressionSource;
-  unsubscribeTopicId?: Maybe<Scalars['UUID']['output']>;
-};
-
-export type MessageSuppressionList = {
-  __typename?: 'MessageSuppressionList';
-  records: Array<MessageSuppression>;
-  totalCount: Scalars['Int']['output'];
-};
-
-export enum MessageSuppressionReason {
-  BOUNCE = 'BOUNCE',
-  COMPLAINT = 'COMPLAINT',
-  TRACKING = 'TRACKING',
-  UNSUBSCRIBE = 'UNSUBSCRIBE'
-}
-
-export enum MessageSuppressionSource {
-  SYSTEM = 'SYSTEM',
-  WEBHOOK = 'WEBHOOK'
 }
 
 export type MetadataEvent = {
@@ -3279,7 +3173,6 @@ export type Mutation = {
   assignRoleToApiKey: Scalars['Boolean']['output'];
   attachRecordToInboxThread: Scalars['Boolean']['output'];
   authorizeApp: AuthorizeApp;
-  cancelMessageCampaign: CancelMessageCampaignOutputDto;
   cancelSwitchBillingInterval: BillingUpdate;
   cancelSwitchBillingPlan: BillingUpdate;
   cancelSwitchResourceCreditPrice: BillingUpdate;
@@ -3306,7 +3199,6 @@ export type Mutation = {
   createCommandMenuItem: CommandMenuItem;
   createDevelopmentApplication: DevelopmentApplication;
   createEmailGroupChannel: CreateEmailGroupChannelOutput;
-  createEmailingDomain: EmailingDomain;
   createFileUpload: FileUploadTarget;
   createFrontComponent: FrontComponent;
   createManyNavigationMenuItems: Array<NavigationMenuItem>;
@@ -3314,7 +3206,6 @@ export type Mutation = {
   createManyViewFields: Array<ViewField>;
   createManyViewGroups: Array<ViewGroup>;
   createMcpServer: McpServer;
-  createMessageSuppression: MessageSuppression;
   createNavigationMenuItem: NavigationMenuItem;
   createNewWorkspaceLogoUpload: FileUploadTarget;
   createOIDCIdentityProvider: SetupSso;
@@ -3333,7 +3224,6 @@ export type Mutation = {
   createSAMLIdentityProvider: SetupSso;
   createSkill: Skill;
   createSubscriptionPaymentIntent: BillingPaymentIntent;
-  createUnsubscribeTopic: UnsubscribeTopic;
   createUsageLimit: UsageLimit;
   createValidationRule: ValidationRule;
   createView: View;
@@ -3354,11 +3244,9 @@ export type Mutation = {
   deleteConnectedAccount: ConnectedAccountPublicDto;
   deleteCurrentWorkspace: Workspace;
   deleteEmailGroupChannel: MessageChannel;
-  deleteEmailingDomain: Scalars['Boolean']['output'];
   deleteFrontComponent: FrontComponent;
   deleteManyNavigationMenuItems: Array<NavigationMenuItem>;
   deleteMcpServer: McpServer;
-  deleteMessageSuppression: Scalars['Boolean']['output'];
   deleteNavigationMenuItem: NavigationMenuItem;
   deleteOneAgent: Agent;
   deleteOneField: Field;
@@ -3372,7 +3260,6 @@ export type Mutation = {
   deleteSSOIdentityProvider: DeleteSso;
   deleteSkill: Skill;
   deleteTwoFactorAuthenticationMethod: DeleteTwoFactorAuthenticationMethod;
-  deleteUnsubscribeTopic: Scalars['Boolean']['output'];
   deleteUsageLimit: Scalars['Boolean']['output'];
   deleteUser: User;
   deleteUserFromWorkspace: UserWorkspace;
@@ -3462,8 +3349,6 @@ export type Mutation = {
   sendEmail: SendEmailOutput;
   sendInboxMessage: SendInboxMessageResult;
   sendInvitations: SendInvitations;
-  sendMessageCampaign: SendMessageCampaignOutputDto;
-  sendMessageCampaignTest: SendEmailViaDomainOutput;
   setAppKeyValue: AppKeyValue;
   setEnterpriseKey: EnterpriseLicenseInfoDto;
   setRecordGeneralAccess: RecordSharingDto;
@@ -3530,7 +3415,6 @@ export type Mutation = {
   updatePasswordViaResetToken: InvalidatePassword;
   updateSkill: Skill;
   updateTimelineActivityType: TimelineActivityType;
-  updateUnsubscribeTopic: UnsubscribeTopic;
   updateUsageLimit: UsageLimit;
   updateUserCreditsFallback: BillingCustomer;
   updateUserEmail: Scalars['Boolean']['output'];
@@ -3569,7 +3453,6 @@ export type Mutation = {
   validateApprovedAccessDomain: ApprovedAccessDomain;
   verifyEmailAndGetLoginToken: VerifyEmailAndGetLoginToken;
   verifyEmailAndGetWorkspaceAgnosticToken: AvailableWorkspacesAndAccessTokens;
-  verifyEmailingDomain: EmailingDomain;
   verifyTwoFactorAuthenticationMethodForAuthenticatedUser: VerifyTwoFactorAuthenticationMethod;
 };
 
@@ -3625,11 +3508,6 @@ export type MutationAuthorizeAppArgs = {
   redirectUrl: Scalars['String']['input'];
   scope?: InputMaybe<Scalars['String']['input']>;
   state?: InputMaybe<Scalars['String']['input']>;
-};
-
-
-export type MutationCancelMessageCampaignArgs = {
-  input: CancelMessageCampaignInput;
 };
 
 
@@ -3746,11 +3624,6 @@ export type MutationCreateEmailGroupChannelArgs = {
 };
 
 
-export type MutationCreateEmailingDomainArgs = {
-  input: CreateEmailingDomainInput;
-};
-
-
 export type MutationCreateFileUploadArgs = {
   fieldMetadataId?: InputMaybe<Scalars['String']['input']>;
   fieldMetadataUniversalIdentifier?: InputMaybe<Scalars['String']['input']>;
@@ -3787,11 +3660,6 @@ export type MutationCreateManyViewGroupsArgs = {
 
 export type MutationCreateMcpServerArgs = {
   input: CreateMcpServerInput;
-};
-
-
-export type MutationCreateMessageSuppressionArgs = {
-  input: CreateMessageSuppressionInput;
 };
 
 
@@ -3895,11 +3763,6 @@ export type MutationCreateSubscriptionPaymentIntentArgs = {
 };
 
 
-export type MutationCreateUnsubscribeTopicArgs = {
-  input: CreateUnsubscribeTopicInput;
-};
-
-
 export type MutationCreateUsageLimitArgs = {
   input: CreateUsageLimitInput;
 };
@@ -3997,11 +3860,6 @@ export type MutationDeleteEmailGroupChannelArgs = {
 };
 
 
-export type MutationDeleteEmailingDomainArgs = {
-  id: Scalars['String']['input'];
-};
-
-
 export type MutationDeleteFrontComponentArgs = {
   id: Scalars['UUID']['input'];
 };
@@ -4013,11 +3871,6 @@ export type MutationDeleteManyNavigationMenuItemsArgs = {
 
 
 export type MutationDeleteMcpServerArgs = {
-  id: Scalars['UUID']['input'];
-};
-
-
-export type MutationDeleteMessageSuppressionArgs = {
   id: Scalars['UUID']['input'];
 };
 
@@ -4084,11 +3937,6 @@ export type MutationDeleteSkillArgs = {
 
 export type MutationDeleteTwoFactorAuthenticationMethodArgs = {
   twoFactorAuthenticationMethodId: Scalars['UUID']['input'];
-};
-
-
-export type MutationDeleteUnsubscribeTopicArgs = {
-  id: Scalars['String']['input'];
 };
 
 
@@ -4513,16 +4361,6 @@ export type MutationSendInvitationsArgs = {
 };
 
 
-export type MutationSendMessageCampaignArgs = {
-  input: SendMessageCampaignInput;
-};
-
-
-export type MutationSendMessageCampaignTestArgs = {
-  input: SendMessageCampaignTestInput;
-};
-
-
 export type MutationSetAppKeyValueArgs = {
   input: SetAppKeyValueInput;
 };
@@ -4867,11 +4705,6 @@ export type MutationUpdateTimelineActivityTypeArgs = {
 };
 
 
-export type MutationUpdateUnsubscribeTopicArgs = {
-  input: UpdateUnsubscribeTopicInput;
-};
-
-
 export type MutationUpdateUsageLimitArgs = {
   input: UpdateUsageLimitInput;
 };
@@ -5044,11 +4877,6 @@ export type MutationVerifyEmailAndGetWorkspaceAgnosticTokenArgs = {
   captchaToken?: InputMaybe<Scalars['String']['input']>;
   email: Scalars['String']['input'];
   emailVerificationToken: Scalars['String']['input'];
-};
-
-
-export type MutationVerifyEmailingDomainArgs = {
-  id: Scalars['String']['input'];
 };
 
 
@@ -5526,22 +5354,6 @@ export type PlaceDetailsResult = {
   street?: Maybe<Scalars['String']['output']>;
 };
 
-export type PreviewMessageCampaignAudienceInput = {
-  listId: Scalars['String']['input'];
-  unsubscribeTopicId?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type PreviewMessageCampaignSendInput = {
-  campaignId: Scalars['String']['input'];
-  scheduledAt?: InputMaybe<Scalars['DateTime']['input']>;
-};
-
-export type PreviewMessageCampaignSendOutputDto = {
-  __typename?: 'PreviewMessageCampaignSendOutputDTO';
-  audience?: Maybe<CampaignAudiencePreviewDto>;
-  blockers: Array<MessageCampaignSendBlockerDto>;
-};
-
 export type PublicApplicationRegistration = {
   __typename?: 'PublicApplicationRegistration';
   id: Scalars['UUID']['output'];
@@ -5681,7 +5493,6 @@ export type Query = {
   getAutoCompleteAddress: Array<AutocompleteResult>;
   getAvailablePackages: Scalars['JSON']['output'];
   getConnectedImapSmtpCaldavAccount: ConnectedImapSmtpCaldavAccount;
-  getEmailingDomains: Array<EmailingDomain>;
   getInviteSuggestions: Array<InviteSuggestion>;
   getJobs: Array<JobStatus>;
   getLogicFunctionSourceCode?: Maybe<Scalars['String']['output']>;
@@ -5723,7 +5534,6 @@ export type Query = {
   listPlans: Array<BillingPlan>;
   mcpServer?: Maybe<McpServer>;
   mcpServers: Array<McpServer>;
-  messageSuppressions: MessageSuppressionList;
   metadataTranslations: Array<MetadataTranslation>;
   minimalMetadata: MinimalMetadata;
   mostlyEmptyFieldMetadataIds: Array<Scalars['UUID']['output']>;
@@ -5739,8 +5549,6 @@ export type Query = {
   objectRecordCounts: Array<ObjectRecordCount>;
   objects: ObjectConnection;
   pieChartData: PieChartData;
-  previewMessageCampaignAudience: CampaignAudiencePreviewDto;
-  previewMessageCampaignSend: PreviewMessageCampaignSendOutputDto;
   publicMarketplaceAppDetail: MarketplaceAppDetail;
   publicMarketplaceApps: Array<MarketplaceApp>;
   recordPermissions: Array<RecordPermissionsResult>;
@@ -5750,7 +5558,6 @@ export type Query = {
   skills: Array<Skill>;
   timelineActivityTypes: Array<TimelineActivityType>;
   twoFactorAuthenticationRecoveryStatus: TwoFactorAuthenticationRecoveryStatus;
-  unsubscribeTopics: Array<UnsubscribeTopic>;
   usageLimits: Array<UsageLimit>;
   usageQuotaDefinitions: UsageQuotaDefinitions;
   usageQuotaScopeConsumption?: Maybe<UsageQuotaScopeConsumption>;
@@ -6181,11 +5988,6 @@ export type QueryMcpServerArgs = {
 };
 
 
-export type QueryMessageSuppressionsArgs = {
-  input: FindMessageSuppressionsInput;
-};
-
-
 export type QueryMetadataTranslationsArgs = {
   input: MetadataTranslationsInput;
 };
@@ -6229,16 +6031,6 @@ export type QueryObjectsArgs = {
 
 export type QueryPieChartDataArgs = {
   input: PieChartDataInput;
-};
-
-
-export type QueryPreviewMessageCampaignAudienceArgs = {
-  input: PreviewMessageCampaignAudienceInput;
-};
-
-
-export type QueryPreviewMessageCampaignSendArgs = {
-  input: PreviewMessageCampaignSendInput;
 };
 
 
@@ -6692,11 +6484,6 @@ export type SendEmailTargetRecordInput = {
   recordId: Scalars['UUID']['input'];
 };
 
-export type SendEmailViaDomainOutput = {
-  __typename?: 'SendEmailViaDomainOutput';
-  messageId: Scalars['String']['output'];
-};
-
 export type SendInboxMessageInput = {
   idempotencyKey: Scalars['String']['input'];
   text: Scalars['String']['input'];
@@ -6717,26 +6504,6 @@ export type SendInvitations = {
   result: Array<WorkspaceInvitation>;
   /** Boolean that confirms query was dispatched */
   success: Scalars['Boolean']['output'];
-};
-
-export type SendMessageCampaignInput = {
-  campaignId: Scalars['String']['input'];
-  scheduledAt?: InputMaybe<Scalars['DateTime']['input']>;
-};
-
-export type SendMessageCampaignOutputDto = {
-  __typename?: 'SendMessageCampaignOutputDTO';
-  audience: CampaignAudiencePreviewDto;
-  campaignId: Scalars['String']['output'];
-  queuedCount: Scalars['Int']['output'];
-};
-
-export type SendMessageCampaignTestInput = {
-  body: Scalars['String']['input'];
-  fromAddress: Scalars['String']['input'];
-  subject: Scalars['String']['input'];
-  toAddress: Scalars['String']['input'];
-  unsubscribeTopicId?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Sentry = {
@@ -7072,27 +6839,6 @@ export type UuidFilterComparison = {
   notIn?: InputMaybe<Array<Scalars['UUID']['input']>>;
   notLike?: InputMaybe<Scalars['UUID']['input']>;
 };
-
-export enum UnsubscribeHostnameStatus {
-  ACTIVE = 'ACTIVE',
-  FAILED = 'FAILED',
-  PENDING = 'PENDING'
-}
-
-export type UnsubscribeTopic = {
-  __typename?: 'UnsubscribeTopic';
-  createdAt: Scalars['DateTime']['output'];
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['UUID']['output'];
-  name?: Maybe<Scalars['String']['output']>;
-  updatedAt: Scalars['DateTime']['output'];
-  visibility: UnsubscribeTopicVisibility;
-};
-
-export enum UnsubscribeTopicVisibility {
-  PRIVATE = 'PRIVATE',
-  PUBLIC = 'PUBLIC'
-}
 
 export type UpdateAgentChatChannelInput = {
   color?: InputMaybe<Scalars['String']['input']>;
@@ -7437,13 +7183,6 @@ export type UpdateTimelineActivityTypeInput = {
   translations?: InputMaybe<Array<MetadataTranslationOverrideInput>>;
 };
 
-export type UpdateUnsubscribeTopicInput = {
-  description?: InputMaybe<Scalars['String']['input']>;
-  id: Scalars['String']['input'];
-  name?: InputMaybe<Scalars['String']['input']>;
-  visibility?: InputMaybe<UnsubscribeTopicVisibility>;
-};
-
 export type UpdateUsageLimitInput = {
   id: Scalars['UUID']['input'];
   payload: CreateUsageLimitInput;
@@ -7598,8 +7337,6 @@ export type UpdateWorkspaceInput = {
   editableProfileFields?: InputMaybe<Array<Scalars['String']['input']>>;
   inviteHash?: InputMaybe<Scalars['String']['input']>;
   isAutoModelSelectionEnabled?: InputMaybe<Scalars['Boolean']['input']>;
-  isCampaignClickTrackingEnabled?: InputMaybe<Scalars['Boolean']['input']>;
-  isCampaignOpenTrackingEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   isGoogleAuthBypassEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   isGoogleAuthEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   isInternalMessagesImportEnabled?: InputMaybe<Scalars['Boolean']['input']>;
@@ -8013,15 +7750,6 @@ export type ValidationRule = {
   objectMetadataId: Scalars['UUID']['output'];
 };
 
-export type VerificationRecord = {
-  __typename?: 'VerificationRecord';
-  key: Scalars['String']['output'];
-  priority?: Maybe<Scalars['Float']['output']>;
-  status?: Maybe<Scalars['String']['output']>;
-  type: Scalars['String']['output'];
-  value: Scalars['String']['output'];
-};
-
 export type VerifyEmailAndGetLoginToken = {
   __typename?: 'VerifyEmailAndGetLoginToken';
   loginToken: AuthToken;
@@ -8362,8 +8090,6 @@ export type Workspace = {
   installedApplications: Array<Application>;
   inviteHash?: Maybe<Scalars['String']['output']>;
   isAutoModelSelectionEnabled: Scalars['Boolean']['output'];
-  isCampaignClickTrackingEnabled: Scalars['Boolean']['output'];
-  isCampaignOpenTrackingEnabled: Scalars['Boolean']['output'];
   isCustomDomainEnabled: Scalars['Boolean']['output'];
   isGoogleAuthBypassEnabled: Scalars['Boolean']['output'];
   isGoogleAuthEnabled: Scalars['Boolean']['output'];

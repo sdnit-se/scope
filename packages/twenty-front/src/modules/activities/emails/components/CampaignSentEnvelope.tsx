@@ -10,7 +10,6 @@ import { themeCssVariables } from 'twenty-ui/theme';
 
 import { ComposerFieldRow } from '@/activities/components/ComposerFieldRow';
 import { CampaignEnvelopeBox } from '@/activities/emails/components/CampaignEnvelopeBox';
-import { useUnsubscribeTopics } from '@/activities/emails/hooks/useUnsubscribeTopics';
 import { type MessageCampaign } from '@/activities/emails/types/MessageCampaign';
 import { formatCampaignSendTime } from '@/activities/emails/utils/formatCampaignSendTime';
 import { useDateTimeFormat } from '@/localization/hooks/useDateTimeFormat';
@@ -40,8 +39,6 @@ type CampaignSentEnvelopeProps = {
 export const CampaignSentEnvelope = ({
   campaign,
 }: CampaignSentEnvelopeProps) => {
-  const { unsubscribeTopics, loading: areTopicsLoading } =
-    useUnsubscribeTopics();
   const { timeFormat, timeZone } = useDateTimeFormat();
   const { localeCatalog } = useAtomStateValue(dateLocaleState);
 
@@ -60,19 +57,6 @@ export const CampaignSentEnvelope = ({
 
   const fromAddress = campaign.fromAddress?.primaryEmail;
   const subject = campaign.subject;
-
-  // Follows the sent id: a topic deleted afterwards must not erase that the send was scoped to one.
-  const hasUnsubscribeTopic = isDefined(campaign.unsubscribeTopicId);
-
-  const unsubscribeTopic = hasUnsubscribeTopic
-    ? unsubscribeTopics.find(
-        (topic) => topic.id === campaign.unsubscribeTopicId,
-      )
-    : undefined;
-
-  // A missing topic may be deleted or unreadable by this role; the two look alike.
-  const isTopicUnresolved =
-    hasUnsubscribeTopic && !isDefined(unsubscribeTopic) && !areTopicsLoading;
 
   const scheduledSendTime =
     campaign.status === MessageCampaignStatus.SCHEDULED
@@ -107,19 +91,6 @@ export const CampaignSentEnvelope = ({
           )
         )}
       </ComposerFieldRow>
-      {hasUnsubscribeTopic && (
-        <ComposerFieldRow label={t`Topic`}>
-          {isDefined(unsubscribeTopic) ? (
-            <StyledValue>
-              {unsubscribeTopic.name ?? t`Untitled topic`}
-            </StyledValue>
-          ) : (
-            isTopicUnresolved && (
-              <StyledEmptyValue>{t`Unavailable`}</StyledEmptyValue>
-            )
-          )}
-        </ComposerFieldRow>
-      )}
       <ComposerFieldRow
         label={t`Subject`}
         hasDivider={isNonEmptyString(scheduledSendTime)}

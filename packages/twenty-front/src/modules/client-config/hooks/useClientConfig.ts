@@ -19,7 +19,6 @@ import { isClickHouseConfiguredState } from '@/client-config/states/isClickHouse
 import { isCloudflareIntegrationEnabledState } from '@/client-config/states/isCloudflareIntegrationEnabledState';
 import { isDDLLockedState } from '@/client-config/states/isDDLLockedState';
 import { enterpriseInstanceTypeState } from '@/client-config/states/enterpriseInstanceTypeState';
-import { isEmailingDomainInDemoModeState } from '@/client-config/states/isEmailingDomainInDemoModeState';
 import { isEmailVerificationRequiredState } from '@/client-config/states/isEmailVerificationRequiredState';
 import { isGoogleCalendarEnabledState } from '@/client-config/states/isGoogleCalendarEnabledState';
 import { isGoogleMessagingEnabledState } from '@/client-config/states/isGoogleMessagingEnabledState';
@@ -119,10 +118,6 @@ export const useClientConfig = (): UseClientConfigResult => {
 
   const setIsCompanyEnrichmentEnabled = useSetAtomState(
     isCompanyEnrichmentEnabledState,
-  );
-
-  const setIsEmailingDomainInDemoMode = useSetAtomState(
-    isEmailingDomainInDemoModeState,
   );
 
   const setIsImapSmtpCaldavEnabled = useSetAtomState(
@@ -242,9 +237,6 @@ export const useClientConfig = (): UseClientConfigResult => {
           clientConfig?.isCompanyEnrichmentEnabled ?? false,
         );
         setIsImapSmtpCaldavEnabled(clientConfig?.isImapSmtpCaldavEnabled);
-        setIsEmailingDomainInDemoMode(
-          clientConfig?.isEmailingDomainInDemoMode ?? false,
-        );
         setAllowRequestsToTwentyIcons(clientConfig?.allowRequestsToTwentyIcons);
         setIsCloudflareIntegrationEnabled(
           clientConfig?.isCloudflareIntegrationEnabled,
@@ -300,7 +292,6 @@ export const useClientConfig = (): UseClientConfigResult => {
       setIsEmailVerificationRequired,
       setIsImapSmtpCaldavEnabled,
       setIsMultiWorkspaceEnabled,
-      setIsEmailingDomainInDemoMode,
       setIsClickHouseConfigured,
       setIsCloudflareIntegrationEnabled,
       setIsDDLLocked,

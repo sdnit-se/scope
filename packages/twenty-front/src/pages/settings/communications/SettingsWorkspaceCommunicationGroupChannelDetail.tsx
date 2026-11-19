@@ -3,21 +3,17 @@ import { SettingsAccountsMessageChannelDetails } from '@/settings/accounts/compo
 import { useDeleteEmailGroupChannel } from '@/settings/accounts/hooks/useDeleteEmailGroupChannel';
 import { useMyMessageChannels } from '@/settings/accounts/hooks/useMyMessageChannels';
 import { useUpdateEmailGroupChannel } from '@/settings/accounts/hooks/useUpdateEmailGroupChannel';
-import { getEmailChannelDomain } from '@/settings/accounts/utils/getEmailChannelDomain';
 import { SettingsDiscoveryHeroCard } from '@/settings/components/SettingsDiscoveryHeroCard';
 import { SettingsDiscoveryHeroCardFooter } from '@/settings/components/SettingsDiscoveryHeroCardFooter';
 import { SettingsEditableTitle } from '@/settings/components/SettingsEditableTitle';
 import { SettingsPageContainer } from '@/settings/components/SettingsPageContainer';
 import { SettingsSkeletonLoader } from '@/settings/components/SettingsSkeletonLoader';
 import { SettingsPageLayout } from '@/settings/components/layout/SettingsPageLayout';
-import { SettingsEmailingDomainDnsRecords } from '@/settings/emailing-domains/components/SettingsEmailingDomainDnsRecords';
-import { SettingsEmailingDomainVerifyButton } from '@/settings/emailing-domains/components/SettingsEmailingDomainVerifyButton';
 import { getDocumentationUrl } from '@/support/utils/getDocumentationUrl';
 import { SettingsTextInput } from '@/ui/input/components/SettingsTextInput';
 import { ConfirmationDialog } from '@/ui/layout/dialog/components/ConfirmationDialog';
 import { useDialog } from '@/ui/layout/dialog/hooks/useDialog';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
-import { useQuery } from '@apollo/client/react';
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { isNonEmptyString } from '@sniptt/guards';
@@ -35,7 +31,6 @@ import {
 } from 'twenty-ui/icon';
 import { Button } from 'twenty-ui/primitives/input';
 import { themeCssVariables } from 'twenty-ui/theme';
-import { GetEmailingDomainsDocument } from '~/generated-metadata/graphql';
 import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
 import { useNavigateSettings } from '~/hooks/useNavigateSettings';
 import { NotFound } from '~/pages/not-found/NotFound';
@@ -55,12 +50,6 @@ const StyledInputContainer = styled.div`
   margin-right: ${themeCssVariables.spacing[2]};
 `;
 
-const StyledSendingDomainColumn = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${themeCssVariables.spacing[3]};
-`;
-
 export const SettingsWorkspaceCommunicationGroupChannelDetail = () => {
   const { t } = useLingui();
   const currentWorkspaceMember = useAtomStateValue(currentWorkspaceMemberState);
@@ -74,7 +63,6 @@ export const SettingsWorkspaceCommunicationGroupChannelDetail = () => {
     useDeleteEmailGroupChannel();
   const { updateEmailGroupChannel, loading: updatingDisplayName } =
     useUpdateEmailGroupChannel();
-  const { data: emailingDomainsData } = useQuery(GetEmailingDomainsDocument);
 
   const [displayNameDraft, setDisplayNameDraft] = useState<string | null>(null);
 
@@ -94,11 +82,6 @@ export const SettingsWorkspaceCommunicationGroupChannelDetail = () => {
 
   const sourceHandle = channel.connectedAccount.handle;
   const forwardingAddress = channel.handle;
-
-  const channelDomain = getEmailChannelDomain(sourceHandle);
-  const emailingDomain = emailingDomainsData?.getEmailingDomains?.find(
-    (domain) => domain.domain.toLowerCase() === channelDomain,
-  );
 
   const displayName = channel.displayName ?? '';
 
@@ -257,38 +240,12 @@ export const SettingsWorkspaceCommunicationGroupChannelDetail = () => {
             />
           </Section.Root>
         )}
-        {isDefined(emailingDomain) && (
-          <Section.Root>
-            <Section.Header
-              title={t`Sending domain`}
-              description={t`Add these records at your DNS provider. Twenty checks them automatically.`}
-            />
-            <StyledSendingDomainColumn>
-              <StyledInputRow>
-                <StyledInputContainer>
-                  <SettingsTextInput
-                    instanceId="email-group-sending-domain"
-                    value={emailingDomain.domain}
-                    disabled
-                    fullWidth
-                  />
-                </StyledInputContainer>
-                <SettingsEmailingDomainVerifyButton
-                  emailingDomainId={emailingDomain.id}
-                />
-              </StyledInputRow>
-              <SettingsEmailingDomainDnsRecords
-                emailingDomain={emailingDomain}
-              />
-            </StyledSendingDomainColumn>
-          </Section.Root>
-        )}
         <SettingsAccountsMessageChannelDetails messageChannel={channel} />
       </SettingsPageContainer>
       <ConfirmationDialog
         dialogId={DELETE_EMAIL_GROUP_MODAL_ID}
         title={t`Delete email channel`}
-        subtitle={t`Are you sure you want to delete ${sourceHandle}? Inbound mail forwarded to this address and outbound replies from it will stop working.`}
+        subtitle={t`Are you sure you want to delete ${sourceHandle}? Inbound mail forwarded to this address will stop arriving.`}
         onConfirmClick={handleDelete}
         confirmButtonText={t`Delete`}
         confirmButtonColor="danger"

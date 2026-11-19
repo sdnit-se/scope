@@ -1,18 +1,11 @@
 import { act, renderHook } from '@testing-library/react';
 
-import { PREVIEW_MESSAGE_CAMPAIGN_SEND } from '@/activities/emails/graphql/metadata-queries/previewMessageCampaignSend';
 import { usePersistedCampaignDraft } from '@/activities/emails/hooks/usePersistedCampaignDraft';
 
 const mockUpdateOneRecord = jest.fn().mockResolvedValue({});
 
 jest.mock('@/object-record/hooks/useUpdateOneRecord', () => ({
   useUpdateOneRecord: () => ({ updateOneRecord: mockUpdateOneRecord }),
-}));
-
-const mockRefetchQueries = jest.fn().mockResolvedValue([]);
-
-jest.mock('@apollo/client/react', () => ({
-  useApolloClient: () => ({ refetchQueries: mockRefetchQueries }),
 }));
 
 const mockEnqueueToast = jest.fn();
@@ -82,23 +75,9 @@ describe('usePersistedCampaignDraft', () => {
     expect(result.current.draftResyncKey).toBe(resyncKeyBeforeEcho);
   });
 
-  it('should refresh the send preview once a save lands, and not when it fails', async () => {
+  it('should tell the user when a save fails', async () => {
     const { result } = renderDraftHook('');
 
-    act(() => {
-      result.current.updateDraft({ subject: 'Typed locally' });
-    });
-
-    await act(async () => {
-      jest.runOnlyPendingTimers();
-    });
-
-    expect(mockRefetchQueries).toHaveBeenCalledTimes(1);
-    expect(mockRefetchQueries).toHaveBeenCalledWith({
-      include: [PREVIEW_MESSAGE_CAMPAIGN_SEND],
-    });
-
-    mockRefetchQueries.mockClear();
     mockUpdateOneRecord.mockRejectedValueOnce(new Error('Save failed'));
 
     act(() => {
@@ -109,7 +88,6 @@ describe('usePersistedCampaignDraft', () => {
       jest.runOnlyPendingTimers();
     });
 
-    expect(mockRefetchQueries).not.toHaveBeenCalled();
     expect(mockEnqueueToast).toHaveBeenCalledTimes(1);
     expect(mockEnqueueToast).toHaveBeenCalledWith(
       expect.objectContaining({ status: 'error' }),

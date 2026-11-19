@@ -3,7 +3,6 @@ import { type MessageCampaign } from '@/activities/emails/types/MessageCampaign'
 
 type CampaignDetailsDraft = {
   listId: string | null;
-  unsubscribeTopicId: string | null;
   fromAddress: string;
   subject: string;
 };
@@ -18,13 +17,11 @@ export const useCampaignDetailsState = ({
       campaignId: campaign.id,
       initialDraft: () => ({
         listId: campaign.listId,
-        unsubscribeTopicId: campaign.unsubscribeTopicId,
         fromAddress: campaign.fromAddress?.primaryEmail ?? '',
         subject: campaign.subject ?? '',
       }),
       toUpdateOneRecordInput: (nextDraft) => ({
         listId: nextDraft.listId,
-        unsubscribeTopicId: nextDraft.unsubscribeTopicId,
         fromAddress: {
           primaryEmail: nextDraft.fromAddress.trim(),
           additionalEmails: null,
@@ -38,8 +35,6 @@ export const useCampaignDetailsState = ({
     flush,
     draftResyncKey,
     setListId: (listId: string | null) => updateDraft({ listId }),
-    setUnsubscribeTopicId: (unsubscribeTopicId: string | null) =>
-      updateDraft({ unsubscribeTopicId }),
     setFromAddress: (fromAddress: string) => updateDraft({ fromAddress }),
     setSubject: (subject: string) => updateDraft({ subject }),
   };

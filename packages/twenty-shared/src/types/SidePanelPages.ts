@@ -36,8 +36,6 @@ export enum SidePanelPages {
   CreateRelatedRecord = 'create-related-record',
   RecordCreationForm = 'record-creation-form',
   RecordCreationFormSettings = 'record-creation-form-settings',
-  SendCampaign = 'send-campaign',
-  SendCampaignTest = 'send-campaign-test',
   AddToMessageList = 'add-to-message-list',
   WorkflowVersions = 'workflow-versions',
   WorkflowVersion = 'workflow-version',

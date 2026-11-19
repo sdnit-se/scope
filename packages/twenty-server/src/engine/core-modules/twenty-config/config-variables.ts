@@ -2456,64 +2456,13 @@ export class ConfigVariables {
   @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.AWS_SES_SETTINGS,
     description:
-      'Driver used for the emailing domain feature — AWS_SES (requires AWS credentials), RESEND (requires a Resend API key), LOG fakes registration/verification/sends locally',
+      'Provider that receives email group mail — AWS_SES (stores inbound mail in S3), RESEND (requires a Resend API key), LOG for local demos without a provider',
     type: ConfigVariableType.ENUM,
     options: Object.values(EmailingDomainDriver),
     isEnvOnly: true,
   })
   @CastToUpperSnakeCase()
   EMAILING_DOMAIN_DRIVER: EmailingDomainDriver = EmailingDomainDriver.LOG;
-
-  @ConfigVariablesMetadata({
-    group: ConfigVariablesGroup.AWS_SES_SETTINGS,
-    description: 'AWS region',
-    type: ConfigVariableType.STRING,
-  })
-  @ValidateIf(
-    (env) => env.EMAILING_DOMAIN_DRIVER === EmailingDomainDriver.AWS_SES,
-  )
-  @IsAWSRegion()
-  @IsNotEmpty()
-  AWS_SES_REGION: AwsRegion;
-
-  @ConfigVariablesMetadata({
-    group: ConfigVariablesGroup.AWS_SES_SETTINGS,
-    isSensitive: true,
-    description: 'AWS access key ID',
-    type: ConfigVariableType.STRING,
-  })
-  @IsOptional()
-  AWS_SES_ACCESS_KEY_ID: string;
-
-  @ConfigVariablesMetadata({
-    group: ConfigVariablesGroup.AWS_SES_SETTINGS,
-    isSensitive: true,
-    description: 'AWS session token',
-    type: ConfigVariableType.STRING,
-  })
-  @IsOptional()
-  AWS_SES_SESSION_TOKEN: string;
-
-  @ConfigVariablesMetadata({
-    group: ConfigVariablesGroup.AWS_SES_SETTINGS,
-    isSensitive: true,
-    description: 'AWS secret access key',
-    type: ConfigVariableType.STRING,
-  })
-  @IsOptional()
-  AWS_SES_SECRET_ACCESS_KEY: string;
-
-  @ConfigVariablesMetadata({
-    group: ConfigVariablesGroup.AWS_SES_SETTINGS,
-    description: 'AWS Account ID for SES ARN construction',
-    type: ConfigVariableType.STRING,
-  })
-  @ValidateIf(
-    (env) => env.EMAILING_DOMAIN_DRIVER === EmailingDomainDriver.AWS_SES,
-  )
-  @IsString()
-  @IsNotEmpty()
-  AWS_SES_ACCOUNT_ID: string;
 
   @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.AWS_SES_SETTINGS,
@@ -2527,41 +2476,12 @@ export class ConfigVariables {
   @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.AWS_SES_SETTINGS,
     description:
-      'Comma-separated list of SNS topic ARNs accepted by the inbound-email and outbound-event webhooks (e.g. arn:aws:sns:us-east-1:123:my-inbound). Every SNS payload whose topic is absent from this list is rejected.',
+      'Comma-separated list of SNS topic ARNs accepted by the inbound-email webhook (e.g. arn:aws:sns:us-east-1:123:my-inbound). Every SNS payload whose topic is absent from this list is rejected.',
     type: ConfigVariableType.STRING,
   })
   @IsOptional()
   @IsString()
   SES_SNS_TOPIC_ARN_ALLOWLIST: string;
-
-  @ConfigVariablesMetadata({
-    group: ConfigVariablesGroup.AWS_SES_SETTINGS,
-    description:
-      'SNS topic ARN that receives SES DELIVERY, BOUNCE, COMPLAINT, REJECT and RENDERING_FAILURE events. An SNS event destination pointing at it is added to each workspace SES configuration set, and the topic must be subscribed to /webhooks/messaging/ses/outbound. Bounces and complaints also arrive through the pre-existing EventBridge destination, so those two are delivered twice and deduplicated downstream.',
-    type: ConfigVariableType.STRING,
-  })
-  @IsOptional()
-  @IsString()
-  SES_OUTBOUND_SNS_TOPIC_ARN: string;
-
-  @ConfigVariablesMetadata({
-    group: ConfigVariablesGroup.AWS_SES_SETTINGS,
-    description:
-      'Tatami Monitor ingest webhook URL (SNS HTTPS subscription target for deliverability observability).',
-    type: ConfigVariableType.STRING,
-    isSensitive: true,
-  })
-  @IsOptional()
-  TATAMI_SES_WEBHOOK_URL: string;
-
-  @ConfigVariablesMetadata({
-    group: ConfigVariablesGroup.AWS_SES_SETTINGS,
-    description:
-      'SNS topic ARN that fans out SES events to Tatami Monitor. When set, an SNS event destination is added to each workspace SES configuration set.',
-    type: ConfigVariableType.STRING,
-  })
-  @IsOptional()
-  TATAMI_SNS_TOPIC_ARN: string;
 
   @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.RESEND_SETTINGS,
@@ -2581,15 +2501,6 @@ export class ConfigVariables {
   })
   @IsOptional()
   RESEND_WEBHOOK_SIGNING_SECRET: string;
-
-  @ConfigVariablesMetadata({
-    group: ConfigVariablesGroup.RESEND_SETTINGS,
-    description:
-      'Region Resend provisions new emailing domains in (us-east-1, eu-west-1, sa-east-1 or ap-northeast-1). Leave empty for the Resend default.',
-    type: ConfigVariableType.STRING,
-  })
-  @IsOptional()
-  RESEND_DOMAIN_REGION: string;
 
   @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.ADVANCED_SETTINGS,

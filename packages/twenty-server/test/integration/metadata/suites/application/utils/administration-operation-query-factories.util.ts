@@ -482,34 +482,6 @@ export const ADMINISTRATION_OPERATION_QUERY_FACTORIES = {
     `,
     variables: { domain: PLACEHOLDER_TEXT },
   }),
-  createEmailingDomain: () => ({
-    query: gql`
-      mutation CreateEmailingDomain($input: CreateEmailingDomainInput!) {
-        createEmailingDomain(input: $input) {
-          __typename
-        }
-      }
-    `,
-    variables: { input: { domain: PLACEHOLDER_TEXT } },
-  }),
-  deleteEmailingDomain: () => ({
-    query: gql`
-      mutation DeleteEmailingDomain($id: String!) {
-        deleteEmailingDomain(id: $id)
-      }
-    `,
-    variables: { id: PLACEHOLDER_TEXT },
-  }),
-  verifyEmailingDomain: () => ({
-    query: gql`
-      mutation VerifyEmailingDomain($id: String!) {
-        verifyEmailingDomain(id: $id) {
-          __typename
-        }
-      }
-    `,
-    variables: { id: PLACEHOLDER_TEXT },
-  }),
   billingPortalSession: () => ({
     query: gql`
       query BillingPortalSession {

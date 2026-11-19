@@ -30,13 +30,6 @@ import { RecordExportModule } from 'src/engine/core-modules/record-export/record
 import { WorkspaceDataExportModule } from 'src/engine/core-modules/workspace-data-export/workspace-data-export.module';
 import { EmailingModule } from 'src/modules/emailing/emailing.module';
 import { AddPeopleToMessageListJob } from 'src/modules/emailing/jobs/add-people-to-message-list.job';
-import { MaterializeCampaignChunkJob } from 'src/modules/emailing/jobs/materialize-campaign-chunk.job';
-import { MaterializeCampaignJob } from 'src/modules/emailing/jobs/materialize-campaign.job';
-import { ReconcileWorkspaceCampaignStatsJob } from 'src/modules/emailing/jobs/reconcile-workspace-campaign-stats.job';
-import { RefreshCampaignStatsJob } from 'src/modules/emailing/jobs/refresh-campaign-stats.job';
-import { SendCampaignEmailBatchJob } from 'src/modules/emailing/jobs/send-campaign-email-batch.job';
-import { SendCampaignEmailJob } from 'src/modules/emailing/jobs/send-campaign-email.job';
-import { SendScheduledCampaignJob } from 'src/modules/emailing/jobs/send-scheduled-campaign.job';
 import { EnterpriseModule } from 'src/engine/core-modules/enterprise/enterprise.module';
 import { EventLogIngestionModule } from 'src/engine/core-modules/event-logs/ingest/event-log-ingestion.module';
 import { FeatureFlagModule } from 'src/engine/core-modules/feature-flag/feature-flag.module';
@@ -126,14 +119,7 @@ import { WorkflowModule } from 'src/modules/workflow/workflow.module';
     CleanSuspendedWorkspacesJob,
     CleanOnboardingWorkspacesJob,
     EmailSenderJob,
-    SendCampaignEmailJob,
     AddPeopleToMessageListJob,
-    SendCampaignEmailBatchJob,
-    MaterializeCampaignJob,
-    MaterializeCampaignChunkJob,
-    SendScheduledCampaignJob,
-    RefreshCampaignStatsJob,
-    ReconcileWorkspaceCampaignStatsJob,
     UpdateSubscriptionQuantityJob,
     HandleWorkspaceMemberDeletedJob,
     WorkspaceDeletionApplicationUninstallJob,
