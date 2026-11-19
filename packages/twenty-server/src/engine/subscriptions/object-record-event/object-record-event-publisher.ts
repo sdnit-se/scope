@@ -23,6 +23,10 @@ import { type FlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/typ
 import { type FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
 import { type FlatObjectMetadata } from 'src/engine/metadata-modules/flat-object-metadata/types/flat-object-metadata.type';
 import { UserWorkspaceRoleMap } from 'src/engine/metadata-modules/role-target/types/user-workspace-role-map.type';
+import {
+  buildFilterFieldsByKey,
+  isEventOutsideQueryFilter,
+} from 'src/engine/subscriptions/object-record-event/utils/is-event-outside-query-filter.util';
 import { omitRestrictedFieldsFromEvent } from 'src/engine/metadata-modules/permissions/utils/omit-restricted-fields-from-event.util';
 import { EventStreamService } from 'src/engine/subscriptions/event-stream.service';
 import { SubscriptionService } from 'src/engine/subscriptions/subscription.service';
@@ -159,6 +163,11 @@ export class ObjectRecordEventPublisher {
       objectRecordEvent: ObjectRecordSubscriptionEvent;
     }[] = [];
 
+    const fieldsByKey = buildFilterFieldsByKey({
+      objectMetadata: workspaceEventBatch.objectMetadata,
+      flatFieldMetadataMaps: permissionsContext.flatFieldMetadataMaps,
+    });
+
     // The role decides for every record of the object alike
     if (
       buildRowAccessPolicy({
@@ -208,6 +217,7 @@ export class ObjectRecordEventPublisher {
       const matchedQueryIds = this.getMatchingObjectRecordQueryIds({
         queries: streamData.queries,
         event: filteredEvent,
+        fieldsByKey,
       });
 
       if (matchedQueryIds.length === 0) {
@@ -392,9 +402,11 @@ export class ObjectRecordEventPublisher {
   private getMatchingObjectRecordQueryIds({
     queries,
     event,
+    fieldsByKey,
   }: {
     queries: Record<string, RecordOrMetadataGqlOperationSignature>;
     event: ObjectRecordSubscriptionEvent;
+    fieldsByKey: ReturnType<typeof buildFilterFieldsByKey>;
   }): string[] {
     const properties = event.properties as {
       after?: object;
@@ -405,13 +417,16 @@ export class ObjectRecordEventPublisher {
       return [];
     }
 
-    // Every live query on the object hears the change; the web app checks
-    // each record against the query's own filter when it applies it
     return Object.entries(queries)
       .filter(
         ([, operationSignature]) =>
           isRecordGqlOperationSignature(operationSignature) &&
-          operationSignature.objectNameSingular === event.objectNameSingular,
+          operationSignature.objectNameSingular === event.objectNameSingular &&
+          !isEventOutsideQueryFilter({
+            properties,
+            filter: operationSignature.variables?.filter,
+            fieldsByKey,
+          }),
       )
       .map(([queryId]) => queryId);
   }

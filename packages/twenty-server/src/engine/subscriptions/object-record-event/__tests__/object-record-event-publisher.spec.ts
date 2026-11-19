@@ -403,34 +403,67 @@ describe('ObjectRecordEventPublisher', () => {
       ).not.toHaveBeenCalled();
     });
 
-    it('should publish to every live query on the object, whatever its filter', async () => {
-      const streamDataWithFilter: EventStreamData = {
-        ...mockStreamData,
-        queries: {
-          'query-1': {
-            objectNameSingular: 'company',
-            variables: {
-              filter: { name: { eq: 'Other Company' } },
-            },
-          },
-        },
-      };
-
+    it('should not publish events when record does not match the query filter', async () => {
       mockEventStreamService.getStreamsData.mockResolvedValue(
-        new Map([[streamChannelId, streamDataWithFilter]]) as Map<
-          string,
-          EventStreamData | undefined
-        >,
+        new Map([
+          [
+            streamChannelId,
+            {
+              ...mockStreamData,
+              queries: {
+                'query-1': {
+                  objectNameSingular: 'company',
+                  variables: { filter: { name: { eq: 'Other Company' } } },
+                },
+              },
+            },
+          ],
+        ]) as Map<string, EventStreamData | undefined>,
       );
 
-      const eventBatch: WorkspaceEventBatch<MockObjectRecordEvent> = {
+      await service.publish({
         name: 'company.created',
         workspaceId,
         objectMetadata: companyObjectMetadata,
         events: [createMockEvent()],
-      };
+      } as WorkspaceEventBatch<never>);
 
-      await service.publish(eventBatch as WorkspaceEventBatch<never>);
+      expect(
+        mockSubscriptionService.publishToEventStream,
+      ).not.toHaveBeenCalled();
+    });
+
+    it('should publish update events when only the BEFORE state matches the filter (record leaving the view)', async () => {
+      mockEventStreamService.getStreamsData.mockResolvedValue(
+        new Map([
+          [
+            streamChannelId,
+            {
+              ...mockStreamData,
+              queries: {
+                'query-1': {
+                  objectNameSingular: 'company',
+                  variables: { filter: { name: { eq: 'Open Company' } } },
+                },
+              },
+            },
+          ],
+        ]) as Map<string, EventStreamData | undefined>,
+      );
+
+      await service.publish({
+        name: 'company.updated',
+        workspaceId,
+        objectMetadata: companyObjectMetadata,
+        events: [
+          createMockEvent({
+            properties: {
+              before: { id: 'record-1', name: 'Open Company' },
+              after: { id: 'record-1', name: 'Done Company' },
+            } as MockObjectRecordEvent['properties'],
+          }),
+        ],
+      } as WorkspaceEventBatch<never>);
 
       const publishCall = (
         mockSubscriptionService.publishToEventStream as jest.Mock
@@ -439,6 +472,125 @@ describe('ObjectRecordEventPublisher', () => {
       expect(
         publishCall.payload.objectRecordEventsWithQueryIds[0].queryIds,
       ).toEqual(['query-1']);
+    });
+
+    it('should not publish update events when neither state matches the filter', async () => {
+      mockEventStreamService.getStreamsData.mockResolvedValue(
+        new Map([
+          [
+            streamChannelId,
+            {
+              ...mockStreamData,
+              queries: {
+                'query-1': {
+                  objectNameSingular: 'company',
+                  variables: { filter: { name: { eq: 'Open Company' } } },
+                },
+              },
+            },
+          ],
+        ]) as Map<string, EventStreamData | undefined>,
+      );
+
+      await service.publish({
+        name: 'company.updated',
+        workspaceId,
+        objectMetadata: companyObjectMetadata,
+        events: [
+          createMockEvent({
+            properties: {
+              before: { id: 'record-1', name: 'Unrelated A' },
+              after: { id: 'record-1', name: 'Unrelated B' },
+            } as MockObjectRecordEvent['properties'],
+          }),
+        ],
+      } as WorkspaceEventBatch<never>);
+
+      expect(
+        mockSubscriptionService.publishToEventStream,
+      ).not.toHaveBeenCalled();
+    });
+
+    it('should publish when the filter cannot be judged from the record', async () => {
+      mockEventStreamService.getStreamsData.mockResolvedValue(
+        new Map([
+          [
+            streamChannelId,
+            {
+              ...mockStreamData,
+              queries: {
+                'query-1': {
+                  objectNameSingular: 'company',
+                  variables: {
+                    filter: {
+                      or: [
+                        { name: { eq: 'Other Company' } },
+                        { people: { name: { eq: 'Ada' } } },
+                      ],
+                    },
+                  },
+                },
+              },
+            },
+          ],
+        ]) as Map<string, EventStreamData | undefined>,
+      );
+
+      await service.publish({
+        name: 'company.created',
+        workspaceId,
+        objectMetadata: companyObjectMetadata,
+        events: [createMockEvent()],
+      } as WorkspaceEventBatch<never>);
+
+      const publishCall = (
+        mockSubscriptionService.publishToEventStream as jest.Mock
+      ).mock.calls[0][0];
+
+      expect(
+        publishCall.payload.objectRecordEventsWithQueryIds[0].queryIds,
+      ).toEqual(['query-1']);
+    });
+
+    it('should not publish a soft-deleted record to a query that does not ask for deleted records', async () => {
+      mockEventStreamService.getStreamsData.mockResolvedValue(
+        new Map([
+          [
+            streamChannelId,
+            {
+              ...mockStreamData,
+              queries: {
+                'query-1': {
+                  objectNameSingular: 'company',
+                  variables: { filter: {} },
+                },
+              },
+            },
+          ],
+        ]) as Map<string, EventStreamData | undefined>,
+      );
+
+      await service.publish({
+        name: 'company.updated',
+        workspaceId,
+        objectMetadata: companyObjectMetadata,
+        events: [
+          createMockEvent({
+            properties: {
+              before: { id: 'record-1', name: 'Gone', deletedAt: '2026-01-01' },
+              after: {
+                id: 'record-1',
+                name: 'Gone again',
+                deletedAt: '2026-01-01',
+              },
+            } as MockObjectRecordEvent['properties'],
+          }),
+        ],
+      } as WorkspaceEventBatch<never>);
+
+      expect(
+        mockSubscriptionService.publishToEventStream,
+      ).not.toHaveBeenCalled();
     });
 
     it('should filter restricted fields from events', async () => {
