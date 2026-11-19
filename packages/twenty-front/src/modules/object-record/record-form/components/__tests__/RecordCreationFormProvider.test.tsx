@@ -97,12 +97,7 @@ it('resolves with the error the server rejected the draft with and keeps the for
     errors: [
       {
         message: 'A company needs an amount',
-        extensions: {
-          subCode: 'VALIDATION_RULE_VIOLATION',
-          validationRuleViolations: [
-            { ruleId: 'amount-rule', fieldMetadataId: 'field-amount' },
-          ],
-        },
+        extensions: { code: 'BAD_USER_INPUT' },
       },
     ],
   });

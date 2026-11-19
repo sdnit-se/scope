@@ -4,7 +4,6 @@ import {
   PermissionsExceptionMessage,
 } from 'src/engine/metadata-modules/permissions/permissions.exception';
 import { resolveRolePermissionConfig } from 'src/engine/twenty-orm/utils/resolve-role-permission-config.util';
-import { isValidationRuleEnforcementEnabled } from 'src/engine/twenty-orm/utils/is-validation-rule-enforcement-enabled.util';
 import { Injectable, type Type } from '@nestjs/common';
 
 import { type ObjectLiteral } from 'typeorm';
@@ -13,7 +12,6 @@ import { type ObjectRecord } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 
 import { getWorkspaceAuthContext } from 'src/engine/core-modules/auth/storage/workspace-auth-context.storage';
-import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
 import { type WorkspaceAuthContext } from 'src/engine/core-modules/auth/types/workspace-auth-context.type';
 import { buildObjectIdByNameMaps } from 'src/engine/metadata-modules/flat-object-metadata/utils/build-object-id-by-name-maps.util';
 import { ExecuteInWorkspaceContextOptions } from 'src/engine/twenty-orm/types/execute-in-workspace-context-options.type';
@@ -34,7 +32,6 @@ export class WorkspaceOrmManager {
   constructor(
     private readonly workspaceCacheService: WorkspaceCacheService,
     private readonly workspaceDataSourceService: WorkspaceDataSourceService,
-    private readonly twentyConfigService: TwentyConfigService,
   ) {}
 
   getRepository<T extends ObjectLiteral = ObjectRecord>(
@@ -169,19 +166,6 @@ export class WorkspaceOrmManager {
     const { idByNameSingular: objectIdByNameSingular } =
       buildObjectIdByNameMaps(flatObjectMetadataMaps);
 
-    const flatValidationRuleMaps = isValidationRuleEnforcementEnabled({
-      featureFlagsMap,
-      billingEntitlements,
-      hasValidEnterprisePlan: false,
-      isBillingEnabled: this.twentyConfigService.get('IS_BILLING_ENABLED'),
-    })
-      ? (
-          await this.workspaceCacheService.getOrRecompute(workspaceId, [
-            'flatValidationRuleMaps',
-          ])
-        ).flatValidationRuleMaps
-      : undefined;
-
     return {
       authContext,
       flatObjectMetadataMaps,
@@ -189,7 +173,6 @@ export class WorkspaceOrmManager {
       flatIndexMaps,
       flatRowLevelPermissionPredicateMaps,
       flatRowLevelPermissionPredicateGroupMaps,
-      flatValidationRuleMaps,
       objectIdByNameSingular,
       featureFlagsMap,
       billingEntitlements,

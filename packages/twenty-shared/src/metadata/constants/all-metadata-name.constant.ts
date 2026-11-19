@@ -34,7 +34,6 @@ export const ALL_METADATA_NAME = {
   searchFieldMetadata: 'searchFieldMetadata',
   timelineActivityType: 'timelineActivityType',
   settingsMenuItem: 'settingsMenuItem',
-  validationRule: 'validationRule',
   workflow: 'workflow',
   workflowVersion: 'workflowVersion',
   agentChatChannel: 'agentChatChannel',

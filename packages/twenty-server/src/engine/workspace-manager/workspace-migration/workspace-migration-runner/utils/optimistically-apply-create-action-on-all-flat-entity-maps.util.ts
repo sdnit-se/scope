@@ -93,8 +93,7 @@ export const optimisticallyApplyCreateActionOnAllFlatEntityMaps = ({
     case 'timelineActivityType':
     case 'agentChatChannel':
     case 'agentChatChannelRole':
-    case 'settingsMenuItem':
-    case 'validationRule': {
+    case 'settingsMenuItem': {
       addFlatEntityToFlatEntityAndRelatedEntityMapsThroughMutationOrThrow({
         flatEntity: flatAction.flatEntity,
         flatEntityAndRelatedMapsToMutate: allFlatEntityMaps,

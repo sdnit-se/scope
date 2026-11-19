@@ -107,7 +107,6 @@ const deriveAllMetadataEventsFromCreateAction = (
     case 'agentChatChannel':
     case 'agentChatChannelRole':
     case 'settingsMenuItem':
-    case 'validationRule':
     case 'searchFieldMetadata': {
       return [
         {

@@ -116,9 +116,6 @@ import { DeleteAgentChatChannelRoleActionHandlerService } from 'src/engine/works
 import { CreateSettingsMenuItemActionHandlerService } from 'src/engine/workspace-manager/workspace-migration/workspace-migration-runner/action-handlers/settings-menu-item/services/create-settings-menu-item-action-handler.service';
 import { DeleteSettingsMenuItemActionHandlerService } from 'src/engine/workspace-manager/workspace-migration/workspace-migration-runner/action-handlers/settings-menu-item/services/delete-settings-menu-item-action-handler.service';
 import { UpdateSettingsMenuItemActionHandlerService } from 'src/engine/workspace-manager/workspace-migration/workspace-migration-runner/action-handlers/settings-menu-item/services/update-settings-menu-item-action-handler.service';
-import { CreateValidationRuleActionHandlerService } from 'src/engine/workspace-manager/workspace-migration/workspace-migration-runner/action-handlers/validation-rule/services/create-validation-rule-action-handler.service';
-import { DeleteValidationRuleActionHandlerService } from 'src/engine/workspace-manager/workspace-migration/workspace-migration-runner/action-handlers/validation-rule/services/delete-validation-rule-action-handler.service';
-import { UpdateValidationRuleActionHandlerService } from 'src/engine/workspace-manager/workspace-migration/workspace-migration-runner/action-handlers/validation-rule/services/update-validation-rule-action-handler.service';
 import { CreateSearchFieldMetadataActionHandlerService } from 'src/engine/workspace-manager/workspace-migration/workspace-migration-runner/action-handlers/search-field-metadata/services/create-search-field-metadata-action-handler.service';
 import { DeleteSearchFieldMetadataActionHandlerService } from 'src/engine/workspace-manager/workspace-migration/workspace-migration-runner/action-handlers/search-field-metadata/services/delete-search-field-metadata-action-handler.service';
 import { UpdateSearchFieldMetadataActionHandlerService } from 'src/engine/workspace-manager/workspace-migration/workspace-migration-runner/action-handlers/search-field-metadata/services/update-search-field-metadata-action-handler.service';
@@ -283,10 +280,6 @@ import { WorkflowDeletionModule } from 'src/modules/workflow/workflow-deletion/w
     CreateAgentChatChannelRoleActionHandlerService,
     UpdateAgentChatChannelRoleActionHandlerService,
     DeleteAgentChatChannelRoleActionHandlerService,
-    CreateValidationRuleActionHandlerService,
-    UpdateValidationRuleActionHandlerService,
-    DeleteValidationRuleActionHandlerService,
-
     CreateSearchFieldMetadataActionHandlerService,
     UpdateSearchFieldMetadataActionHandlerService,
     DeleteSearchFieldMetadataActionHandlerService,

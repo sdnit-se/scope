@@ -296,10 +296,6 @@ export const MANIFEST_ENTITY_REGISTRY: Record<
     entityKind: 'workflow version',
     getCandidates: () => NO_MANIFEST_CANDIDATES,
   },
-  validationRule: {
-    entityKind: 'validation rule',
-    getCandidates: () => NO_MANIFEST_CANDIDATES,
-  },
   agentChatChannel: {
     entityKind: 'chat channel',
     getCandidates: () => NO_MANIFEST_CANDIDATES,

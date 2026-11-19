@@ -28,18 +28,11 @@ import { recordCreationFormIsSubmittingComponentState } from '@/side-panel/pages
 import { recordCreationFormPendingContactLookupComponentState } from '@/side-panel/pages/record-creation-form/states/recordCreationFormPendingContactLookupComponentState';
 import { recordCreationFormRequestComponentState } from '@/side-panel/pages/record-creation-form/states/recordCreationFormRequestComponentState';
 import { SidePanelFooter } from '@/ui/layout/side-panel/components/SidePanelFooter';
-import { useValidationRules } from '@/validation-rules/hooks/useValidationRules';
-import { type ValidationRuleViolation } from '@/validation-rules/types/ValidationRuleViolation';
-import { buildValidationRuleFieldDescriptors } from '@/validation-rules/utils/buildValidationRuleFieldDescriptors';
-import { computeDraftValidationRuleViolations } from '@/validation-rules/utils/computeDraftValidationRuleViolations';
-import { getValidationRuleViolationsFromError } from '@/validation-rules/utils/getValidationRuleViolationsFromError';
-import { groupValidationRuleViolationsByField } from '@/validation-rules/utils/groupValidationRuleViolationsByField';
 import { useAtomComponentState } from '@/ui/utilities/state/jotai/hooks/useAtomComponentState';
 import { useAtomComponentStateCallbackState } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateCallbackState';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { useStore } from 'jotai';
 import { useId, useState } from 'react';
-import { flushSync } from 'react-dom';
 import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
 import { Key } from 'ts-key-enum';
@@ -47,7 +40,7 @@ import { type JsonValue } from 'type-fest';
 import { PermissionFlagType } from 'twenty-shared/constants';
 import { isNonEmptyString } from '@sniptt/guards';
 import { isDefined } from 'twenty-shared/utils';
-import { InlineBanner, useToast } from 'twenty-ui/components/feedback';
+import { useToast } from 'twenty-ui/components/feedback';
 import { LightButton } from 'twenty-ui/components/input';
 import { Dropdown } from 'twenty-ui/components/navigation';
 import {
@@ -64,16 +57,6 @@ const StyledContainer = styled.div`
   flex-direction: column;
   height: 100%;
   outline: none;
-`;
-
-const StyledValidationRuleErrors = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-  gap: ${themeCssVariables.spacing[2]};
-  max-height: 30%;
-  overflow-y: auto;
-  padding: ${themeCssVariables.spacing[2]} ${themeCssVariables.spacing[3]};
 `;
 
 const StyledContent = styled.div`
@@ -157,12 +140,6 @@ const SidePanelRecordCreationForm = ({
   const formMountId = useId();
   const formInstanceId = `${formMountId}-${formResetCount}`;
   const optionsDropdownId = useId();
-  const [draftValidationRuleViolations, setDraftValidationRuleViolations] =
-    useState<ValidationRuleViolation[]>([]);
-  const [serverValidationRuleViolations, setServerValidationRuleViolations] =
-    useState<ValidationRuleViolation[]>([]);
-
-  const { validationRules } = useValidationRules({ objectMetadataId });
   const currentFocusId = useAtomStateValue(currentFocusIdSelector);
 
   const draftRecord = recordCreationFormDraft ?? initialDraftRecord;
@@ -201,40 +178,11 @@ const SidePanelRecordCreationForm = ({
     ...(recordCreationFormAreHiddenFieldsShown ? hiddenFieldMetadataItems : []),
   ];
 
-  const { violationsByFieldMetadataId, recordViolations } =
-    groupValidationRuleViolationsByField({
-      violations: [
-        ...draftValidationRuleViolations,
-        ...serverValidationRuleViolations,
-      ],
-      displayedFieldMetadataIds: displayedFieldMetadataItems.map(
-        (fieldMetadataItem) => fieldMetadataItem.id,
-      ),
-    });
-
-  const computeViolations = (draftRecordToCheck: Partial<ObjectRecord>) =>
-    computeDraftValidationRuleViolations({
-      validationRules,
-      draftRecord: draftRecordToCheck,
-      fields: buildValidationRuleFieldDescriptors({
-        objectMetadataItem,
-        objectMetadataItems,
-      }),
-      fieldMetadataItems: objectMetadataItem.fields,
-      now: new Date().toISOString(),
-    });
-
   const updateDraftRecord = (gqlFieldName: string, value: JsonValue) => {
     setRecordCreationFormDraft((previousDraftRecord) => ({
       ...(previousDraftRecord ?? initialDraftRecord),
       [gqlFieldName]: value,
     }));
-
-    if (draftValidationRuleViolations.length > 0) {
-      setDraftValidationRuleViolations(
-        computeViolations({ ...draftRecord, [gqlFieldName]: value }),
-      );
-    }
   };
 
   const { lookUpPointOfContact } = usePointOfContactLookup();
@@ -341,19 +289,6 @@ const SidePanelRecordCreationForm = ({
     );
   };
 
-  const revealHiddenFieldsIfTargeted = (
-    targetedFieldMetadataIds: (string | null)[],
-  ) => {
-    const isAnyHiddenFieldTargeted = hiddenFieldMetadataItems.some(
-      (fieldMetadataItem) =>
-        targetedFieldMetadataIds.includes(fieldMetadataItem.id),
-    );
-
-    if (isAnyHiddenFieldTargeted) {
-      setRecordCreationFormAreHiddenFieldsShown(true);
-    }
-  };
-
   const scrollToFirstFieldViolation = () =>
     document
       .getElementById(contentId)
@@ -386,25 +321,6 @@ const SidePanelRecordCreationForm = ({
         return;
       }
 
-      setServerValidationRuleViolations([]);
-
-      if (validationRules.length > 0) {
-        const draftViolations = computeViolations(draftRecord);
-
-        flushSync(() => {
-          setDraftValidationRuleViolations(draftViolations);
-
-          revealHiddenFieldsIfTargeted(
-            draftViolations.map((violation) => violation.fieldMetadataId),
-          );
-        });
-
-        if (draftViolations.length > 0) {
-          scrollToFirstFieldViolation();
-          return;
-        }
-      }
-
       const { error } = await settleRecordCreationDraft({
         requestId,
         draftRecord: computeRecordFormCreateRecordInput({
@@ -418,7 +334,6 @@ const SidePanelRecordCreationForm = ({
       if (!isDefined(error)) {
         if (shouldKeepOpen) {
           setRecordCreationFormDraft(null);
-          setDraftValidationRuleViolations([]);
           setRecordCreationFormAreHiddenFieldsShown(false);
           setFormResetCount(
             (previousFormResetCount) => previousFormResetCount + 1,
@@ -432,22 +347,7 @@ const SidePanelRecordCreationForm = ({
         return;
       }
 
-      const serverViolations = getValidationRuleViolationsFromError(error);
-
-      flushSync(() => {
-        setServerValidationRuleViolations(serverViolations);
-
-        revealHiddenFieldsIfTargeted(
-          serverViolations.map((violation) => violation.fieldMetadataId),
-        );
-      });
-
-      if (serverViolations.length === 0) {
-        enqueueToast(getToastOptionsFromError({ error }));
-        return;
-      }
-
-      scrollToFirstFieldViolation();
+      enqueueToast(getToastOptionsFromError({ error }));
     } finally {
       store.set(isSubmittingAtom, false);
     }
@@ -498,9 +398,6 @@ const SidePanelRecordCreationForm = ({
           objectMetadataItem={objectMetadataItem}
           fieldMetadataItems={visibleFieldMetadataItems}
           draftRecord={draftRecord}
-          validationRuleViolationsByFieldMetadataId={
-            violationsByFieldMetadataId
-          }
           onFieldValueChange={handleFieldValueChange}
           onFieldValueClear={handleFieldValueClear}
           formInstanceId={formInstanceId}
@@ -528,24 +425,12 @@ const SidePanelRecordCreationForm = ({
             objectMetadataItem={objectMetadataItem}
             fieldMetadataItems={hiddenFieldMetadataItems}
             draftRecord={draftRecord}
-            validationRuleViolationsByFieldMetadataId={
-              violationsByFieldMetadataId
-            }
             onFieldValueChange={handleFieldValueChange}
             onFieldValueClear={handleFieldValueClear}
             formInstanceId={formInstanceId}
           />
         )}
       </StyledContent>
-      {recordViolations.length > 0 && (
-        <StyledValidationRuleErrors>
-          {recordViolations.map((violation) => (
-            <InlineBanner key={violation.ruleId} status="error" role="alert">
-              {violation.message}
-            </InlineBanner>
-          ))}
-        </StyledValidationRuleErrors>
-      )}
       <SidePanelFooter
         actions={[
           isOptionsDropdownShown && (

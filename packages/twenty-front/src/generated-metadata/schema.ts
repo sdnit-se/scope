@@ -357,7 +357,6 @@ export enum AllMetadataName {
   settingsMenuItem = 'settingsMenuItem',
   skill = 'skill',
   timelineActivityType = 'timelineActivityType',
-  validationRule = 'validationRule',
   view = 'view',
   viewField = 'viewField',
   viewFieldGroup = 'viewFieldGroup',
@@ -1757,17 +1756,6 @@ export type CreateUsageLimitInput = {
   unit: UsageUnit;
 };
 
-export type CreateValidationRuleInput = {
-  description?: InputMaybe<Scalars['String']['input']>;
-  errorFieldMetadataId?: InputMaybe<Scalars['UUID']['input']>;
-  expression: Scalars['String']['input'];
-  icon?: InputMaybe<Scalars['String']['input']>;
-  isActive?: InputMaybe<Scalars['Boolean']['input']>;
-  message: Scalars['String']['input'];
-  name: Scalars['String']['input'];
-  objectMetadataId: Scalars['UUID']['input'];
-};
-
 export type CreateViewFieldGroupInput = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   isVisible?: InputMaybe<Scalars['Boolean']['input']>;
@@ -3141,7 +3129,6 @@ export type Mutation = {
   createSkill: Skill;
   createSubscriptionPaymentIntent: BillingPaymentIntent;
   createUsageLimit: UsageLimit;
-  createValidationRule: ValidationRule;
   createView: View;
   createViewField: ViewField;
   createViewFieldGroup: ViewFieldGroup;
@@ -3176,7 +3163,6 @@ export type Mutation = {
   deleteUsageLimit: Scalars['Boolean']['output'];
   deleteUser: User;
   deleteUserFromWorkspace: UserWorkspace;
-  deleteValidationRule: ValidationRule;
   deleteView: Scalars['Boolean']['output'];
   deleteViewField: ViewField;
   deleteViewFieldGroup: ViewFieldGroup;
@@ -3329,7 +3315,6 @@ export type Mutation = {
   updateUsageLimit: UsageLimit;
   updateUserCreditsFallback: BillingCustomer;
   updateUserEmail: Scalars['Boolean']['output'];
-  updateValidationRule: ValidationRule;
   updateView: View;
   updateViewField: ViewField;
   updateViewFieldGroup: ViewFieldGroup;
@@ -3653,11 +3638,6 @@ export type MutationCreateUsageLimitArgs = {
 };
 
 
-export type MutationCreateValidationRuleArgs = {
-  input: CreateValidationRuleInput;
-};
-
-
 export type MutationCreateViewArgs = {
   input: CreateViewInput;
 };
@@ -3817,11 +3797,6 @@ export type MutationDeleteUsageLimitArgs = {
 
 export type MutationDeleteUserFromWorkspaceArgs = {
   workspaceMemberIdToDelete: Scalars['String']['input'];
-};
-
-
-export type MutationDeleteValidationRuleArgs = {
-  id: Scalars['UUID']['input'];
 };
 
 
@@ -4578,11 +4553,6 @@ export type MutationUpdateUserCreditsFallbackArgs = {
 export type MutationUpdateUserEmailArgs = {
   newEmail: Scalars['String']['input'];
   verifyEmailRedirectPath?: InputMaybe<Scalars['String']['input']>;
-};
-
-
-export type MutationUpdateValidationRuleArgs = {
-  input: UpdateValidationRuleInput;
 };
 
 
@@ -5411,7 +5381,6 @@ export type Query = {
   usageQuotaScopeConsumption?: Maybe<UsageQuotaScopeConsumption>;
   usageQuotasWithConsumption: Array<UsageQuotaWithConsumption>;
   validatePasswordResetToken: ValidatePasswordResetToken;
-  validationRules: Array<ValidationRule>;
   webhook?: Maybe<Webhook>;
   webhooks: Array<Webhook>;
 };
@@ -5914,11 +5883,6 @@ export type QueryUsageQuotaScopeConsumptionArgs = {
 
 export type QueryValidatePasswordResetTokenArgs = {
   passwordResetToken: Scalars['String']['input'];
-};
-
-
-export type QueryValidationRulesArgs = {
-  objectMetadataId: Scalars['UUID']['input'];
 };
 
 
@@ -6978,21 +6942,6 @@ export type UpdateUsageLimitInput = {
   payload: CreateUsageLimitInput;
 };
 
-export type UpdateValidationRuleInput = {
-  id: Scalars['UUID']['input'];
-  update: UpdateValidationRuleInputUpdates;
-};
-
-export type UpdateValidationRuleInputUpdates = {
-  description?: InputMaybe<Scalars['String']['input']>;
-  errorFieldMetadataId?: InputMaybe<Scalars['UUID']['input']>;
-  expression?: InputMaybe<Scalars['String']['input']>;
-  icon?: InputMaybe<Scalars['String']['input']>;
-  isActive?: InputMaybe<Scalars['Boolean']['input']>;
-  message?: InputMaybe<Scalars['String']['input']>;
-  name?: InputMaybe<Scalars['String']['input']>;
-};
-
 export type UpdateViewFieldGroupInput = {
   /** The id of the view field group to update */
   id: Scalars['UUID']['input'];
@@ -7524,19 +7473,6 @@ export type ValidatePasswordResetToken = {
   email: Scalars['String']['output'];
   hasPassword: Scalars['Boolean']['output'];
   id: Scalars['UUID']['output'];
-};
-
-export type ValidationRule = {
-  __typename?: 'ValidationRule';
-  description?: Maybe<Scalars['String']['output']>;
-  errorFieldMetadataId?: Maybe<Scalars['UUID']['output']>;
-  expression: Scalars['String']['output'];
-  icon?: Maybe<Scalars['String']['output']>;
-  id: Scalars['UUID']['output'];
-  isActive: Scalars['Boolean']['output'];
-  message: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  objectMetadataId: Scalars['UUID']['output'];
 };
 
 export type VerifyEmailAndGetLoginToken = {

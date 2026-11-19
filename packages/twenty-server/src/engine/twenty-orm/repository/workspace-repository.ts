@@ -66,8 +66,6 @@ import { type RolePermissionConfig } from 'src/engine/twenty-orm/types/role-perm
 import { getRoleIdsFromRolePermissionConfig } from 'src/engine/twenty-orm/utils/get-role-ids-from-role-permission-config.util';
 import { resolveRowLevelPermissionRecordFilter } from 'src/engine/twenty-orm/utils/resolve-row-level-permission-record-filter.util';
 import { validateRLSPredicatesForRecords } from 'src/engine/twenty-orm/utils/validate-rls-predicates-for-records.util';
-import { getActiveValidationRules } from 'src/engine/twenty-orm/utils/get-active-validation-rules.util';
-import { validateRecordsAgainstValidationRulesOrThrow } from 'src/engine/twenty-orm/utils/validate-records-against-validation-rules.util';
 import {
   TwentyOrmException,
   TwentyOrmExceptionCode,
@@ -127,8 +125,6 @@ const MUTATION_EVENT_ACTIONS_BY_KIND: Record<
   'soft-delete': [DatabaseEventAction.DELETED],
   update: [DatabaseEventAction.UPDATED, DatabaseEventAction.UPSERTED],
 };
-
-type ValidateWrittenRecords = (writtenRecords: ObjectRecord[]) => Promise<void>;
 
 type WorkspaceRepositoryOptions<TEntity extends ObjectLiteral> = {
   tableShape: WorkspaceTableShape;
@@ -771,39 +767,6 @@ export class WorkspaceRepository<TEntity extends ObjectLiteral = ObjectRecord> {
       : this.options.runInNewTransaction(work);
   }
 
-  private runWithValidationRules<TResult>({
-    write,
-    inputRecordIds,
-  }: {
-    write: (
-      repository: WorkspaceRepository<TEntity>,
-      validateWrittenRecords?: ValidateWrittenRecords,
-    ) => Promise<TResult>;
-    inputRecordIds?: (string | undefined)[];
-  }): Promise<TResult> {
-    const validationRules = getActiveValidationRules({
-      flatValidationRuleMaps:
-        this.options.internalContext.flatValidationRuleMaps,
-      objectMetadataId: this.options.flatObjectMetadata.id,
-    });
-
-    if (validationRules.length === 0) {
-      return write(this);
-    }
-
-    return this.runAtomically((repository) =>
-      write(repository, (writtenRecords) =>
-        validateRecordsAgainstValidationRulesOrThrow({
-          repository,
-          tableShape: this.options.tableShape,
-          validationRules,
-          writtenRecords,
-          inputRecordIds,
-        }),
-      ),
-    );
-  }
-
   private async findExistingIds(ids: string[]): Promise<Set<string>> {
     if (ids.length === 0) {
       return new Set<string>();
@@ -999,32 +962,14 @@ export class WorkspaceRepository<TEntity extends ObjectLiteral = ObjectRecord> {
     }
   }
 
-  async runInsert(args: {
-    records: Partial<ObjectRecord>[];
-    columnsToReturn: string[];
-    onConflictDoNothing?: boolean;
-  }): Promise<{
-    identifiers: { id: string }[];
-    generatedMaps: ObjectRecord[];
-    raw: ObjectRecord[];
-  }> {
-    return this.runWithValidationRules({
-      inputRecordIds: args.records.map((record) => record.id),
-      write: (repository, validateWrittenRecords) =>
-        repository.performInsert({ ...args, validateWrittenRecords }),
-    });
-  }
-
-  private async performInsert({
+  async runInsert({
     records,
     columnsToReturn,
     onConflictDoNothing,
-    validateWrittenRecords,
   }: {
     records: Partial<ObjectRecord>[];
     columnsToReturn: string[];
     onConflictDoNothing?: boolean;
-    validateWrittenRecords?: ValidateWrittenRecords;
   }): Promise<{
     identifiers: { id: string }[];
     generatedMaps: ObjectRecord[];
@@ -1085,8 +1030,6 @@ export class WorkspaceRepository<TEntity extends ObjectLiteral = ObjectRecord> {
 
     const rawRows = await this.executeRaw<ObjectRecord>(sql, parameters);
 
-    await validateWrittenRecords?.(rawRows);
-
     await this.acquireRecordStock(rawRows.length);
 
     if (isDefined(filesFieldFileIds)) {
@@ -1105,29 +1048,12 @@ export class WorkspaceRepository<TEntity extends ObjectLiteral = ObjectRecord> {
     };
   }
 
-  async runBatchUpdate(args: {
-    inputs: { id: string; data: Partial<ObjectRecord> }[];
-    columnsToReturn: string[];
-  }): Promise<{
-    identifiers: { id: string }[];
-    generatedMaps: ObjectRecord[];
-    raw: ObjectRecord[];
-  }> {
-    return this.runWithValidationRules({
-      inputRecordIds: args.inputs.map((input) => input.id),
-      write: (repository, validateWrittenRecords) =>
-        repository.performBatchUpdate({ ...args, validateWrittenRecords }),
-    });
-  }
-
-  private async performBatchUpdate({
+  async runBatchUpdate({
     inputs,
     columnsToReturn,
-    validateWrittenRecords,
   }: {
     inputs: { id: string; data: Partial<ObjectRecord> }[];
     columnsToReturn: string[];
-    validateWrittenRecords?: ValidateWrittenRecords;
   }): Promise<{
     identifiers: { id: string }[];
     generatedMaps: ObjectRecord[];
@@ -1262,8 +1188,6 @@ export class WorkspaceRepository<TEntity extends ObjectLiteral = ObjectRecord> {
         ),
       );
     }
-
-    await validateWrittenRecords?.(generatedMaps);
 
     if (isDefined(filesFieldFileIds)) {
       await this.filesFieldSync.updateFileEntityRecords(filesFieldFileIds);
@@ -1490,44 +1414,18 @@ export class WorkspaceRepository<TEntity extends ObjectLiteral = ObjectRecord> {
     return new Set(rows.map((row) => String(row.id)));
   }
 
-  async runMutation(args: {
-    selectQueryBuilder: WorkspaceSelectQueryBuilder;
-    rowLevelPermissionsApplied: boolean;
-    kind: MutationKind;
-    columnsToReturn: string[];
-    data?: Partial<ObjectRecord>;
-  }): Promise<ObjectRecord[]> {
-    if (args.kind !== 'update') {
-      return this.performMutation(args);
-    }
-
-    return this.runWithValidationRules({
-      write: (repository, validateWrittenRecords) =>
-        repository.performMutation({
-          ...args,
-          selectQueryBuilder:
-            repository === this
-              ? args.selectQueryBuilder
-              : args.selectQueryBuilder.clone(repository.options.executor),
-          validateWrittenRecords,
-        }),
-    });
-  }
-
-  private async performMutation({
+  async runMutation({
     selectQueryBuilder,
     rowLevelPermissionsApplied,
     kind,
     columnsToReturn,
     data,
-    validateWrittenRecords,
   }: {
     selectQueryBuilder: WorkspaceSelectQueryBuilder;
     rowLevelPermissionsApplied: boolean;
     kind: MutationKind;
     columnsToReturn: string[];
     data?: Partial<ObjectRecord>;
-    validateWrittenRecords?: ValidateWrittenRecords;
   }): Promise<ObjectRecord[]> {
     this.validateWriteIsPermitted({
       operationType: kind,
@@ -1633,8 +1531,6 @@ export class WorkspaceRepository<TEntity extends ObjectLiteral = ObjectRecord> {
     if (kind === 'delete') {
       await this.releaseRecordStock(mutationResult.generatedMaps.length);
     }
-
-    await validateWrittenRecords?.(mutationResult.generatedMaps);
 
     if (isDefined(filesFieldFileIds)) {
       await this.filesFieldSync.updateFileEntityRecords(filesFieldFileIds);
