@@ -14,7 +14,6 @@ import {
 } from 'test/integration/metadata/suites/connection-provider/utils/setup-application-with-app-connection.util';
 import { makeMetadataApiRequest } from 'test/integration/metadata/suites/utils/make-metadata-api-request.util';
 import { expectOneNotInternalServerErrorHttpResponseSnapshot } from 'test/integration/utils/expect-one-not-internal-server-error-http-response-snapshot.util';
-import { getAppProviderByClassName } from 'test/integration/utils/get-app-provider-by-class-name.util';
 import {
   type EachTestingContext,
   eachTestingContextFilter,
@@ -22,7 +21,6 @@ import {
 import { isDefined } from 'twenty-shared/utils';
 import { v4 as uuidv4 } from 'uuid';
 
-import { type AppBillingService } from 'src/engine/core-modules/billing/app-billing/app-billing.service';
 import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
 import { SEED_APPLE_WORKSPACE_ID } from 'src/engine/workspace-manager/dev-seeder/core/constants/seeder-workspaces.constant';
 import { TWENTY_CLI_APPLICATION_REGISTRATION } from 'src/engine/workspace-manager/twenty-standard-application/constants/twenty-cli-application-registration.constant';
@@ -31,7 +29,6 @@ type GlobalTestContext = {
   application: ApplicationWithAppConnection;
   target: ApplicationOnlyEndpointTarget;
   oauthClientToken: string;
-  emitChargeEventSpy: jest.SpyInstance;
 };
 
 type CallerTestContext = {
@@ -128,10 +125,7 @@ const GRAPHQL_STATE_READERS: Partial<
   ingestAppMessages: readIngestedMessages,
 };
 
-const REST_STATE_READERS: Partial<Record<RestRequestName, StateReader>> = {
-  'POST /app/billing/charge': async ({ emitChargeEventSpy }) =>
-    emitChargeEventSpy.mock.calls.length,
-};
+const REST_STATE_READERS: Partial<Record<RestRequestName, StateReader>> = {};
 
 const graphqlOperationNames = Object.keys(
   APPLICATION_ONLY_GRAPHQL_OPERATION_FACTORIES,
@@ -188,18 +182,10 @@ describe('Application-only endpoints with a non-application caller should fail',
         batchJobId: `application-only-probe.${uuidv4()}`,
       },
       oauthClientToken,
-      emitChargeEventSpy: jest.spyOn(
-        getAppProviderByClassName<AppBillingService>('AppBillingService'),
-        'emitChargeEvent',
-      ),
     };
   }, 120000);
 
   afterAll(async () => {
-    if (isDefined(globalTestContext)) {
-      globalTestContext.emitChargeEventSpy.mockRestore();
-    }
-
     await globalThis.testDataSource.query(
       `DELETE FROM core."keyValuePair" WHERE key = $1`,
       [KEY_VALUE_KEY],

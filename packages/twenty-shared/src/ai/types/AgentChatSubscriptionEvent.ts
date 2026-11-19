@@ -15,11 +15,4 @@ export type AgentChatSubscriptionEvent =
       revision: number;
     }
   | { type: 'stream-error'; code: string; message: string }
-  | { type: 'credits-exhausted' }
-  | {
-      type: 'user-credits-exhausted';
-      workspaceMemberId: string;
-      isFallingBackToWorkspaceCredits: boolean;
-      renewsAt: string;
-    }
   | { type: 'keepalive' };

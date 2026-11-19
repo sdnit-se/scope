@@ -6,16 +6,7 @@ import { assertUnreachable, isDefined } from 'twenty-shared/utils';
 import { WorkspaceActivationStatus } from 'twenty-shared/workspace';
 import { type DataSource, type QueryRunner, Repository } from 'typeorm';
 
-import { BillingCreditGrantType } from 'src/engine/core-modules/billing/enums/billing-credit-grant-type.enum';
-import { BillingCreditGrantService } from 'src/engine/core-modules/billing/services/billing-credit-grant.service';
-import { BillingCreditService } from 'src/engine/core-modules/billing/services/billing-credit.service';
-import { BillingService } from 'src/engine/core-modules/billing/services/billing.service';
-import { CacheLockService } from 'src/engine/core-modules/cache-lock/cache-lock.service';
-import { ExceptionHandlerService } from 'src/engine/core-modules/exception-handler/exception-handler.service';
-import { ONBOARDING_INVITE_TEAM_REWARD_LOCK_OPTIONS } from 'src/engine/core-modules/onboarding/constants/onboarding-invite-team-reward-lock-options';
-import { ONBOARDING_REWARD_IDEMPOTENCY_KEY_PREFIXES } from 'src/engine/core-modules/onboarding/constants/onboarding-reward-idempotency-key-prefixes';
 import { ACQUIRE_ONBOARDING_STEP_TRANSITION_LOCK_STATEMENT } from 'src/engine/core-modules/onboarding/constants/acquire-onboarding-step-transition-lock-statement';
-import { buildOnboardingInviteTeamRewardLockKey } from 'src/engine/core-modules/onboarding/utils/build-onboarding-invite-team-reward-lock-key.util';
 import { buildOnboardingStepTransitionLockName } from 'src/engine/core-modules/onboarding/utils/build-onboarding-step-transition-lock-name.util';
 import { OnboardingStatus } from 'src/engine/core-modules/onboarding/enums/onboarding-status.enum';
 import {
@@ -23,7 +14,6 @@ import {
   OnboardingExceptionCode,
 } from 'src/engine/core-modules/onboarding/onboarding.exception';
 import { type ReversibleOnboardingStep } from 'src/engine/core-modules/onboarding/types/reversible-onboarding-step.type';
-import { getOnboardingEnrichmentCreditRewardMicro } from 'src/engine/core-modules/onboarding/utils/get-onboarding-enrichment-credit-reward-micro.util';
 import { readBookCallStepMinEmployeeCount } from 'src/engine/core-modules/onboarding/utils/read-book-call-step-min-employee-count.util';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
 import { UserVarsService } from 'src/engine/core-modules/user/user-vars/services/user-vars.service';
@@ -53,11 +43,6 @@ export class OnboardingService {
   private readonly logger = new Logger(OnboardingService.name);
 
   constructor(
-    private readonly billingService: BillingService,
-    private readonly billingCreditService: BillingCreditService,
-    private readonly billingCreditGrantService: BillingCreditGrantService,
-    private readonly cacheLockService: CacheLockService,
-    private readonly exceptionHandlerService: ExceptionHandlerService,
     private readonly userVarsService: UserVarsService<OnboardingKeyValueTypeMap>,
     private readonly twentyConfigService: TwentyConfigService,
     @InjectRepository(WorkspaceEntity)
@@ -141,9 +126,6 @@ export class OnboardingService {
     const isInviteTeamPending =
       userVars.get(OnboardingStepKeys.ONBOARDING_INVITE_TEAM_PENDING) === true;
 
-    const isBookCallPending =
-      userVars.get(OnboardingStepKeys.ONBOARDING_BOOK_CALL_PENDING) === true;
-
     if (isConnectAccountPending) {
       return OnboardingStatus.SYNC_EMAIL;
     }
@@ -154,23 +136,6 @@ export class OnboardingService {
 
     if (isInviteTeamPending) {
       return OnboardingStatus.INVITE_TEAM;
-    }
-
-    const isPlanRequired =
-      await this.billingService.isSubscriptionIncompleteOnboardingStatus(
-        workspace.id,
-      );
-
-    if (
-      isBookCallPending &&
-      isPlanRequired &&
-      isDefined(readBookCallStepMinEmployeeCount(this.twentyConfigService))
-    ) {
-      return OnboardingStatus.BOOK_CALL;
-    }
-
-    if (isPlanRequired) {
-      return OnboardingStatus.PLAN_REQUIRED;
     }
 
     return OnboardingStatus.COMPLETED;
@@ -460,36 +425,26 @@ export class OnboardingService {
     userId: string;
     workspaceId: string;
   }) {
-    const hasClaimedConnectAccountStep =
-      await this.runStepTransitionInLockedTransaction(
-        { userId, workspaceId },
-        async (queryRunner) => {
-          const hasClaimedStep = await this.claimOnboardingConnectAccountStep(
-            { userId, workspaceId },
-            queryRunner,
-          );
+    await this.runStepTransitionInLockedTransaction(
+      { userId, workspaceId },
+      async (queryRunner) => {
+        const hasClaimedStep = await this.claimOnboardingConnectAccountStep(
+          { userId, workspaceId },
+          queryRunner,
+        );
 
-          if (!hasClaimedStep) {
-            return false;
-          }
+        if (!hasClaimedStep) {
+          return false;
+        }
 
-          await this.clearReversibleOnboardingStepHistoryAfterIrreversibleStep(
-            { userId, workspaceId },
-            queryRunner,
-          );
+        await this.clearReversibleOnboardingStepHistoryAfterIrreversibleStep(
+          { userId, workspaceId },
+          queryRunner,
+        );
 
-          return true;
-        },
-      );
-
-    if (!hasClaimedConnectAccountStep) {
-      return;
-    }
-
-    await this.creditImportContactsRewardForWorkspaceCreator({
-      userId,
-      workspaceId,
-    });
+        return true;
+      },
+    );
   }
 
   async skipOnboardingConnectAccountStep({
@@ -564,93 +519,6 @@ export class OnboardingService {
     return isDefined(affectedRows) && affectedRows > 0;
   }
 
-  private async creditImportContactsRewardForWorkspaceCreator({
-    userId,
-    workspaceId,
-  }: {
-    userId: string;
-    workspaceId: string;
-  }) {
-    try {
-      const isWorkspaceCreator = await this.isWorkspaceCreator({
-        userId,
-        workspaceId,
-      });
-
-      if (!isWorkspaceCreator) {
-        return;
-      }
-
-      await this.billingCreditService.grantCredits({
-        workspaceId,
-        amountMicro: this.twentyConfigService.get(
-          'ONBOARDING_IMPORT_CONTACTS_CREDITS_REWARD',
-        ),
-        type: BillingCreditGrantType.ONBOARDING_REWARD,
-        reason: 'Onboarding reward: import contacts',
-        idempotencyKey: `${ONBOARDING_REWARD_IDEMPOTENCY_KEY_PREFIXES.importContacts}:${workspaceId}`,
-      });
-    } catch (error) {
-      this.logger.error(
-        `Failed to credit onboarding import-contacts reward for workspace ${workspaceId}`,
-        error,
-      );
-    }
-  }
-
-  async creditInviteTeamReward({
-    workspaceId,
-    userId,
-  }: {
-    workspaceId: string;
-    userId: string;
-  }) {
-    const idempotencyKeyPrefix = `${ONBOARDING_REWARD_IDEMPOTENCY_KEY_PREFIXES.inviteTeam}:${workspaceId}:`;
-
-    try {
-      await this.cacheLockService.withLock(
-        async () => {
-          const rewardedTeammatesCount =
-            await this.billingCreditGrantService.countGrantsByIdempotencyKeyPrefix(
-              {
-                workspaceId,
-                type: BillingCreditGrantType.ONBOARDING_REWARD,
-                idempotencyKeyPrefix,
-              },
-            );
-
-          if (
-            rewardedTeammatesCount >=
-            this.twentyConfigService.get('ONBOARDING_INVITE_TEAM_MAX_INVITES')
-          ) {
-            return;
-          }
-
-          await this.billingCreditService.grantCredits({
-            workspaceId,
-            amountMicro: this.twentyConfigService.get(
-              'ONBOARDING_INVITE_TEAM_CREDITS_REWARD_PER_USER',
-            ),
-            type: BillingCreditGrantType.ONBOARDING_REWARD,
-            reason: 'Onboarding reward: invited teammate signed up',
-            idempotencyKey: `${idempotencyKeyPrefix}${userId}`,
-          });
-        },
-        buildOnboardingInviteTeamRewardLockKey(workspaceId),
-        ONBOARDING_INVITE_TEAM_REWARD_LOCK_OPTIONS,
-      );
-    } catch (error) {
-      this.logger.error(
-        `Failed to credit onboarding invite reward for workspace ${workspaceId}`,
-        error,
-      );
-
-      this.exceptionHandlerService.captureExceptions([error], {
-        workspace: { id: workspaceId },
-      });
-    }
-  }
-
   async setOnboardingInviteTeamPending(
     {
       userId,
@@ -685,56 +553,6 @@ export class OnboardingService {
       },
       queryRunner,
     );
-  }
-
-  async creditEnrichmentQualificationReward({
-    workspaceId,
-    employeeCount,
-  }: {
-    workspaceId: string;
-    employeeCount: number | null;
-  }) {
-    // Reading the tiers throws on malformed config, so it stays guarded: a broken reward must not break onboarding.
-    try {
-      const { amountMicro, malformedTierKeys } =
-        getOnboardingEnrichmentCreditRewardMicro({
-          employeeCount,
-          tiers: this.twentyConfigService.get(
-            'ONBOARDING_ENRICHMENT_CREDIT_REWARD_TIERS',
-          ),
-        });
-
-      if (malformedTierKeys.length > 0) {
-        // Otherwise a dropped tier would silently under-pay every workspace that should have matched it.
-        this.exceptionHandlerService.captureExceptions([
-          new Error(
-            `Ignored malformed ONBOARDING_ENRICHMENT_CREDIT_REWARD_TIERS entries: ${malformedTierKeys.join(', ')}`,
-          ),
-        ]);
-      }
-
-      if (!isDefined(amountMicro)) {
-        return;
-      }
-
-      await this.billingCreditService.grantCredits({
-        workspaceId,
-        amountMicro,
-        type: BillingCreditGrantType.ONBOARDING_REWARD,
-        reason: 'Onboarding reward: enrichment-qualified workspace',
-        // Keyed on the workspace, not the user, so re-runs and later members replay instead of topping up.
-        idempotencyKey: `${ONBOARDING_REWARD_IDEMPOTENCY_KEY_PREFIXES.enrichmentQualification}:${workspaceId}`,
-      });
-    } catch (error) {
-      this.logger.error(
-        `Failed to credit onboarding enrichment qualification reward for workspace ${workspaceId}`,
-        error,
-      );
-
-      this.exceptionHandlerService.captureExceptions([error], {
-        workspace: { id: workspaceId },
-      });
-    }
   }
 
   async isOnboardingBookCallPending({

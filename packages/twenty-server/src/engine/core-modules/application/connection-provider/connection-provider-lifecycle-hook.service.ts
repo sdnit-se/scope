@@ -330,7 +330,6 @@ export class ConnectionProviderLifecycleHookService {
         logicFunctionId: logicFunction.id,
         workspaceId,
         payload: this.buildPayload({ provider, connectedAccountId }),
-        shouldEnforceUsageLimits: false,
       });
 
       if (isDefined(executionResult.error)) {
@@ -362,7 +361,6 @@ export class ConnectionProviderLifecycleHookService {
       logicFunctionId,
       workspaceId,
       payload,
-      shouldEnforceUsageLimits: true,
       toException: (reason) =>
         buildConnectionFlowHookFailedException({ hook, provider, reason }),
     });

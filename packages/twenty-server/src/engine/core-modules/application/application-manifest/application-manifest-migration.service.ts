@@ -105,15 +105,10 @@ export class ApplicationManifestMigrationService {
       [
         ...Object.values(ALL_METADATA_NAME).map(getMetadataFlatEntityMapsKey),
         'featureFlagsMap',
-        'billingEntitlements',
       ],
     );
 
-    const {
-      featureFlagsMap,
-      billingEntitlements,
-      ...existingAllFlatEntityMaps
-    } = cacheResult;
+    const { featureFlagsMap, ...existingAllFlatEntityMaps } = cacheResult;
 
     const fromAllFlatEntityMaps = getApplicationSubAllFlatEntityMaps({
       applicationIds: [ownerFlatApplication.id],
@@ -152,7 +147,7 @@ export class ApplicationManifestMigrationService {
           }),
           workspaceId,
           dependencyAllFlatEntityMaps,
-          additionalCacheDataMaps: { featureFlagsMap, billingEntitlements },
+          additionalCacheDataMaps: { featureFlagsMap },
         },
       );
 

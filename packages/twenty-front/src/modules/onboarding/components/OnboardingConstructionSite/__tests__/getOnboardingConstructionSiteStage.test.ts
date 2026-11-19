@@ -47,7 +47,7 @@ describe('getOnboardingConstructionSiteStage', () => {
   it('should keep the finale for the last step', () => {
     expect(
       getOnboardingConstructionSiteStage({
-        onboardingStatus: OnboardingStatus.PLAN_REQUIRED,
+        onboardingStatus: OnboardingStatus.COMPLETED,
         isLastOnboardingStep: false,
       }).stageIndex,
     ).toBe(ONBOARDING_CONSTRUCTION_SITE_FINAL_STAGE_INDEX - 1);

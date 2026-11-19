@@ -6,6 +6,5 @@ export const ONBOARDING_STATUS_ORDER = [
   OnboardingStatus.PROFILE_CREATION,
   OnboardingStatus.INVITE_TEAM,
   OnboardingStatus.BOOK_CALL,
-  OnboardingStatus.PLAN_REQUIRED,
   OnboardingStatus.COMPLETED,
 ];

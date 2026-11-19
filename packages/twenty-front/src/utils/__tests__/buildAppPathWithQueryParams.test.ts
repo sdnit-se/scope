@@ -4,10 +4,10 @@ import { buildAppPathWithQueryParams } from '~/utils/buildAppPathWithQueryParams
 describe('buildAppPathWithQueryParams', () => {
   it('should build the correct path with query params', () => {
     expect(
-      buildAppPathWithQueryParams(AppPath.PlanRequired, {
+      buildAppPathWithQueryParams(AppPath.SignInUp, {
         key1: 'value1',
         key2: 'value2',
       }),
-    ).toBe('/plan-required?key1=value1&key2=value2');
+    ).toBe('/welcome?key1=value1&key2=value2');
   });
 });

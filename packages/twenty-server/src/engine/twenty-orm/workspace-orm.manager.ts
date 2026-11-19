@@ -138,7 +138,6 @@ export class WorkspaceOrmManager {
       flatFieldMetadataMapsOrm,
       flatIndexMaps,
       featureFlagsMap,
-      billingEntitlements,
       rolesPermissions: permissionsPerRoleId,
       roleIdsWithAllRecordsAccess,
       userWorkspaceRoleMap,
@@ -152,7 +151,6 @@ export class WorkspaceOrmManager {
       'flatFieldMetadataMapsOrm',
       'flatIndexMaps',
       'featureFlagsMap',
-      'billingEntitlements',
       'rolesPermissions',
       'roleIdsWithAllRecordsAccess',
       'userWorkspaceRoleMap',
@@ -175,7 +173,6 @@ export class WorkspaceOrmManager {
       flatRowLevelPermissionPredicateGroupMaps,
       objectIdByNameSingular,
       featureFlagsMap,
-      billingEntitlements,
       permissionsPerRoleId,
       roleIdsWithAllRecordsAccess,
       userWorkspaceRoleMap,
@@ -190,15 +187,11 @@ export class WorkspaceOrmManager {
   ): Promise<ORMWorkspaceContext> {
     const workspaceId = authContext.workspace.id;
 
-    const {
-      flatObjectMetadataMaps,
-      flatFieldMetadataMapsOrm,
-      billingEntitlements,
-    } = await this.workspaceCacheService.getOrRecompute(workspaceId, [
-      'flatObjectMetadataMaps',
-      'flatFieldMetadataMapsOrm',
-      'billingEntitlements',
-    ]);
+    const { flatObjectMetadataMaps, flatFieldMetadataMapsOrm } =
+      await this.workspaceCacheService.getOrRecompute(workspaceId, [
+        'flatObjectMetadataMaps',
+        'flatFieldMetadataMapsOrm',
+      ]);
 
     const { idByNameSingular: objectIdByNameSingular } =
       buildObjectIdByNameMaps(flatObjectMetadataMaps);
@@ -224,7 +217,6 @@ export class WorkspaceOrmManager {
       },
       objectIdByNameSingular,
       featureFlagsMap: {} as ORMWorkspaceContext['featureFlagsMap'],
-      billingEntitlements,
       permissionsPerRoleId: {},
       roleIdsWithAllRecordsAccess: [],
       userWorkspaceRoleMap: {},

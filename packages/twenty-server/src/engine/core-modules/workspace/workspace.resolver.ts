@@ -23,12 +23,6 @@ import { fromFlatApplicationToApplicationDto } from 'src/engine/core-modules/app
 import { getScopedCallingApplication } from 'src/engine/core-modules/application/utils/get-scoped-calling-application.util';
 import { type AuthContextUser } from 'src/engine/core-modules/auth/types/auth-context.type';
 import { AuthGraphqlApiExceptionFilter } from 'src/engine/core-modules/auth/filters/auth-graphql-api-exception.filter';
-import { BillingEntitlementDTO } from 'src/engine/core-modules/billing/dtos/billing-entitlement.dto';
-import { BillingCustomerEntity } from 'src/engine/core-modules/billing/entities/billing-customer.entity';
-import { BillingSubscriptionEntity } from 'src/engine/core-modules/billing/entities/billing-subscription.entity';
-import { BillingPortalWorkspaceService } from 'src/engine/core-modules/billing/services/billing-portal.workspace-service';
-import { BillingService } from 'src/engine/core-modules/billing/services/billing.service';
-import { BillingSubscriptionService } from 'src/engine/core-modules/billing/services/billing-subscription.service';
 import { WorkspaceDomainsService } from 'src/engine/core-modules/domain/workspace-domains/services/workspace-domains.service';
 import { FeatureFlagDTO } from 'src/engine/core-modules/feature-flag/dtos/feature-flag.dto';
 import { FeatureFlagService } from 'src/engine/core-modules/feature-flag/services/feature-flag.service';
@@ -91,9 +85,6 @@ export class WorkspaceResolver {
     private readonly userWorkspaceService: UserWorkspaceService,
     private readonly twentyConfigService: TwentyConfigService,
     private readonly fileUrlService: FileUrlService,
-    private readonly billingSubscriptionService: BillingSubscriptionService,
-    private readonly billingPortalWorkspaceService: BillingPortalWorkspaceService,
-    private readonly billingService: BillingService,
     private readonly featureFlagService: FeatureFlagService,
     private readonly roleService: RoleService,
     private readonly viewService: ViewService,
@@ -249,23 +240,6 @@ export class WorkspaceResolver {
     return this.workspaceService.deleteWorkspace(id, true);
   }
 
-  @ResolveField(() => [BillingSubscriptionEntity])
-  async billingSubscriptions(
-    @Parent() workspace: WorkspaceEntity,
-  ): Promise<BillingSubscriptionEntity[] | undefined> {
-    if (!this.twentyConfigService.isBillingEnabled()) {
-      return [];
-    }
-
-    try {
-      return this.billingSubscriptionService.getBillingSubscriptions(
-        workspace.id,
-      );
-    } catch (error) {
-      workspaceGraphqlApiExceptionHandler(error);
-    }
-  }
-
   @ResolveField(() => String, { nullable: true })
   inviteHash(
     @Parent() workspace: WorkspaceEntity,
@@ -323,49 +297,6 @@ export class WorkspaceResolver {
     return flatApplications.map(fromFlatApplicationToApplicationDto);
   }
 
-  @ResolveField(() => BillingSubscriptionEntity, { nullable: true })
-  async currentBillingSubscription(
-    @Parent() workspace: WorkspaceEntity,
-  ): Promise<BillingSubscriptionEntity | undefined> {
-    if (!this.twentyConfigService.isBillingEnabled()) {
-      return;
-    }
-
-    return this.billingSubscriptionService.getCurrentBillingSubscription({
-      workspaceId: workspace.id,
-    });
-  }
-
-  @ResolveField(() => Boolean)
-  async isTrialAvailable(
-    @Parent() workspace: WorkspaceEntity,
-    @AuthUser({ allowUndefined: true }) user: AuthContextUser | undefined,
-  ): Promise<boolean> {
-    if (
-      !isDefined(user) ||
-      (await this.billingService.hasWorkspaceAnySubscription(workspace.id))
-    ) {
-      return false;
-    }
-
-    return !(await this.billingPortalWorkspaceService.hasReachedTrialLimit({
-      userId: user.id,
-      userEmail: user.email,
-      workspaceId: workspace.id,
-    }));
-  }
-
-  @ResolveField(() => BillingCustomerEntity, { nullable: true })
-  async billingCustomer(
-    @Parent() workspace: WorkspaceEntity,
-  ): Promise<BillingCustomerEntity | null> {
-    if (!this.twentyConfigService.isBillingEnabled()) {
-      return null;
-    }
-
-    return this.billingSubscriptionService.getBillingCustomer(workspace.id);
-  }
-
   @ResolveField(() => Number)
   async workspaceMembersCount(
     @Parent() workspace: WorkspaceEntity,
@@ -384,24 +315,6 @@ export class WorkspaceResolver {
       workspaceId: workspace.id,
       fileFolder: FileFolder.CorePicture,
     });
-  }
-
-  @ResolveField(() => [BillingEntitlementDTO])
-  billingEntitlements(@Parent() workspace: WorkspaceEntity) {
-    return this.billingSubscriptionService.getWorkspaceEntitlements(
-      workspace.id,
-    );
-  }
-
-  // This server never holds a paid licence; the web app still asks.
-  @ResolveField(() => Boolean)
-  hasValidSignedEnterpriseKey(): boolean {
-    return false;
-  }
-
-  @ResolveField(() => Boolean)
-  hasValidEnterpriseValidityToken(): boolean {
-    return false;
   }
 
   @ResolveField(() => WorkspaceUrlsDTO)

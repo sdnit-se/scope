@@ -172,7 +172,6 @@ export class WorkspaceInvitationService {
     email: string,
     workspace: WorkspaceEntity,
     roleId?: string,
-    isOnboardingInvitation = false,
   ) {
     const maybeWorkspaceInvitation = await this.getOneWorkspaceInvitation(
       workspace.id,
@@ -214,12 +213,7 @@ export class WorkspaceInvitationService {
       }),
     });
 
-    return this.generateInvitationToken(
-      workspace.id,
-      email,
-      roleId,
-      isOnboardingInvitation,
-    );
+    return this.generateInvitationToken(workspace.id, email, roleId);
   }
 
   async deleteWorkspaceInvitation(appTokenId: string, workspaceId: string) {
@@ -275,8 +269,6 @@ export class WorkspaceInvitationService {
       workspace,
       sender,
       roleId: appToken.context.roleId,
-      isOnboardingInviteRewardOverride:
-        appToken.type === AppTokenType.OnboardingInvitationToken,
       appTokenIdToInvalidate: appToken.id,
     });
   }
@@ -286,14 +278,12 @@ export class WorkspaceInvitationService {
     workspace,
     sender,
     roleId,
-    isOnboardingInviteRewardOverride,
     appTokenIdToInvalidate,
   }: {
     emails: string[];
     workspace: WorkspaceEntity;
     sender: WorkspaceMemberWorkspaceEntity;
     roleId?: string;
-    isOnboardingInviteRewardOverride?: boolean;
     appTokenIdToInvalidate?: string;
   }): Promise<SendInvitationsDTO> {
     if (!workspace?.inviteHash) {
@@ -310,14 +300,6 @@ export class WorkspaceInvitationService {
       );
     }
 
-    const isOnboardingInviteReward =
-      this.twentyConfigService.get('IS_BILLING_ENABLED') &&
-      (isOnboardingInviteRewardOverride ??
-        (await this.onboardingService.isOnboardingInviteTeamPending({
-          userId: sender.userId,
-          workspaceId: workspace.id,
-        })));
-
     await this.throttleInvitationSending(workspace.id, emails);
 
     if (isDefined(appTokenIdToInvalidate)) {
@@ -330,7 +312,6 @@ export class WorkspaceInvitationService {
           email,
           workspace,
           roleId,
-          isOnboardingInviteReward,
         );
 
         if (!appToken.context?.email) {
@@ -451,7 +432,6 @@ export class WorkspaceInvitationService {
     workspaceId: string,
     email: string,
     roleId?: string,
-    isOnboardingInvitation = false,
   ) {
     const expiresIn = this.twentyConfigService.get(
       'INVITATION_TOKEN_EXPIRES_IN',
@@ -469,9 +449,7 @@ export class WorkspaceInvitationService {
     const invitationToken = this.appTokenRepository.create({
       workspaceId,
       expiresAt,
-      type: isOnboardingInvitation
-        ? AppTokenType.OnboardingInvitationToken
-        : AppTokenType.InvitationToken,
+      type: AppTokenType.InvitationToken,
       value: crypto.randomBytes(32).toString('hex'),
       context: {
         email,

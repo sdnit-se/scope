@@ -18,7 +18,6 @@ import { ConnectionProviderExceptionCode } from 'src/engine/core-modules/applica
 import { ConnectionProviderFlowRedirectService } from 'src/engine/core-modules/application/connection-provider/connection-provider-flow-redirect.service';
 import { ConnectionProviderException } from 'src/engine/core-modules/application/connection-provider/connection-provider.exception';
 import { ConnectionProviderRestApiExceptionFilter } from 'src/engine/core-modules/application/connection-provider/filters/connection-provider-rest-api-exception.filter';
-import { BillingRestApiExceptionFilter } from 'src/engine/core-modules/billing/filters/billing-api-exception.filter';
 import { LogicFunctionExecutionRestApiExceptionFilter } from 'src/engine/core-modules/logic-function/logic-function-executor/filters/logic-function-execution-rest-api-exception.filter';
 import {
   extractBody,
@@ -26,7 +25,6 @@ import {
   filterRequestHeaders,
   normalizeQueryStringParameters,
 } from 'src/engine/core-modules/logic-function/logic-function-trigger/triggers/route/utils/build-logic-function-event.util';
-import { UsageLimitRestApiExceptionFilter } from 'src/engine/core-modules/usage-limit/filters/usage-limit-rest-api-exception.filter';
 import { NoPermissionGuard } from 'src/engine/guards/no-permission.guard';
 import { PublicEndpointGuard } from 'src/engine/guards/public-endpoint.guard';
 import { PermissionsRestApiExceptionFilter } from 'src/engine/metadata-modules/permissions/utils/permissions-rest-api-exception.filter';
@@ -81,8 +79,6 @@ export class ConnectionProviderCustomController {
     ConnectionProviderRestApiExceptionFilter,
     PermissionsRestApiExceptionFilter,
     LogicFunctionExecutionRestApiExceptionFilter,
-    UsageLimitRestApiExceptionFilter,
-    BillingRestApiExceptionFilter,
   )
   async callbackNotification(@Req() req: Request): Promise<{ success: true }> {
     const { state, queryStringParameters, headers } =

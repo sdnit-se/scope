@@ -5,13 +5,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeORMModule } from 'src/database/typeorm/typeorm.module';
 import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache.module';
 import { AuthModule } from 'src/engine/core-modules/auth/auth.module';
-import { BillingModule } from 'src/engine/core-modules/billing/billing.module';
-import { UpdateSubscriptionQuantityJob } from 'src/engine/core-modules/billing/jobs/update-subscription-quantity.job';
-import { ApplicationRecurringChargeModule } from 'src/engine/core-modules/billing/app-billing/application-recurring-charge.module';
-import { ApplicationRecurringChargeCronJob } from 'src/engine/core-modules/billing/app-billing/crons/jobs/application-recurring-charge.cron.job';
-import { BillingReminderModule } from 'src/engine/core-modules/billing/reminders/billing-reminder.module';
-import { BillingReminderCronJob } from 'src/engine/core-modules/billing/reminders/crons/billing-reminder.cron.job';
-import { StripeModule } from 'src/engine/core-modules/billing/stripe/stripe.module';
 import { ApplicationInstallModule } from 'src/engine/core-modules/application/application-install/application-install.module';
 import { TriggerInstallApplicationJob } from 'src/engine/core-modules/application/application-install/jobs/trigger-install-application.job';
 import { TriggerUninstallApplicationJob } from 'src/engine/core-modules/application/application-install/jobs/trigger-uninstall-application.job';
@@ -76,7 +69,6 @@ import { WorkflowModule } from 'src/modules/workflow/workflow.module';
     UserModule,
     UserVarsModule,
     EmailModule,
-    BillingModule,
     UserWorkspaceModule,
     WorkspaceModule,
     AuthModule,
@@ -84,7 +76,6 @@ import { WorkflowModule } from 'src/modules/workflow/workflow.module';
     CalendarModule,
     CalendarEventParticipantManagerModule,
     TimelineActivityModule,
-    StripeModule,
     FeatureFlagModule,
     AutoCompaniesAndContactsCreationJobModule,
     TimelineJobModule,
@@ -107,18 +98,13 @@ import { WorkflowModule } from 'src/modules/workflow/workflow.module';
     ApplicationUpgradeModule,
     PreInstalledAppsModule,
     PendingWakeUpModule,
-    BillingReminderModule,
-    ApplicationRecurringChargeModule,
     WorkspaceMigrationRunnerModule,
   ],
   providers: [
-    ApplicationRecurringChargeCronJob,
-    BillingReminderCronJob,
     CleanSuspendedWorkspacesJob,
     CleanOnboardingWorkspacesJob,
     EmailSenderJob,
     AddPeopleToMessageListJob,
-    UpdateSubscriptionQuantityJob,
     HandleWorkspaceMemberDeletedJob,
     WorkspaceDeletionApplicationUninstallJob,
     CleanWorkspaceDeletionWarningUserVarsJob,

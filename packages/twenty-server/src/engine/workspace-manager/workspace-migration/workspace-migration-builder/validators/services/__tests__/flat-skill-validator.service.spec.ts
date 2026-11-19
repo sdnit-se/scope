@@ -50,7 +50,6 @@ const validateWorkspaceUpdate = (
   return new FlatSkillValidatorService().validateFlatSkillUpdate({
     additionalCacheDataMaps: {
       featureFlagsMap: buildFeatureFlagsMap(),
-      billingEntitlements: {},
     },
     optimisticFlatEntityMapsAndRelatedFlatEntityMaps,
     finalFlatEntityMaps:

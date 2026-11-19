@@ -13,8 +13,6 @@ import { FileModule } from 'src/engine/core-modules/file/file.module';
 import { MetricsModule } from 'src/engine/core-modules/metrics/metrics.module';
 import { RecordPositionModule } from 'src/engine/core-modules/record-position/record-position.module';
 import { RecordTransformerModule } from 'src/engine/core-modules/record-transformer/record-transformer.module';
-import { UsageLimitModule } from 'src/engine/core-modules/usage-limit/usage-limit.module';
-import { UsageModule } from 'src/engine/core-modules/usage/usage.module';
 import { ViewFilterGroupModule } from 'src/engine/metadata-modules/view-filter-group/view-filter-group.module';
 import { ViewFilterModule } from 'src/engine/metadata-modules/view-filter/view-filter.module';
 import { ViewModule } from 'src/engine/metadata-modules/view/view.module';
@@ -30,8 +28,6 @@ import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache
     ViewModule,
     ViewFilterModule,
     ViewFilterGroupModule,
-    UsageLimitModule,
-    UsageModule,
     MetricsModule,
     RecordPositionModule,
     RecordShareModule,

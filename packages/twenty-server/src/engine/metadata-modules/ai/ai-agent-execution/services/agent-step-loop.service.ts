@@ -11,7 +11,7 @@ import {
   type SystemModelMessage,
   type ToolSet,
 } from 'ai';
-import { isDefined, sortKeysDeeply } from 'twenty-shared/utils';
+import { sortKeysDeeply } from 'twenty-shared/utils';
 
 import { AI_LATENCY_MS_BUCKET_BOUNDARIES } from 'src/engine/core-modules/metrics/constants/ai-latency-ms-bucket-boundaries.constant';
 import { TOOL_EXECUTION_DURATION_MS_BUCKET_BOUNDARIES } from 'src/engine/core-modules/metrics/constants/tool-execution-duration-ms-bucket-boundaries.constant';
@@ -23,8 +23,6 @@ import { estimateToolOutputTokens } from 'src/engine/core-modules/tool-provider/
 import { getToolMetricName } from 'src/engine/core-modules/tool-provider/utils/get-tool-metric-name.util';
 import { isToolOutputSuccessful } from 'src/engine/core-modules/tool-provider/utils/is-tool-output-successful.util';
 import { resolveToolName } from 'src/engine/core-modules/tool-provider/utils/resolve-tool-name.util';
-import { type UsageOperationType } from 'src/engine/core-modules/usage/enums/usage-operation-type.enum';
-import { type UsageSpenders } from 'src/engine/core-modules/usage/types/usage-spenders.type';
 import { endsOnPausingToolCall } from 'src/engine/metadata-modules/ai/ai-agent-execution/pausing-tools/utils/ends-on-pausing-tool-call.util';
 import {
   getCacheProviderOptions,
@@ -32,11 +30,6 @@ import {
 } from 'src/engine/metadata-modules/ai/ai-agent-execution/utils/provider-options.util';
 import { AGENT_CONFIG } from 'src/engine/metadata-modules/ai/ai-agent/constants/agent-config.const';
 import { repairToolCall } from 'src/engine/metadata-modules/ai/ai-agent/utils/repair-tool-call.util';
-import {
-  AiBillingService,
-  type WebSearchOperationType,
-} from 'src/engine/metadata-modules/ai/ai-billing/services/ai-billing.service';
-import { type StepDebitResult } from 'src/engine/metadata-modules/ai/ai-billing/types/step-debit-result.type';
 import {
   extractCacheCreationTokens,
   extractCacheCreationTokensFromSteps,
@@ -100,16 +93,6 @@ export type AgentStepLoopInput = {
   abortSignal?: AbortSignal;
   offeredPausingToolNames: string[];
   shouldStopAfterStep?: StopCondition<ToolSet>;
-  billing: {
-    workspaceId: string;
-    operationType: UsageOperationType;
-    webSearchOperationType: WebSearchOperationType;
-    spenders: UsageSpenders;
-  };
-  onUserCreditsExhausted?: (notice: {
-    renewsAt: Date;
-    isFallingBackToWorkspaceCredits: boolean;
-  }) => Promise<void>;
   telemetry: Parameters<typeof buildAiTelemetry>[0];
   providerOptions?: ProviderOptions;
   streamRetries?: number;
@@ -120,7 +103,6 @@ export type AgentStepLoopInput = {
 
 export type AgentStepLoop = {
   stream: ReturnType<typeof streamText<ToolSet>>;
-  getStopReason: () => StepDebitResult['stopReason'];
 };
 
 const sumSteps = (
@@ -139,7 +121,6 @@ export class AgentStepLoopService {
   private readonly logger = new Logger(AgentStepLoopService.name);
 
   constructor(
-    private readonly aiBillingService: AiBillingService,
     private readonly metricsService: MetricsService,
     private readonly exceptionHandlerService: ExceptionHandlerService,
   ) {}
@@ -155,60 +136,29 @@ export class AgentStepLoopService {
     abortSignal,
     offeredPausingToolNames,
     shouldStopAfterStep,
-    billing,
     telemetry,
     providerOptions,
     streamRetries,
     beforeStep,
     metricsScope,
     onError,
-    onUserCreditsExhausted,
   }: AgentStepLoopInput): AgentStepLoop {
     const { toolMetricKeys, stepTokensLogTag, recordsTurnMetrics } =
       METRICS_CONFIG_BY_SCOPE[metricsScope];
     const modelAttributes = { model: registeredModel.modelId };
     const finishedSteps: StepResult<ToolSet>[] = [];
     const startedAt = performance.now();
-    let stopReason: StepDebitResult['stopReason'] = null;
-    let userCreditsUsedMicro = 0;
     let stepStartedAt = startedAt;
     let isUsageRecorded = false;
     let isFirstTokenRecorded = !recordsTurnMetrics;
 
-    const notifyUserCreditsCrossing = async (debit: StepDebitResult) => {
-      if (
-        isDefined(debit.userAllowanceExhaustedUntil) &&
-        debit.userCreditsUsedMicro > 0
-      ) {
-        await onUserCreditsExhausted?.({
-          renewsAt: debit.userAllowanceExhaustedUntil,
-          isFallingBackToWorkspaceCredits: debit.stopReason === null,
-        });
-      }
-    };
-
-    // credits were taken step by step; the run's usage is recorded once, however it ends
+    // the run's token metrics are recorded once, however it ends
     const recordUsage = async (steps: StepResult<ToolSet>[]) => {
-      if (isUsageRecorded) {
+      if (isUsageRecorded || !recordsTurnMetrics) {
         return;
       }
 
       isUsageRecorded = true;
-
-      const webSearchDebit = await this.aiBillingService.recordStepsUsage({
-        modelId: registeredModel.modelId,
-        steps,
-        ...billing,
-        userCreditsUsedMicro,
-      });
-
-      if (isDefined(webSearchDebit) && stopReason !== 'userAllowance') {
-        await notifyUserCreditsCrossing(webSearchDebit);
-      }
-
-      if (!recordsTurnMetrics) {
-        return;
-      }
 
       for (const [key, amount] of [
         [
@@ -259,7 +209,6 @@ export class AgentStepLoopService {
       abortSignal,
       streamRetries,
       stopWhen: async (step) =>
-        isDefined(stopReason) ||
         endsOnPausingToolCall({
           steps: step.steps,
           offeredToolNames: offeredPausingToolNames,
@@ -323,25 +272,6 @@ export class AgentStepLoopService {
           });
         }
 
-        const stepDebit =
-          await this.aiBillingService.decrementAndCheckAvailableCredits({
-            modelId: registeredModel.modelId,
-            billingInput: {
-              usage: step.usage,
-              cacheCreationTokens: extractCacheCreationTokens(
-                step.providerMetadata,
-              ),
-            },
-            workspaceId: billing.workspaceId,
-            operationType: billing.operationType,
-            spenders: billing.spenders,
-          });
-
-        stopReason ??= stepDebit.stopReason;
-        userCreditsUsedMicro += stepDebit.userCreditsUsedMicro;
-
-        await notifyUserCreditsCrossing(stepDebit);
-
         this.logStepTokens({
           step,
           stepTokensLogTag,
@@ -362,13 +292,7 @@ export class AgentStepLoopService {
           inputSchema,
           error,
           model: registeredModel.model,
-          billingContext: {
-            aiBillingService: this.aiBillingService,
-            modelId: registeredModel.modelId,
-            workspaceId: billing.workspaceId,
-            spenders: billing.spenders,
-            operationType: billing.operationType,
-          },
+          telemetry,
         }),
     });
 
@@ -388,10 +312,7 @@ export class AgentStepLoopService {
         this.exceptionHandlerService.captureExceptions([error]),
       );
 
-    return {
-      stream,
-      getStopReason: () => stopReason,
-    };
+    return { stream };
   }
 
   private logStepTokens({

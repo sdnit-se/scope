@@ -10,7 +10,6 @@ import { FeatureFlagKey } from 'twenty-shared/types';
 
 import { SupportDriver } from 'src/engine/core-modules/twenty-config/interfaces/support.interface';
 
-import { BillingTrialPeriodDTO } from 'src/engine/core-modules/billing/dtos/billing-trial-period.dto';
 import { CaptchaDriverType } from 'src/engine/core-modules/captcha/interfaces';
 import { AuthProvidersDTO } from 'src/engine/core-modules/workspace/dtos/public-workspace-data.dto';
 import { type AiModelKind } from 'src/engine/metadata-modules/ai/ai-models/constants/ai-model-kinds.const';
@@ -226,21 +225,6 @@ export class AdminAiModelsDTO {
 }
 
 @ObjectType()
-export class Billing {
-  @Field(() => Boolean)
-  isBillingEnabled: boolean;
-
-  @Field(() => String, { nullable: true })
-  billingUrl?: string;
-
-  @Field(() => String, { nullable: true })
-  stripePublishableKey?: string;
-
-  @Field(() => [BillingTrialPeriodDTO])
-  trialPeriods: BillingTrialPeriodDTO[];
-}
-
-@ObjectType()
 export class Support {
   @Field(() => SupportDriver)
   supportDriver: SupportDriver;
@@ -277,18 +261,6 @@ export class Captcha {
 export class ApiConfig {
   @Field(() => Number, { nullable: false })
   mutationMaximumAffectedRecords: number;
-}
-
-export class OnboardingConfig {
-  importContactsCreditsReward: number;
-
-  inviteTeamCreditsRewardPerUser: number;
-
-  createProfileCreditsReward: number;
-
-  upgradeCreditsReward: number;
-
-  inviteTeamMaxInvites: number;
 }
 
 @ObjectType()
@@ -334,9 +306,6 @@ export class ClientConfig {
 
   @Field(() => AuthProvidersDTO, { nullable: false })
   authProviders: AuthProvidersDTO;
-
-  @Field(() => Billing, { nullable: false })
-  billing: Billing;
 
   @Field(() => [ClientAiModelConfig])
   aiModels: ClientAiModelConfig[];
@@ -386,8 +355,6 @@ export class ClientConfig {
   @Field(() => ApiConfig)
   api: ApiConfig;
 
-  onboarding: OnboardingConfig | null;
-
   @Field(() => Boolean)
   canManageFeatureFlags: boolean;
 
@@ -436,9 +403,6 @@ export class ClientConfig {
 
   @Field(() => Boolean)
   isOnboardingAiChatEnabled: boolean;
-
-  @Field(() => String)
-  enterpriseInstanceType: string;
 
   @Field(() => ClientConfigMaintenanceMode, { nullable: true })
   maintenance?: ClientConfigMaintenanceMode;

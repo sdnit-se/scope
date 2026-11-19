@@ -23,7 +23,6 @@ import {
   CommonQueryRunnerExceptionCode,
 } from 'src/engine/api/common/common-query-runners/errors/common-query-runner.exception';
 import { STANDARD_ERROR_MESSAGE } from 'src/engine/api/common/common-query-runners/errors/standard-error-message.constant';
-import { computeMaxFieldCountPerRecord } from 'src/engine/api/common/common-query-runners/utils/compute-max-field-count-per-record.util';
 import { CommonBaseQueryRunnerContext } from 'src/engine/api/common/types/common-base-query-runner-context.type';
 import { CommonExtendedQueryRunnerContext } from 'src/engine/api/common/types/common-extended-query-runner-context.type';
 import {
@@ -797,28 +796,5 @@ export class CommonCreateManyQueryRunnerService extends CommonBaseQueryRunnerSer
     }
 
     return recordWithoutCreatedByUpdate;
-  }
-
-  protected override computeQueryComplexityV2(
-    selectedFieldsResult: CommonSelectedFieldsResult,
-    args: CommonExtendedInput<CreateManyQueryArgs>,
-    queryRunnerContext: CommonBaseQueryRunnerContext,
-  ): number {
-    const {
-      flatObjectMetadata,
-      flatObjectMetadataMaps,
-      flatFieldMetadataMaps,
-    } = queryRunnerContext;
-
-    return (
-      args.data.length *
-      computeMaxFieldCountPerRecord({
-        selectedFieldsResult,
-        flatObjectMetadata,
-        flatObjectMetadataMaps,
-        flatFieldMetadataMaps,
-        recordLimitPerOneToManyRelation: args.upsert ? QUERY_MAX_RECORDS : 0,
-      })
-    );
   }
 }

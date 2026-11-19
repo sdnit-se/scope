@@ -94,22 +94,7 @@ export class BackfillLogicFunctionFileRowsCommand extends ProvisionedWorkspaceCo
       return;
     }
 
-    try {
-      await this.insertFileRows({ workspaceId, storedFiles });
-    } finally {
-      // Rows inserted here bypass the storage stock counters, and a rerun
-      // cannot see what a partial run inserted, so always drop them.
-      const applicationIds = new Set(
-        logicFunctionFiles.map(({ applicationId }) => applicationId),
-      );
-
-      for (const applicationId of applicationIds) {
-        await this.fileStorageService.invalidateStorageStock({
-          workspaceId,
-          applicationId,
-        });
-      }
-    }
+    await this.insertFileRows({ workspaceId, storedFiles });
   }
 
   private async findFilesWithoutFileRow({

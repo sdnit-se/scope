@@ -1,4 +1,3 @@
-import { type EnableCommonRecordSharingCommand } from 'src/database/commands/upgrade-version-command/2-43/2-43-workspace-command-1790312694997-enable-common-record-sharing.command';
 import { type LinkChatThreadsToWorkspaceMembersCommand } from 'src/database/commands/upgrade-version-command/2-43/2-43-workspace-command-1790360612188-link-chat-threads-to-workspace-members.command';
 import { type AddWorkflowRunToChatThreadsCommand } from 'src/database/commands/upgrade-version-command/2-44/2-44-workspace-command-1790607161319-add-workflow-run-to-chat-threads.command';
 import { type OpenAgentChatThreadArchivedAtWritabilityCommand } from 'src/database/commands/upgrade-version-command/2-44/2-44-workspace-command-1790672076234-open-agent-chat-thread-archived-at-writability.command';
@@ -361,15 +360,6 @@ describe('versioned agent history upgrade (integration)', () => {
     await dataSource.query('DELETE FROM core."agentChatThread" WHERE id = $1', [
       threadId,
     ]);
-    await getAppProviderByClassName<EnableCommonRecordSharingCommand>(
-      'EnableCommonRecordSharingCommand',
-    ).up({
-      workspaceId: WORKSPACE_ID,
-      dataSource,
-      index: 0,
-      total: 1,
-      options: {},
-    });
     // Replay the later upgrades on the rebuilt 2.42 objects, in order, for the suites that follow.
     for (const laterCommand of [
       getAppProviderByClassName<LinkChatThreadsToWorkspaceMembersCommand>(

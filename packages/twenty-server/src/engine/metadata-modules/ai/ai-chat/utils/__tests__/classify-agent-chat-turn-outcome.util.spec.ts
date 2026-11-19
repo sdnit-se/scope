@@ -8,7 +8,6 @@ const baseTurn = {
   isAborted: false,
   isAwaitingUserAnswer: false,
   isSilent: false,
-  stopReason: null,
 };
 
 describe('classifyAgentChatTurnOutcome', () => {
@@ -70,44 +69,6 @@ describe('classifyAgentChatTurnOutcome', () => {
       classifyAgentChatTurnOutcome({ ...baseTurn, hasText: false }),
     ).toEqual({ kind: 'failed', failurePhase: 'no_text' });
   });
-
-  it('separates running out of credits from an empty reply', () => {
-    expect(
-      classifyAgentChatTurnOutcome({
-        ...baseTurn,
-        hasText: false,
-        stopReason: 'workspaceAllowance',
-      }),
-    ).toEqual({ kind: 'failed', failurePhase: 'credits_exhausted' });
-  });
-
-  it('separates a member running out of their own credits from the workspace running out', () => {
-    expect(
-      classifyAgentChatTurnOutcome({
-        ...baseTurn,
-        hasText: false,
-        stopReason: 'userAllowance',
-      }),
-    ).toEqual({ kind: 'failed', failurePhase: 'user_credits_exhausted' });
-  });
-
-  it('still counts a turn that produced text before the user credits ran out as answered', () => {
-    expect(
-      classifyAgentChatTurnOutcome({
-        ...baseTurn,
-        stopReason: 'userAllowance',
-      }),
-    ).toEqual({ kind: 'completed', outcome: 'answered' });
-  });
-
-  it('still counts a turn that produced text before credits ran out as answered', () => {
-    expect(
-      classifyAgentChatTurnOutcome({
-        ...baseTurn,
-        stopReason: 'workspaceAllowance',
-      }),
-    ).toEqual({ kind: 'completed', outcome: 'answered' });
-  });
 });
 
 describe('classifyAgentChatTurnOutcome for a background run', () => {
@@ -120,41 +81,14 @@ describe('classifyAgentChatTurnOutcome for a background run', () => {
   };
 
   it('completes a run that ends on tool calls without writing a reply', () => {
-    expect(
-      classifyAgentChatTurnOutcome({ ...runTurn, stopReason: null }),
-    ).toEqual({ kind: 'completed', outcome: 'answered' });
-  });
-
-  it('still fails a run that ran out of credits before writing anything', () => {
-    expect(
-      classifyAgentChatTurnOutcome({
-        ...runTurn,
-        stopReason: 'workspaceAllowance',
-      }),
-    ).toEqual({ kind: 'failed', failurePhase: 'credits_exhausted' });
-  });
-
-  it('fails a run that ran out of credits even after writing a reply', () => {
-    expect(
-      classifyAgentChatTurnOutcome({
-        ...runTurn,
-        hasText: true,
-        stopReason: 'workspaceAllowance',
-      }),
-    ).toEqual({ kind: 'failed', failurePhase: 'credits_exhausted' });
+    expect(classifyAgentChatTurnOutcome(runTurn)).toEqual({
+      kind: 'completed',
+      outcome: 'answered',
+    });
   });
 });
 
 describe('resolveSupersededTurnOutcome', () => {
-  it('keeps a credits failure rather than filing it as a cancellation', () => {
-    expect(
-      resolveSupersededTurnOutcome({
-        kind: 'failed',
-        failurePhase: 'credits_exhausted',
-      }),
-    ).toEqual({ kind: 'failed', failurePhase: 'credits_exhausted' });
-  });
-
   it('keeps a no_text failure', () => {
     expect(
       resolveSupersededTurnOutcome({ kind: 'failed', failurePhase: 'no_text' }),

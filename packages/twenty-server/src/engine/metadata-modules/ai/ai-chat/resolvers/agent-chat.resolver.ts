@@ -46,8 +46,6 @@ import {
   AiException,
   AiExceptionCode,
 } from 'src/engine/metadata-modules/ai/ai.exception';
-import { BillingGraphqlApiExceptionFilter } from 'src/engine/core-modules/billing/filters/billing-graphql-api-exception.filter';
-import { UsageLimitGraphqlApiExceptionFilter } from 'src/engine/core-modules/usage-limit/filters/usage-limit-graphql-api-exception.filter';
 import { AiGraphqlApiExceptionInterceptor } from 'src/engine/metadata-modules/ai/interceptors/ai-graphql-api-exception.interceptor';
 import { AuthGraphqlApiExceptionFilter } from 'src/engine/core-modules/auth/filters/auth-graphql-api-exception.filter';
 import { AgentTurnRecorderService } from 'src/engine/metadata-modules/ai/ai-history/services/agent-turn-recorder.service';
@@ -69,11 +67,7 @@ import { FeatureFlagService } from 'src/engine/core-modules/feature-flag/service
   SettingsPermissionGuard(PermissionFlagType.AI),
 )
 @UseInterceptors(AiGraphqlApiExceptionInterceptor)
-@UseFilters(
-  UsageLimitGraphqlApiExceptionFilter,
-  BillingGraphqlApiExceptionFilter,
-  AuthGraphqlApiExceptionFilter,
-)
+@UseFilters(AuthGraphqlApiExceptionFilter)
 @MetadataResolver(() => AgentChatThreadDTO)
 export class AgentChatResolver {
   constructor(
@@ -291,11 +285,7 @@ export class AgentChatResolver {
 
     // Members can keep talking when the assistant cannot run
     if (isAssistantReplying) {
-      await this.turnPreflightService.assertCanRunAgentTurn({
-        modelId,
-        userWorkspaceId,
-        workspace,
-      });
+      this.turnPreflightService.assertCanRunAgentTurn({ modelId, workspace });
     }
 
     if (isDefined(thread.deletedAt)) {
@@ -371,7 +361,6 @@ export class AgentChatResolver {
     await this.turnPreflightService.assertCanStartChatTurn({
       threadId,
       modelId,
-      userWorkspaceId,
       workspaceMemberId,
       workspace,
     });

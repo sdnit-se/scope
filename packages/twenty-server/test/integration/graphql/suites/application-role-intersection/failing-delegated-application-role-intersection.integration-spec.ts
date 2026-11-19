@@ -1,6 +1,5 @@
 import { randomUUID } from 'crypto';
 
-import { checkoutSession } from 'test/integration/graphql/suites/user-session/utils/checkout-session.util';
 import {
   createWorkspaceBlocklistEntry,
   destroyWorkspaceBlocklistEntry,
@@ -34,7 +33,6 @@ import {
   eachTestingContextFilter,
 } from 'twenty-shared/testing';
 
-import { BillingPlanKey } from 'src/engine/core-modules/billing/enums/billing-plan-key.enum';
 import { type BaseGraphQLError } from 'src/engine/core-modules/graphql/utils/graphql-errors.util';
 import { WORKSPACE_MEMBER_DATA_SEED_IDS } from 'src/engine/workspace-manager/dev-seeder/data/constants/workspace-member-data-seeds.constant';
 
@@ -78,19 +76,6 @@ const testCases: EachTestingContext<TestContext>[] = [
         }),
       readTarget: () =>
         workspaceMemberExists(WORKSPACE_MEMBER_DATA_SEED_IDS.JONY),
-    },
-  },
-  {
-    // A refused checkout persists nothing to read back, so the refusal itself is
-    // the whole observable effect.
-    title: 'the billing checkout permission path',
-    context: {
-      attempt: (token) =>
-        checkoutSession({
-          input: { recurringInterval: 'Month', plan: BillingPlanKey.PRO },
-          token,
-          expectToFail: true,
-        }),
     },
   },
   {

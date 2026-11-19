@@ -1,24 +1,7 @@
-import { Logger } from '@nestjs/common';
-
-import {
-  type LanguageModel,
-  type LanguageModelUsage,
-  NoSuchToolError,
-  Output,
-  type StepResult,
-  type ToolSet,
-  generateText,
-} from 'ai';
-import { isDefined } from 'twenty-shared/utils';
+import { type LanguageModel, NoSuchToolError, Output, generateText } from 'ai';
 import { type z } from 'zod';
 
-import { UsageOperationType } from 'src/engine/core-modules/usage/enums/usage-operation-type.enum';
-import { type UsageSpenders } from 'src/engine/core-modules/usage/types/usage-spenders.type';
-import { AiBillingService } from 'src/engine/metadata-modules/ai/ai-billing/services/ai-billing.service';
-import { extractCacheCreationTokensFromSteps } from 'src/engine/metadata-modules/ai/ai-billing/utils/extract-cache-creation-tokens.util';
 import { buildAiTelemetry } from 'src/engine/metadata-modules/ai/ai-models/utils/build-ai-telemetry.util';
-
-const logger = new Logger('repairToolCall');
 
 type ToolCall = {
   type: 'tool-call';
@@ -27,28 +10,20 @@ type ToolCall = {
   input: string;
 };
 
-type RepairToolCallBillingContext = {
-  aiBillingService: AiBillingService;
-  modelId: string;
-  workspaceId: string;
-  spenders: UsageSpenders;
-  operationType: UsageOperationType;
-};
-
 export const repairToolCall = async ({
   toolCall,
   tools,
   inputSchema,
   error,
   model,
-  billingContext,
+  telemetry,
 }: {
   toolCall: ToolCall;
   tools: Record<string, unknown>;
   inputSchema: (toolCall: { toolName: string }) => unknown;
   error: Error;
   model: LanguageModel;
-  billingContext: RepairToolCallBillingContext;
+  telemetry: { workspaceId?: string; userWorkspaceId?: string | null };
 }): Promise<ToolCall | null> => {
   if (NoSuchToolError.isInstance(error)) {
     return null;
@@ -65,9 +40,6 @@ export const repairToolCall = async ({
   if (!schema || typeof schema !== 'object') {
     return null;
   }
-
-  let usage: LanguageModelUsage | undefined;
-  let steps: StepResult<ToolSet>[] | undefined;
 
   try {
     const result = await generateText({
@@ -90,13 +62,10 @@ export const repairToolCall = async ({
       ].join('\n'),
       ...buildAiTelemetry({
         functionId: 'repair-tool-call',
-        workspaceId: billingContext.workspaceId,
-        userWorkspaceId: billingContext.spenders.userWorkspaceId,
+        workspaceId: telemetry.workspaceId,
+        userWorkspaceId: telemetry.userWorkspaceId,
       }),
     });
-
-    usage = result.usage;
-    steps = result.steps;
 
     const repairedInput = result.output;
 
@@ -112,26 +81,5 @@ export const repairToolCall = async ({
     };
   } catch {
     return null;
-  } finally {
-    if (isDefined(usage)) {
-      const cacheCreationTokens = steps
-        ? extractCacheCreationTokensFromSteps(steps)
-        : 0;
-
-      void billingContext.aiBillingService
-        .calculateAndBillUsage({
-          modelId: billingContext.modelId,
-          billingInput: { usage, cacheCreationTokens },
-          workspaceId: billingContext.workspaceId,
-          operationType: billingContext.operationType,
-          spenders: billingContext.spenders,
-        })
-        .catch((error: unknown) =>
-          logger.error(
-            `Could not bill the repair of tool call ${toolCall.toolCallId} in workspace ${billingContext.workspaceId}`,
-            error instanceof Error ? error.stack : error,
-          ),
-        );
-    }
   }
 };

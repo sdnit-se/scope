@@ -8,13 +8,10 @@ import {
   WarnSuspendedWorkspaceEmail,
   renderEmail,
 } from 'twenty-emails';
-import { SettingsPath } from 'twenty-shared/types';
-import { getSettingsPath, isDefined } from 'twenty-shared/utils';
+import { isDefined } from 'twenty-shared/utils';
 import { WorkspaceActivationStatus } from 'twenty-shared/workspace';
 import { In, Repository } from 'typeorm';
 
-import { BillingSubscriptionEntity } from 'src/engine/core-modules/billing/entities/billing-subscription.entity';
-import { SubscriptionStatus } from 'src/engine/core-modules/billing/enums/billing-subscription-status.enum';
 import {
   KeyValuePairEntity,
   KeyValuePairType,
@@ -30,8 +27,6 @@ import { UserService } from 'src/engine/core-modules/user/services/user.service'
 import { UserVarsService } from 'src/engine/core-modules/user/user-vars/services/user-vars.service';
 import { WorkspaceService } from 'src/engine/core-modules/workspace/services/workspace.service';
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
-import { InjectWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/inject-workspace-scoped-repository.decorator';
-import { WorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/workspace-scoped-repository';
 import { USER_WORKSPACE_DELETION_WARNING_SENT_KEY } from 'src/engine/workspace-manager/workspace-cleaner/constants/user-workspace-deletion-warning-sent-key.constant';
 import {
   DestroySoftDeletedWorkspaceJob,
@@ -72,8 +67,6 @@ export class CleanerWorkspaceService {
     private readonly workspaceRepository: Repository<WorkspaceEntity>,
     @InjectRepository(KeyValuePairEntity)
     private readonly keyValuePairRepository: Repository<KeyValuePairEntity>,
-    @InjectWorkspaceScopedRepository(BillingSubscriptionEntity)
-    private readonly billingSubscriptionRepository: WorkspaceScopedRepository<BillingSubscriptionEntity>,
     private readonly i18nService: I18nService,
     private readonly workspaceDomainsService: WorkspaceDomainsService,
     @InjectMessageQueue(MessageQueue.workspaceDestroyQueue)
@@ -121,7 +114,7 @@ export class CleanerWorkspaceService {
   async sendWarningEmail(
     workspaceMember: WorkspaceMemberWorkspaceEntity,
     workspaceDisplayName: string | undefined,
-    billingSettingsUrl: string,
+    workspaceUrl: string,
     daysSinceInactive: number,
   ) {
     const emailData = {
@@ -129,7 +122,7 @@ export class CleanerWorkspaceService {
       inactiveDaysBeforeDelete: this.inactiveDaysBeforeSoftDelete,
       userName: `${workspaceMember.name.firstName} ${workspaceMember.name.lastName}`,
       workspaceDisplayName: `${workspaceDisplayName}`,
-      link: billingSettingsUrl,
+      link: workspaceUrl,
       locale: workspaceMember.locale,
     };
     const emailTemplate = WarnSuspendedWorkspaceEmail(emailData);
@@ -171,11 +164,8 @@ export class CleanerWorkspaceService {
         .join(', ')}']`,
     );
 
-    const billingSettingsUrl = this.workspaceDomainsService
-      .buildWorkspaceURL({
-        workspace,
-        pathname: getSettingsPath(SettingsPath.Billing),
-      })
+    const workspaceUrl = this.workspaceDomainsService
+      .buildWorkspaceURL({ workspace })
       .toString();
 
     if (!dryRun) {
@@ -183,7 +173,7 @@ export class CleanerWorkspaceService {
         await this.sendWarningEmail(
           workspaceMember,
           workspace.displayName,
-          billingSettingsUrl,
+          workspaceUrl,
           daysSinceInactive,
         );
 
@@ -472,26 +462,6 @@ export class CleanerWorkspaceService {
         );
 
         continue;
-      }
-
-      if (this.twentyConfigService.get('IS_BILLING_ENABLED')) {
-        const activeBillingSubscription =
-          await this.billingSubscriptionRepository.findOne(workspace.id, {
-            where: {
-              status: In([
-                SubscriptionStatus.Active,
-                SubscriptionStatus.Trialing,
-              ]),
-            },
-          });
-
-        if (isDefined(activeBillingSubscription)) {
-          this.logger.warn(
-            `${dryRun ? 'DRY RUN - ' : ''}Workspace ${workspace.id} has an active billing subscription, skipping`,
-          );
-
-          continue;
-        }
       }
 
       this.logger.log(

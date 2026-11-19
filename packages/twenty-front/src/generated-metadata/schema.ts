@@ -7,7 +7,6 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
-  BigInt: { input: any; output: any; }
   ConnectionCursor: { input: any; output: any; }
   DateTime: { input: string; output: string; }
   JSON: { input: any; output: any; }
@@ -290,21 +289,6 @@ export enum AggregateOperations {
   PERCENTAGE_NOT_EMPTY = 'PERCENTAGE_NOT_EMPTY',
   SUM = 'SUM'
 }
-
-export type AiChatUsage = {
-  __typename?: 'AiChatUsage';
-  consumedValue?: Maybe<Scalars['BigInt']['output']>;
-  kind: Scalars['String']['output'];
-  limitValue: Scalars['BigInt']['output'];
-  periodEnd?: Maybe<Scalars['DateTime']['output']>;
-};
-
-export type AiChatUserCreditsUsage = {
-  __typename?: 'AiChatUserCreditsUsage';
-  consumedValue?: Maybe<Scalars['BigInt']['output']>;
-  limitValue: Scalars['BigInt']['output'];
-  periodEnd: Scalars['DateTime']['output'];
-};
 
 export enum AiModelTier {
   balanced = 'balanced',
@@ -692,10 +676,8 @@ export type ApplicationRegistrationStats = {
   __typename?: 'ApplicationRegistrationStats';
   activeInstalls: Scalars['Int']['output'];
   autoUpdateEnabled: Scalars['Int']['output'];
-  creditsUsedBreakdown?: Maybe<Array<CreditUsedItem>>;
   mostInstalledVersion?: Maybe<Scalars['String']['output']>;
   suspendedInstalls: Scalars['Int']['output'];
-  totalCreditsUsed?: Maybe<Scalars['Float']['output']>;
   versionDistribution: Array<VersionDistributionEntry>;
 };
 
@@ -903,14 +885,6 @@ export type BarChartSeries = {
   label: Scalars['String']['output'];
 };
 
-export type Billing = {
-  __typename?: 'Billing';
-  billingUrl?: Maybe<Scalars['String']['output']>;
-  isBillingEnabled: Scalars['Boolean']['output'];
-  stripePublishableKey?: Maybe<Scalars['String']['output']>;
-  trialPeriods: Array<BillingTrialPeriod>;
-};
-
 export type BillingCustomer = {
   __typename?: 'BillingCustomer';
   hasPaymentMethod?: Maybe<Scalars['Boolean']['output']>;
@@ -931,23 +905,6 @@ export type BillingEndTrialPeriod = {
   /** Updated subscription status */
   status?: Maybe<SubscriptionStatus>;
 };
-
-export type BillingEntitlement = {
-  __typename?: 'BillingEntitlement';
-  key: BillingEntitlementKey;
-  value: Scalars['Boolean']['output'];
-};
-
-export enum BillingEntitlementKey {
-  AUDIT_LOGS = 'AUDIT_LOGS',
-  CUSTOM_DOMAIN = 'CUSTOM_DOMAIN',
-  CUSTOM_ROLES = 'CUSTOM_ROLES',
-  RECORD_SHARING = 'RECORD_SHARING',
-  RLS = 'RLS',
-  SSO = 'SSO',
-  USAGE_LIMIT = 'USAGE_LIMIT',
-  VALIDATION_RULES = 'VALIDATION_RULES'
-}
 
 export type BillingLicensedProduct = BillingProductDto & {
   __typename?: 'BillingLicensedProduct';
@@ -1073,7 +1030,6 @@ export type BillingSubscription = {
   cancelAt?: Maybe<Scalars['DateTime']['output']>;
   collectionMethod?: Maybe<BillingSubscriptionCollectionMethod>;
   currentPeriodEnd?: Maybe<Scalars['DateTime']['output']>;
-  hasUserCredits?: Maybe<Scalars['Boolean']['output']>;
   id: Scalars['UUID']['output'];
   interval?: Maybe<SubscriptionInterval>;
   metadata: Scalars['JSON']['output'];
@@ -1108,12 +1064,6 @@ export type BillingSubscriptionSchedulePhaseItem = {
   __typename?: 'BillingSubscriptionSchedulePhaseItem';
   price: Scalars['String']['output'];
   quantity?: Maybe<Scalars['Float']['output']>;
-};
-
-export type BillingTrialPeriod = {
-  __typename?: 'BillingTrialPeriod';
-  duration: Scalars['Float']['output'];
-  isCreditCardRequired: Scalars['Boolean']['output'];
 };
 
 export type BillingUpdate = {
@@ -1319,12 +1269,10 @@ export type ClientConfig = {
   api: ApiConfig;
   appVersion?: Maybe<Scalars['String']['output']>;
   authProviders: AuthProviders;
-  billing: Billing;
   calendarBookingPageId?: Maybe<Scalars['String']['output']>;
   canManageFeatureFlags: Scalars['Boolean']['output'];
   captcha: Captcha;
   defaultSubdomain?: Maybe<Scalars['String']['output']>;
-  enterpriseInstanceType: Scalars['String']['output'];
   frontDomain: Scalars['String']['output'];
   isAttachmentPreviewEnabled: Scalars['Boolean']['output'];
   isBookCallOnboardingStepEnabled: Scalars['Boolean']['output'];
@@ -1743,19 +1691,6 @@ export type CreateSkillInput = {
   name: Scalars['String']['input'];
 };
 
-export type CreateUsageLimitInput = {
-  burstValue?: InputMaybe<Scalars['BigInt']['input']>;
-  limitKind: Scalars['String']['input'];
-  limitValue: Scalars['BigInt']['input'];
-  operationType: UsageOperationType;
-  periodCount: Scalars['Int']['input'];
-  periodUnit: Scalars['String']['input'];
-  resourceType: UsageResourceType;
-  spenderId?: InputMaybe<Scalars['String']['input']>;
-  spenderType: Scalars['String']['input'];
-  unit: UsageUnit;
-};
-
 export type CreateViewFieldGroupInput = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   isVisible?: InputMaybe<Scalars['Boolean']['input']>;
@@ -1841,14 +1776,6 @@ export type CreateWebhookInput = {
   operations: Array<Scalars['String']['input']>;
   secret?: InputMaybe<Scalars['String']['input']>;
   targetUrl: Scalars['String']['input'];
-};
-
-export type CreditUsedItem = {
-  __typename?: 'CreditUsedItem';
-  creditsUsed: Scalars['Float']['output'];
-  label?: Maybe<Scalars['String']['output']>;
-  operation?: Maybe<UsageOperationType>;
-  resource?: Maybe<UsageResourceType>;
 };
 
 export type CursorPaging = {
@@ -3128,7 +3055,6 @@ export type Mutation = {
   createPageLayoutWidget: PageLayoutWidget;
   createSkill: Skill;
   createSubscriptionPaymentIntent: BillingPaymentIntent;
-  createUsageLimit: UsageLimit;
   createView: View;
   createViewField: ViewField;
   createViewFieldGroup: ViewFieldGroup;
@@ -3160,7 +3086,6 @@ export type Mutation = {
   deleteQueuedChatMessage: Scalars['Boolean']['output'];
   deleteSkill: Skill;
   deleteTwoFactorAuthenticationMethod: DeleteTwoFactorAuthenticationMethod;
-  deleteUsageLimit: Scalars['Boolean']['output'];
   deleteUser: User;
   deleteUserFromWorkspace: UserWorkspace;
   deleteView: Scalars['Boolean']['output'];
@@ -3312,7 +3237,6 @@ export type Mutation = {
   updatePasswordViaResetToken: InvalidatePassword;
   updateSkill: Skill;
   updateTimelineActivityType: TimelineActivityType;
-  updateUsageLimit: UsageLimit;
   updateUserCreditsFallback: BillingCustomer;
   updateUserEmail: Scalars['Boolean']['output'];
   updateView: View;
@@ -3633,11 +3557,6 @@ export type MutationCreateSubscriptionPaymentIntentArgs = {
 };
 
 
-export type MutationCreateUsageLimitArgs = {
-  input: CreateUsageLimitInput;
-};
-
-
 export type MutationCreateViewArgs = {
   input: CreateViewInput;
 };
@@ -3787,11 +3706,6 @@ export type MutationDeleteSkillArgs = {
 
 export type MutationDeleteTwoFactorAuthenticationMethodArgs = {
   twoFactorAuthenticationMethodId: Scalars['UUID']['input'];
-};
-
-
-export type MutationDeleteUsageLimitArgs = {
-  usageLimitId: Scalars['UUID']['input'];
 };
 
 
@@ -4540,11 +4454,6 @@ export type MutationUpdateTimelineActivityTypeArgs = {
 };
 
 
-export type MutationUpdateUsageLimitArgs = {
-  input: UpdateUsageLimitInput;
-};
-
-
 export type MutationUpdateUserCreditsFallbackArgs = {
   userCreditsFallback: UserCreditsFallback;
 };
@@ -4941,7 +4850,6 @@ export enum OnboardingStatus {
   BOOK_CALL = 'BOOK_CALL',
   COMPLETED = 'COMPLETED',
   INVITE_TEAM = 'INVITE_TEAM',
-  PLAN_REQUIRED = 'PLAN_REQUIRED',
   PROFILE_CREATION = 'PROFILE_CREATION',
   SYNC_EMAIL = 'SYNC_EMAIL',
   WORKSPACE_ACTIVATION = 'WORKSPACE_ACTIVATION'
@@ -5247,8 +5155,6 @@ export type Query = {
   agentChatChannels: Array<AgentChatChannel>;
   agentChatOpenThreadsSummary: AgentChatOpenThreadsSummary;
   agentRuns: Array<AgentRun>;
-  aiChatUsage?: Maybe<AiChatUsage>;
-  aiChatUserCreditsUsage?: Maybe<AiChatUserCreditsUsage>;
   apiKey?: Maybe<ApiKey>;
   apiKeys: Array<ApiKey>;
   appConnection: AppConnection;
@@ -5330,7 +5236,6 @@ export type Query = {
   getRoles: Array<Role>;
   getToolIndex: Array<ToolIndexEntry>;
   getToolInputSchema?: Maybe<Scalars['JSON']['output']>;
-  getUsageAnalytics: UsageAnalytics;
   getView?: Maybe<View>;
   getViewField?: Maybe<ViewField>;
   getViewFieldGroup?: Maybe<ViewFieldGroup>;
@@ -5376,10 +5281,6 @@ export type Query = {
   skills: Array<Skill>;
   timelineActivityTypes: Array<TimelineActivityType>;
   twoFactorAuthenticationRecoveryStatus: TwoFactorAuthenticationRecoveryStatus;
-  usageLimits: Array<UsageLimit>;
-  usageQuotaDefinitions: UsageQuotaDefinitions;
-  usageQuotaScopeConsumption?: Maybe<UsageQuotaScopeConsumption>;
-  usageQuotasWithConsumption: Array<UsageQuotaWithConsumption>;
   validatePasswordResetToken: ValidatePasswordResetToken;
   webhook?: Maybe<Webhook>;
   webhooks: Array<Webhook>;
@@ -5549,8 +5450,6 @@ export type QueryFindApplicationRegistrationByUniversalIdentifierArgs = {
 
 export type QueryFindApplicationRegistrationStatsArgs = {
   id: Scalars['String']['input'];
-  periodEnd?: InputMaybe<Scalars['DateTime']['input']>;
-  periodStart?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 
@@ -5706,11 +5605,6 @@ export type QueryGetRoleArgs = {
 
 export type QueryGetToolInputSchemaArgs = {
   toolName: Scalars['String']['input'];
-};
-
-
-export type QueryGetUsageAnalyticsArgs = {
-  input?: InputMaybe<UsageAnalyticsInput>;
 };
 
 
@@ -5873,11 +5767,6 @@ export type QuerySkillArgs = {
 
 export type QueryTwoFactorAuthenticationRecoveryStatusArgs = {
   userId: Scalars['UUID']['input'];
-};
-
-
-export type QueryUsageQuotaScopeConsumptionArgs = {
-  input: UsageQuotaScopeInput;
 };
 
 
@@ -6937,11 +6826,6 @@ export type UpdateTimelineActivityTypeInput = {
   translations?: InputMaybe<Array<MetadataTranslationOverrideInput>>;
 };
 
-export type UpdateUsageLimitInput = {
-  id: Scalars['UUID']['input'];
-  payload: CreateUsageLimitInput;
-};
-
 export type UpdateViewFieldGroupInput = {
   /** The id of the view field group to update */
   id: Scalars['UUID']['input'];
@@ -7212,174 +7096,6 @@ export type UpsertViewWidgetViewSortInput = {
   direction?: InputMaybe<ViewSortDirection>;
   fieldMetadataId: Scalars['UUID']['input'];
   id?: InputMaybe<Scalars['UUID']['input']>;
-};
-
-export type UsageAnalytics = {
-  __typename?: 'UsageAnalytics';
-  periodEnd: Scalars['DateTime']['output'];
-  periodStart: Scalars['DateTime']['output'];
-  timeSeries: Array<UsageTimeSeries>;
-  usageByApplication: Array<UsageBreakdownItem>;
-  usageByModel: Array<UsageBreakdownItem>;
-  usageByOperationType: Array<UsageBreakdownItem>;
-  usageByUser: Array<UsageBreakdownItem>;
-  userDailyUsage?: Maybe<UsageUserDaily>;
-};
-
-export type UsageAnalyticsInput = {
-  operationTypes?: InputMaybe<Array<UsageOperationType>>;
-  periodEnd?: InputMaybe<Scalars['DateTime']['input']>;
-  periodStart?: InputMaybe<Scalars['DateTime']['input']>;
-  userWorkspaceId?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type UsageBreakdownItem = {
-  __typename?: 'UsageBreakdownItem';
-  creditsUsed: Scalars['Float']['output'];
-  key: Scalars['String']['output'];
-  label?: Maybe<Scalars['String']['output']>;
-  userCreditsUsed: Scalars['Float']['output'];
-  workspaceCreditsUsed: Scalars['Float']['output'];
-};
-
-export type UsageLimit = {
-  __typename?: 'UsageLimit';
-  burstValue?: Maybe<Scalars['BigInt']['output']>;
-  createdAt: Scalars['DateTime']['output'];
-  id: Scalars['UUID']['output'];
-  limitKind: Scalars['String']['output'];
-  limitValue: Scalars['BigInt']['output'];
-  operationType: UsageOperationType;
-  periodCount: Scalars['Int']['output'];
-  periodUnit: Scalars['String']['output'];
-  resourceType: UsageResourceType;
-  spenderId?: Maybe<Scalars['String']['output']>;
-  spenderType: Scalars['String']['output'];
-  unit: UsageUnit;
-  updatedAt: Scalars['DateTime']['output'];
-};
-
-export type UsageLimitOperationDefinition = {
-  __typename?: 'UsageLimitOperationDefinition';
-  allowedUnits: Array<UsageUnit>;
-  operationType: UsageOperationType;
-};
-
-export enum UsageOperationType {
-  AI_CHAT_TOKEN = 'AI_CHAT_TOKEN',
-  AI_WORKFLOW_TOKEN = 'AI_WORKFLOW_TOKEN',
-  AI_WORKFLOW_WEB_SEARCH = 'AI_WORKFLOW_WEB_SEARCH',
-  ALL = 'ALL',
-  API_REQUEST = 'API_REQUEST',
-  CALL_RECORDING = 'CALL_RECORDING',
-  CODE_EXECUTION = 'CODE_EXECUTION',
-  EMAIL_SEND = 'EMAIL_SEND',
-  MESSAGE_CAMPAIGN_SEND = 'MESSAGE_CAMPAIGN_SEND',
-  RECORD_WRITE = 'RECORD_WRITE',
-  STORAGE_FILE = 'STORAGE_FILE',
-  SUBSCRIPTION = 'SUBSCRIPTION',
-  WEBHOOK_CALL = 'WEBHOOK_CALL',
-  WEB_SEARCH = 'WEB_SEARCH',
-  WORKFLOW_EXECUTION = 'WORKFLOW_EXECUTION'
-}
-
-export type UsageQuotaDefinition = {
-  __typename?: 'UsageQuotaDefinition';
-  allowedOperations: Array<UsageLimitOperationDefinition>;
-  allowedSpenderTypes: Array<Scalars['String']['output']>;
-  limitKind: Scalars['String']['output'];
-  operatorOnlyScopes: Array<UsageQuotaOperatorOnlyScope>;
-  resourceType: UsageResourceType;
-};
-
-export type UsageQuotaDefinitions = {
-  __typename?: 'UsageQuotaDefinitions';
-  definitions: Array<UsageQuotaDefinition>;
-  hasAllowancePeriod: Scalars['Boolean']['output'];
-  isIntraWorkspaceLimitEntitled: Scalars['Boolean']['output'];
-};
-
-export type UsageQuotaOperatorOnlyScope = {
-  __typename?: 'UsageQuotaOperatorOnlyScope';
-  operationType: UsageOperationType;
-  periodUnit: Scalars['String']['output'];
-  spenderType: Scalars['String']['output'];
-  unit: UsageUnit;
-};
-
-export type UsageQuotaScopeConsumption = {
-  __typename?: 'UsageQuotaScopeConsumption';
-  consumedValue?: Maybe<Scalars['BigInt']['output']>;
-  periodEnd: Scalars['DateTime']['output'];
-  periodStart: Scalars['DateTime']['output'];
-};
-
-export type UsageQuotaScopeInput = {
-  operationType: UsageOperationType;
-  periodUnit: Scalars['String']['input'];
-  resourceType: UsageResourceType;
-  spenderId?: InputMaybe<Scalars['String']['input']>;
-  spenderType: Scalars['String']['input'];
-  unit: UsageUnit;
-};
-
-export type UsageQuotaWithConsumption = {
-  __typename?: 'UsageQuotaWithConsumption';
-  consumedValue?: Maybe<Scalars['BigInt']['output']>;
-  id: Scalars['UUID']['output'];
-  isEnforced: Scalars['Boolean']['output'];
-  limitValue: Scalars['BigInt']['output'];
-  operationType: UsageOperationType;
-  periodEnd?: Maybe<Scalars['DateTime']['output']>;
-  periodStart?: Maybe<Scalars['DateTime']['output']>;
-  periodUnit: Scalars['String']['output'];
-  remainingValue?: Maybe<Scalars['BigInt']['output']>;
-  resourceType: UsageResourceType;
-  spenderId?: Maybe<Scalars['String']['output']>;
-  spenderLabel?: Maybe<Scalars['String']['output']>;
-  spenderType: Scalars['String']['output'];
-  unit: UsageUnit;
-};
-
-export enum UsageResourceType {
-  AI = 'AI',
-  ALL = 'ALL',
-  API = 'API',
-  APP = 'APP',
-  EMAIL = 'EMAIL',
-  LOGIC_FUNCTION = 'LOGIC_FUNCTION',
-  RECORD = 'RECORD',
-  STORAGE = 'STORAGE',
-  WEBHOOK = 'WEBHOOK',
-  WORKFLOW = 'WORKFLOW'
-}
-
-export type UsageTimeSeries = {
-  __typename?: 'UsageTimeSeries';
-  creditsUsed: Scalars['Float']['output'];
-  date: Scalars['String']['output'];
-  workspaceCreditsUsed: Scalars['Float']['output'];
-};
-
-export enum UsageUnit {
-  BYTE = 'BYTE',
-  COMPLEXITY = 'COMPLEXITY',
-  CREDIT = 'CREDIT',
-  FILE = 'FILE',
-  INVOCATION = 'INVOCATION',
-  MILLISECOND = 'MILLISECOND',
-  MINUTE = 'MINUTE',
-  RECORD = 'RECORD',
-  REQUEST = 'REQUEST',
-  SEAT = 'SEAT',
-  TOKEN = 'TOKEN',
-  USER_CREDIT = 'USER_CREDIT'
-}
-
-export type UsageUserDaily = {
-  __typename?: 'UsageUserDaily';
-  dailyUsage: Array<UsageTimeSeries>;
-  userWorkspaceId: Scalars['String']['output'];
 };
 
 export type User = {
@@ -7797,11 +7513,7 @@ export type Workspace = {
   aiModelIdByTier: Scalars['JSON']['output'];
   allowImpersonation: Scalars['Boolean']['output'];
   allowedIframeOrigins?: Maybe<Array<Scalars['String']['output']>>;
-  billingCustomer?: Maybe<BillingCustomer>;
-  billingEntitlements: Array<BillingEntitlement>;
-  billingSubscriptions: Array<BillingSubscription>;
   createdAt: Scalars['DateTime']['output'];
-  currentBillingSubscription?: Maybe<BillingSubscription>;
   customDomain?: Maybe<Scalars['String']['output']>;
   databaseSchema?: Maybe<Scalars['String']['output']>;
   defaultRole?: Maybe<Role>;
@@ -7809,8 +7521,6 @@ export type Workspace = {
   displayName?: Maybe<Scalars['String']['output']>;
   editableProfileFields?: Maybe<Array<Scalars['String']['output']>>;
   featureFlags?: Maybe<Array<FeatureFlag>>;
-  hasValidEnterpriseValidityToken: Scalars['Boolean']['output'];
-  hasValidSignedEnterpriseKey: Scalars['Boolean']['output'];
   id: Scalars['UUID']['output'];
   installedApplications: Array<Application>;
   inviteHash?: Maybe<Scalars['String']['output']>;
@@ -7824,7 +7534,6 @@ export type Workspace = {
   isPasswordAuthBypassEnabled: Scalars['Boolean']['output'];
   isPasswordAuthEnabled: Scalars['Boolean']['output'];
   isPublicInviteLinkEnabled: Scalars['Boolean']['output'];
-  isTrialAvailable: Scalars['Boolean']['output'];
   isTwoFactorAuthenticationEnforced: Scalars['Boolean']['output'];
   logo?: Maybe<Scalars['String']['output']>;
   logoFileId?: Maybe<Scalars['UUID']['output']>;

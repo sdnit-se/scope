@@ -24,7 +24,6 @@ export class AgentHistorySchemaService {
         'flatFieldMetadataMaps',
         'flatIndexMaps',
         'featureFlagsMap',
-        'billingEntitlements',
       ]),
     );
     const { twentyStandardFlatApplication } =
@@ -72,7 +71,6 @@ export class AgentHistorySchemaService {
         },
         additionalCacheDataMaps: {
           featureFlagsMap: existing.featureFlagsMap,
-          billingEntitlements: existing.billingEntitlements,
         },
         idByUniversalIdentifierByMetadataName,
         fromToAllFlatEntityMaps: {

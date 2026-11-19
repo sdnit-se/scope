@@ -3,13 +3,9 @@ import { AgentChatStreamStateModule } from 'src/engine/metadata-modules/ai/ai-ch
 import { AgentChatThreadLifecycleModule } from 'src/engine/metadata-modules/ai/ai-chat/agent-chat-thread-lifecycle.module';
 import { AgentChatThreadModule } from 'src/engine/metadata-modules/ai/ai-chat/agent-chat-thread.module';
 import { AgentHistoryModule } from 'src/engine/metadata-modules/ai/ai-history/ai-history.module';
-import { UsageLimitModule } from 'src/engine/core-modules/usage-limit/usage-limit.module';
-import { AiChatUsageService } from 'src/engine/metadata-modules/ai/ai-chat/services/ai-chat-usage.service';
-import { AiChatUsageResolver } from 'src/engine/metadata-modules/ai/ai-chat/resolvers/ai-chat-usage.resolver';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { BillingModule } from 'src/engine/core-modules/billing/billing.module';
 import { WorkspaceDomainsModule } from 'src/engine/core-modules/domain/workspace-domains/workspace-domains.module';
 import { FeatureFlagModule } from 'src/engine/core-modules/feature-flag/feature-flag.module';
 import { FileEntity } from 'src/engine/core-modules/file/entities/file.entity';
@@ -19,7 +15,6 @@ import { UserWorkspaceModule } from 'src/engine/core-modules/user-workspace/user
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { AiAgentExecutionModule } from 'src/engine/metadata-modules/ai/ai-agent-execution/ai-agent-execution.module';
 import { MetricsModule } from 'src/engine/core-modules/metrics/metrics.module';
-import { AiBillingModule } from 'src/engine/metadata-modules/ai/ai-billing/ai-billing.module';
 import { PermissionsModule } from 'src/engine/metadata-modules/permissions/permissions.module';
 import { SkillModule } from 'src/engine/metadata-modules/skill/skill.module';
 import { provideWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/provide-workspace-scoped-repository';
@@ -56,10 +51,8 @@ import { AgentInboxAccessService } from 'src/engine/metadata-modules/ai/ai-chat/
     AgentChatThreadLifecycleModule,
     AgentChatThreadModule,
     AgentHistoryModule,
-    UsageLimitModule,
     TypeOrmModule.forFeature([FileEntity, WorkspaceEntity]),
     AiAgentExecutionModule,
-    BillingModule,
     FeatureFlagModule,
     FileModule,
     PermissionsModule,
@@ -67,15 +60,12 @@ import { AgentInboxAccessService } from 'src/engine/metadata-modules/ai/ai-chat/
     WorkspaceCacheModule,
     WorkspaceDomainsModule,
     UserWorkspaceModule,
-    AiBillingModule,
     MetricsModule,
     ToolProviderModule,
     DashboardToolsModule,
   ],
   providers: [
     AgentChatActorService,
-    AiChatUsageService,
-    AiChatUsageResolver,
     AgentChatResolver,
     AgentChatChannelResolver,
     AgentChatThreadParticipantResolver,

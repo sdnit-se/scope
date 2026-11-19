@@ -281,15 +281,6 @@ export const APPLICATION_ONLY_REST_REQUEST_FACTORIES = {
     path: '/apps/connections/get',
     body: { id: connectedAccountId },
   }),
-  'GET /app/billing/credits': (): ApplicationOnlyRestRequest => ({
-    method: 'get',
-    path: '/app/billing/credits',
-  }),
-  'POST /app/billing/charge': (): ApplicationOnlyRestRequest => ({
-    method: 'post',
-    path: '/app/billing/charge',
-    body: { creditsUsedMicro: 0, quantity: 1, operationType: 'AI_CHAT_TOKEN' },
-  }),
 };
 
 export const makeApplicationOnlyRestRequest = (

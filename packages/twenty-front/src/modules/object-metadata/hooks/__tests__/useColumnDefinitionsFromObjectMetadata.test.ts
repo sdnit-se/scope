@@ -7,8 +7,6 @@ import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/Enriche
 import { jotaiStore } from '@/ui/utilities/state/jotai/jotaiStore';
 import {
   AiModelTier,
-  SubscriptionInterval,
-  SubscriptionStatus,
   WorkspaceActivationStatus,
   WorkspaceDiscoverability,
 } from '~/generated-metadata/graphql';
@@ -33,9 +31,6 @@ describe('useColumnDefinitionsFromObjectMetadata', () => {
       allowImpersonation: false,
       subdomain: 'test',
       activationStatus: WorkspaceActivationStatus.ACTIVE,
-      hasValidSignedEnterpriseKey: false,
-      hasValidEnterpriseValidityToken: false,
-      isTrialAvailable: true,
       metadataVersion: 1,
       isPublicInviteLinkEnabled: false,
       workspaceDiscoverability: WorkspaceDiscoverability.PUBLIC,
@@ -51,22 +46,6 @@ describe('useColumnDefinitionsFromObjectMetadata', () => {
         subdomainUrl: 'https://twenty.twenty.com',
         customUrl: 'https://my-custom-domain.com',
       },
-      currentBillingSubscription: {
-        id: '1',
-        interval: SubscriptionInterval.Month,
-        status: SubscriptionStatus.Active,
-        metadata: {},
-        phases: [],
-      },
-      billingEntitlements: [],
-      billingSubscriptions: [
-        {
-          id: '1',
-          status: SubscriptionStatus.Active,
-          metadata: {},
-          phases: [],
-        },
-      ],
       isTwoFactorAuthenticationEnforced: false,
       trashRetentionDays: 14,
       aiChatModelTier: AiModelTier.fast,
