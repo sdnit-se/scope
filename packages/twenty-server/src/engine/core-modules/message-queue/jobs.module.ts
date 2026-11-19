@@ -30,7 +30,6 @@ import { RecordExportModule } from 'src/engine/core-modules/record-export/record
 import { WorkspaceDataExportModule } from 'src/engine/core-modules/workspace-data-export/workspace-data-export.module';
 import { EmailingModule } from 'src/modules/emailing/emailing.module';
 import { AddPeopleToMessageListJob } from 'src/modules/emailing/jobs/add-people-to-message-list.job';
-import { EnterpriseModule } from 'src/engine/core-modules/enterprise/enterprise.module';
 import { EventLogIngestionModule } from 'src/engine/core-modules/event-logs/ingest/event-log-ingestion.module';
 import { FeatureFlagModule } from 'src/engine/core-modules/feature-flag/feature-flag.module';
 import { GenerateSdkClientJob } from 'src/engine/core-modules/sdk-client/jobs/generate-sdk-client.job';
@@ -101,7 +100,6 @@ import { WorkflowModule } from 'src/modules/workflow/workflow.module';
     AiChatModule,
     LogicFunctionModule,
     LogicFunctionPrebuiltWarmUpModule,
-    EnterpriseModule,
     EmailingModule,
     ApplicationInstallModule,
     ApplicationManifestModule,

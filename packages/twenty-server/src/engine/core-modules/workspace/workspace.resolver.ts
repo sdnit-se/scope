@@ -30,7 +30,6 @@ import { BillingPortalWorkspaceService } from 'src/engine/core-modules/billing/s
 import { BillingService } from 'src/engine/core-modules/billing/services/billing.service';
 import { BillingSubscriptionService } from 'src/engine/core-modules/billing/services/billing-subscription.service';
 import { WorkspaceDomainsService } from 'src/engine/core-modules/domain/workspace-domains/services/workspace-domains.service';
-import { EnterprisePlanService } from 'src/engine/core-modules/enterprise/services/enterprise-plan.service';
 import { FeatureFlagDTO } from 'src/engine/core-modules/feature-flag/dtos/feature-flag.dto';
 import { FeatureFlagService } from 'src/engine/core-modules/feature-flag/services/feature-flag.service';
 import { FileUrlService } from 'src/engine/core-modules/file/file-url/file-url.service';
@@ -99,7 +98,6 @@ export class WorkspaceResolver {
     private readonly roleService: RoleService,
     private readonly viewService: ViewService,
     private readonly applicationService: ApplicationService,
-    private readonly enterprisePlanService: EnterprisePlanService,
   ) {}
 
   @Query(() => WorkspaceEntity)
@@ -395,14 +393,15 @@ export class WorkspaceResolver {
     );
   }
 
+  // This server never holds a paid licence; the web app still asks.
   @ResolveField(() => Boolean)
   hasValidSignedEnterpriseKey(): boolean {
-    return this.enterprisePlanService.hasValidSignedEnterpriseKey();
+    return false;
   }
 
   @ResolveField(() => Boolean)
   hasValidEnterpriseValidityToken(): boolean {
-    return this.enterprisePlanService.hasValidEnterpriseValidityToken();
+    return false;
   }
 
   @ResolveField(() => WorkspaceUrlsDTO)
