@@ -1,5 +1,3 @@
-import * as http from 'http';
-
 import { Injectable, Logger } from '@nestjs/common';
 
 import axios, { type AxiosInstance, type CreateAxiosDefaults } from 'axios';
@@ -131,20 +129,6 @@ export class SecureHttpClientService {
     }
 
     return buildAxiosFetch(this.getHttpClient()) as typeof globalThis.fetch;
-  }
-
-  // For libraries that only accept an agent (openid-client); undefined means no restriction.
-  getSsrfSafeAgent(url: URL): http.Agent | undefined {
-    const allowedInternalHosts = this.getAllowedInternalHosts();
-
-    if (!this.isSafeModeEnabled(allowedInternalHosts)) {
-      return undefined;
-    }
-
-    return createSsrfSafeAgent(
-      url.protocol === 'https:' ? 'https' : 'http',
-      allowedInternalHosts,
-    );
   }
 
   async getValidatedHost(hostnameOrUrl: string): Promise<string> {

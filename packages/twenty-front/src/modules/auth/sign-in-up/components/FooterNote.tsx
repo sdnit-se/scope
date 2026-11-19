@@ -1,7 +1,6 @@
 import { styled } from '@linaria/react';
 import { Trans, useLingui } from '@lingui/react/macro';
 
-import { useWorkspaceBypass } from '@/auth/sign-in-up/hooks/useWorkspaceBypass';
 import { getTwentyWebsiteUrl } from '@/auth/utils/getTwentyWebsiteUrl';
 import { useIsCurrentLocationOnAWorkspace } from '@/domain-manager/hooks/useIsCurrentLocationOnAWorkspace';
 import { ONBOARDING_CONTENT_BLOCK_WIDTH } from '@/onboarding/constants/OnboardingContentBlockWidth';
@@ -37,14 +36,8 @@ const StyledLinksContainer = styled.div`
   text-align: center;
   white-space: nowrap;
 
-  & > a,
-  & > button {
-    background: none;
-    border: none;
+  & > a {
     color: ${themeCssVariables.font.color.tertiary};
-    cursor: pointer;
-    font: inherit;
-    padding: 0;
     text-decoration: none;
 
     &:hover {
@@ -60,9 +53,6 @@ const StyledSeparator = styled.span`
 export const FooterNote = () => {
   const { isOnAWorkspace } = useIsCurrentLocationOnAWorkspace();
   const { i18n } = useLingui();
-
-  const { shouldOfferBypass, shouldUseBypass, enableBypass } =
-    useWorkspaceBypass();
 
   if (!isOnAWorkspace) {
     return (
@@ -90,14 +80,6 @@ export const FooterNote = () => {
 
   return (
     <StyledLinksContainer>
-      {shouldOfferBypass && !shouldUseBypass && (
-        <>
-          <button type="button" onClick={enableBypass}>
-            <Trans>Bypass SSO</Trans>
-          </button>
-          <StyledSeparator>•</StyledSeparator>
-        </>
-      )}
       <a
         href={getTwentyWebsiteUrl(i18n.locale, 'privacy-policy')}
         target="_blank"

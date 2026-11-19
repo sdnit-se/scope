@@ -13,7 +13,7 @@ import { signUp } from 'test/integration/graphql/utils/sign-up.util';
 import { makeMetadataApiRequest } from 'test/integration/metadata/suites/utils/make-metadata-api-request.util';
 import { updateConfigVariable } from 'test/integration/twenty-config/utils/update-config-variable.util';
 
-import { type AvailableWorkspace } from 'src/engine/core-modules/auth/dto/available-workspaces.dto';
+import { type AvailableWorkspaceDTO } from 'src/engine/core-modules/workspace/dtos/available-workspace.dto';
 import { SEED_APPLE_WORKSPACE_ID } from 'src/engine/workspace-manager/dev-seeder/core/constants/seeder-workspaces.constant';
 
 const PASSWORD = 'Pending-invitation-1';
@@ -40,7 +40,7 @@ describe('signUp with a pending personal invitation (integration)', () => {
   let email: string;
   let inviteToken: string;
   let accessToken: string;
-  let signUpAvailableWorkspacesForSignUp: AvailableWorkspace[];
+  let signUpAvailableWorkspacesForSignUp: AvailableWorkspaceDTO[];
 
   beforeEach(async () => {
     email = `pending-invite-${randomUUID()}@example.com`;

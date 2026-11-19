@@ -29,7 +29,6 @@ import { FileCorePictureService } from 'src/engine/core-modules/file/file-core-p
 import { FileUploadService } from 'src/engine/core-modules/file/file-upload/services/file-upload.service';
 import { UserSessionCookieService } from 'src/engine/core-modules/user-session/services/user-session-cookie.service';
 import { UserSessionService } from 'src/engine/core-modules/user-session/services/user-session.service';
-import { SsoService } from 'src/engine/core-modules/sso/services/sso.service';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
 import { TwoFactorAuthenticationService } from 'src/engine/core-modules/two-factor-authentication/two-factor-authentication.service';
 import { TwoFactorAuthenticationRecoveryService } from 'src/engine/core-modules/two-factor-authentication/services/two-factor-authentication-recovery.service';
@@ -232,10 +231,6 @@ describe('AuthResolver', () => {
         },
         {
           provide: FeatureFlagService,
-          useValue: {},
-        },
-        {
-          provide: SsoService,
           useValue: {},
         },
         {

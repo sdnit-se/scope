@@ -702,7 +702,6 @@ type AuthProviders {
   magicLink: Boolean!
   microsoft: Boolean!
   password: Boolean!
-  sso: [SSOIdentityProvider!]!
 }
 
 type AuthToken {
@@ -735,7 +734,6 @@ type AvailableWorkspace {
   loginToken: String
   logo: String
   personalInviteToken: String
-  sso: [SSOConnection!]!
   workspaceUrls: WorkspaceUrls!
 }
 
@@ -1802,14 +1800,6 @@ input DeleteOneObjectInput {
   id: UUID!
 }
 
-type DeleteSso {
-  identityProviderId: UUID!
-}
-
-input DeleteSsoInput {
-  identityProviderId: UUID!
-}
-
 type DeleteTwoFactorAuthenticationMethod {
   """Boolean that confirms query was dispatched"""
   success: Boolean!
@@ -1895,19 +1885,6 @@ type DuplicatedMessageList {
   name: String
   position: Float!
   updatedAt: String!
-}
-
-type EditSso {
-  id: UUID!
-  issuer: String!
-  name: String!
-  status: SSOIdentityProviderStatus!
-  type: IdentityProviderType!
-}
-
-input EditSsoInput {
-  id: UUID!
-  status: SSOIdentityProviderStatus!
 }
 
 input EmailAccountConnectionParameters {
@@ -2292,15 +2269,6 @@ type FilesConfiguration {
   configurationType: WidgetConfigurationType!
 }
 
-type FindAvailableSSOIDP {
-  id: UUID!
-  issuer: String!
-  name: String!
-  status: SSOIdentityProviderStatus!
-  type: IdentityProviderType!
-  workspace: WorkspaceNameAndId!
-}
-
 type FormFieldConfiguration {
   configurationType: WidgetConfigurationType!
   fieldMetadataId: String!
@@ -2348,17 +2316,6 @@ input GetApiKeyInput {
   id: UUID!
 }
 
-type GetAuthorizationUrlForSSO {
-  authorizationURL: String!
-  id: UUID!
-  type: String!
-}
-
-input GetAuthorizationUrlForSSOInput {
-  identityProviderId: UUID!
-  workspaceInviteHash: String
-}
-
 input GrantApplicationCapabilitiesInput {
   applicationId: UUID!
   capabilities: [String!]!
@@ -2380,11 +2337,6 @@ type GridPosition {
   columnSpan: Float!
   row: Float!
   rowSpan: Float!
-}
-
-enum IdentityProviderType {
-  OIDC
-  SAML
 }
 
 type IframeConfiguration {
@@ -3020,7 +2972,6 @@ type Mutation {
   createMcpServer(input: CreateMcpServerInput!): McpServer!
   createNavigationMenuItem(input: CreateNavigationMenuItemInput!): NavigationMenuItem!
   createNewWorkspaceLogoUpload(filename: String!, size: Float!, workspaceId: String!): FileUploadTarget!
-  createOIDCIdentityProvider(input: SetupOIDCSsoInput!): SetupSso!
   createObjectEvent(event: String!, objectMetadataId: UUID!, properties: JSON, recordId: UUID!): Analytics!
   createOneAgent(input: CreateAgentInput!): Agent!
   createOneField(input: CreateOneFieldMetadataInput!): Field!
@@ -3031,7 +2982,6 @@ type Mutation {
   createPageLayout(input: CreatePageLayoutInput!): PageLayout!
   createPageLayoutTab(input: CreatePageLayoutTabInput!): PageLayoutTab!
   createPageLayoutWidget(input: CreatePageLayoutWidgetInput!): PageLayoutWidget!
-  createSAMLIdentityProvider(input: SetupSAMLSsoInput!): SetupSso!
   createSkill(input: CreateSkillInput!): Skill!
   createSubscriptionPaymentIntent(idempotencyKey: String!, plan: BillingPlanKey!, recurringInterval: SubscriptionInterval!, requirePaymentMethod: Boolean! = true, successUrlPath: String): BillingPaymentIntent!
   createUsageLimit(input: CreateUsageLimitInput!): UsageLimit!
@@ -3065,7 +3015,6 @@ type Mutation {
   deleteOneObject(input: DeleteOneObjectInput!): Object!
   deleteOneRole(roleId: UUID!): String!
   deleteQueuedChatMessage(messageId: UUID!): Boolean!
-  deleteSSOIdentityProvider(input: DeleteSsoInput!): DeleteSso!
   deleteSkill(id: UUID!): Skill!
   deleteTwoFactorAuthenticationMethod(twoFactorAuthenticationMethodId: UUID!): DeleteTwoFactorAuthenticationMethod!
   deleteUsageLimit(usageLimitId: UUID!): Boolean!
@@ -3095,7 +3044,6 @@ type Mutation {
   disconnectConnectedAccount(id: UUID!): ConnectedAccountPublicDTO!
   duplicateDashboard(id: UUID!): DuplicatedDashboard!
   duplicateMessageList(id: UUID!): DuplicatedMessageList!
-  editSSOIdentityProvider(input: EditSsoInput!): EditSso!
   emailPasswordResetLink(captchaToken: String, email: String!, workspaceId: UUID): EmailPasswordResetLink!
   endSubscriptionTrialPeriod: BillingEndTrialPeriod!
   enqueueJob(input: EnqueueJobInput!): EnqueueJobResult! @deprecated(reason: "Use enqueueJobs instead.")
@@ -3111,7 +3059,6 @@ type Mutation {
   getAuthTokensFromOTP(captchaToken: String, loginToken: String!, origin: String!, otp: String!): AuthTokens!
   getAuthTokensFromSSOExchangeToken(ssoExchangeToken: String!): AuthTokens!
   getAuthTokensFromTwoFactorAuthenticationRecoveryCode(captchaToken: String, loginToken: String!, origin: String!, recoveryCode: String!): TwoFactorAuthenticationRecoveryCodeRedemption!
-  getAuthorizationUrlForSSO(input: GetAuthorizationUrlForSSOInput!): GetAuthorizationUrlForSSO!
   getLoginTokenFromCredentials(captchaToken: String, email: String!, locale: String, origin: String!, password: String!, verifyEmailRedirectPath: String): LoginToken!
   goBackToPreviousOnboardingStep: OnboardingStepNavigation!
   grantApplicationCapabilities(input: GrantApplicationCapabilitiesInput!): ApplicationCapabilityGrant!
@@ -3844,7 +3791,6 @@ type Query {
   getResourceCreditUsage: [BillingResourceCreditUsage!]!
   getRole(id: UUID!): Role!
   getRoles: [Role!]!
-  getSSOIdentityProviders: [FindAvailableSSOIDP!]!
   getToolIndex: [ToolIndexEntry!]!
   getToolInputSchema(toolName: String!): JSON
   getUsageAnalytics(input: UsageAnalyticsInput): UsageAnalytics!
@@ -4201,28 +4147,6 @@ input RunAgentThreadInput {
   title: String
 }
 
-type SSOConnection {
-  id: UUID!
-  issuer: String!
-  name: String!
-  status: SSOIdentityProviderStatus!
-  type: IdentityProviderType!
-}
-
-type SSOIdentityProvider {
-  id: UUID!
-  issuer: String!
-  name: String!
-  status: SSOIdentityProviderStatus!
-  type: IdentityProviderType!
-}
-
-enum SSOIdentityProviderStatus {
-  Active
-  Error
-  Inactive
-}
-
 type SdkClientChecksums {
   core: String
   metadata: String!
@@ -4336,30 +4260,6 @@ type SettingsMenuItem {
 enum SettingsMenuItemScope {
   USER
   WORKSPACE
-}
-
-input SetupOIDCSsoInput {
-  clientID: String!
-  clientSecret: String!
-  issuer: String!
-  name: String!
-}
-
-input SetupSAMLSsoInput {
-  certificate: String!
-  fingerprint: String
-  id: UUID!
-  issuer: String!
-  name: String!
-  ssoURL: String!
-}
-
-type SetupSso {
-  id: UUID!
-  issuer: String!
-  name: String!
-  status: SSOIdentityProviderStatus!
-  type: IdentityProviderType!
 }
 
 type SignUp {
@@ -5980,11 +5880,6 @@ enum WorkspaceMemberTimeFormatEnum {
 type WorkspaceMigration {
   actions: JSON!
   applicationUniversalIdentifier: String!
-}
-
-type WorkspaceNameAndId {
-  displayName: String
-  id: UUID!
 }
 
 enum WorkspacePersonEnrichmentOutcome {
