@@ -120,16 +120,6 @@ exports[`Administration operations with an application token should fail with a 
 }
 `;
 
-exports[`Administration operations with an application token should fail with a user-bound application token should refuse createEmailingDomain 1`] = `
-{
-  "extensions": {
-    "code": "FORBIDDEN",
-    "userFriendlyMessage": "You do not have permission to perform this action.",
-  },
-  "message": "This endpoint is not available to this caller",
-}
-`;
-
 exports[`Administration operations with an application token should fail with a user-bound application token should refuse createFrontComponent 1`] = `
 {
   "extensions": {
@@ -191,16 +181,6 @@ exports[`Administration operations with an application token should fail with a 
 `;
 
 exports[`Administration operations with an application token should fail with a user-bound application token should refuse deleteCurrentWorkspace 1`] = `
-{
-  "extensions": {
-    "code": "FORBIDDEN",
-    "userFriendlyMessage": "You do not have permission to perform this action.",
-  },
-  "message": "This endpoint is not available to this caller",
-}
-`;
-
-exports[`Administration operations with an application token should fail with a user-bound application token should refuse deleteEmailingDomain 1`] = `
 {
   "extensions": {
     "code": "FORBIDDEN",
@@ -580,16 +560,6 @@ exports[`Administration operations with an application token should fail with a 
 }
 `;
 
-exports[`Administration operations with an application token should fail with a user-bound application token should refuse verifyEmailingDomain 1`] = `
-{
-  "extensions": {
-    "code": "FORBIDDEN",
-    "userFriendlyMessage": "You do not have permission to perform this action.",
-  },
-  "message": "This endpoint is not available to this caller",
-}
-`;
-
 exports[`Administration operations with an application token should fail with an application token without user binding should refuse assignRoleToAgent 1`] = `
 {
   "extensions": {
@@ -710,16 +680,6 @@ exports[`Administration operations with an application token should fail with an
 }
 `;
 
-exports[`Administration operations with an application token should fail with an application token without user binding should refuse createEmailingDomain 1`] = `
-{
-  "extensions": {
-    "code": "FORBIDDEN",
-    "userFriendlyMessage": "You do not have permission to perform this action.",
-  },
-  "message": "This endpoint is not available to this caller",
-}
-`;
-
 exports[`Administration operations with an application token should fail with an application token without user binding should refuse createFrontComponent 1`] = `
 {
   "extensions": {
@@ -781,16 +741,6 @@ exports[`Administration operations with an application token should fail with an
 `;
 
 exports[`Administration operations with an application token should fail with an application token without user binding should refuse deleteCurrentWorkspace 1`] = `
-{
-  "extensions": {
-    "code": "FORBIDDEN",
-    "userFriendlyMessage": "You do not have permission to perform this action.",
-  },
-  "message": "This endpoint is not available to this caller",
-}
-`;
-
-exports[`Administration operations with an application token should fail with an application token without user binding should refuse deleteEmailingDomain 1`] = `
 {
   "extensions": {
     "code": "FORBIDDEN",
@@ -1161,16 +1111,6 @@ exports[`Administration operations with an application token should fail with an
 `;
 
 exports[`Administration operations with an application token should fail with an application token without user binding should refuse validateApprovedAccessDomain 1`] = `
-{
-  "extensions": {
-    "code": "FORBIDDEN",
-    "userFriendlyMessage": "You do not have permission to perform this action.",
-  },
-  "message": "This endpoint is not available to this caller",
-}
-`;
-
-exports[`Administration operations with an application token should fail with an application token without user binding should refuse verifyEmailingDomain 1`] = `
 {
   "extensions": {
     "code": "FORBIDDEN",
