@@ -40,16 +40,6 @@ exports[`Account operations with an application token should fail with an applic
 }
 `;
 
-exports[`Account operations with an application token should fail with an application token bound to nobody should refuse an admin panel AI provider query 1`] = `
-{
-  "extensions": {
-    "code": "FORBIDDEN",
-    "userFriendlyMessage": "You do not have permission to perform this action.",
-  },
-  "message": "This endpoint is not available to this caller",
-}
-`;
-
 exports[`Account operations with an application token should fail with an application token bound to nobody should refuse an admin panel query 1`] = `
 {
   "extensions": {
@@ -321,16 +311,6 @@ exports[`Account operations with an application token should fail with an applic
 `;
 
 exports[`Account operations with an application token should fail with an application token bound to the admin should refuse a timeline messaging query 1`] = `
-{
-  "extensions": {
-    "code": "FORBIDDEN",
-    "userFriendlyMessage": "You do not have permission to perform this action.",
-  },
-  "message": "This endpoint is not available to this caller",
-}
-`;
-
-exports[`Account operations with an application token should fail with an application token bound to the admin should refuse an admin panel AI provider query 1`] = `
 {
   "extensions": {
     "code": "FORBIDDEN",

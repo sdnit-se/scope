@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useToast } from 'twenty-ui/components/feedback';
 import { Section } from 'twenty-ui/components/layout';
 
@@ -14,15 +14,9 @@ import { getAiModelTierLabel } from '@/ai/utils/getAiModelTierLabel';
 import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
 import { useClientConfig } from '@/client-config/hooks/useClientConfig';
 import { billingState } from '@/client-config/states/billingState';
-import { SettingsAdminAiProviderListCard } from '@/settings/admin-panel/ai/components/SettingsAdminAiProviderListCard';
-import { AI_PROVIDER_SOURCE } from '@/settings/admin-panel/ai/constants/AiProviderSource';
 import { SET_ADMIN_DEFAULT_AI_MODEL } from '@/settings/admin-panel/ai/graphql/mutations/setAdminDefaultAiModel';
 import { GET_ADMIN_AI_MODELS } from '@/settings/admin-panel/ai/graphql/queries/getAdminAiModels';
 import { GET_ADMIN_AI_USAGE_BY_WORKSPACE } from '@/settings/admin-panel/ai/graphql/queries/getAdminAiUsageByWorkspace';
-import { GET_AI_PROVIDERS } from '@/settings/admin-panel/ai/graphql/queries/getAiProviders';
-import { useCustomAiProviderAccess } from '@/settings/admin-panel/ai/hooks/useCustomAiProviderAccess';
-import { type GetAiProvidersResult } from '@/settings/admin-panel/ai/types/GetAiProvidersResult';
-import { parseProviderItems } from '@/settings/admin-panel/ai/utils/parseProviderItems';
 import { useApolloAdminClient } from '@/settings/admin-panel/apollo/hooks/useApolloAdminClient';
 import { AiModelPinSelect } from '@/ai/components/AiModelPinSelect';
 import { SettingsEnterpriseFeatureGateCard } from '@/settings/components/SettingsEnterpriseFeatureGateCard';
@@ -66,11 +60,6 @@ export const SettingsAdminAI = () => {
   const hasEnterpriseAccess =
     isBillingEnabled ||
     currentWorkspace?.hasValidEnterpriseValidityToken === true;
-  const {
-    hasAccess: hasCustomAiProviderAccess,
-    gateDescription: customAiProviderGateDescription,
-    tooltipContent: customAiProviderTooltipContent,
-  } = useCustomAiProviderAccess();
   const [usagePeriod, setUsagePeriod] = useState<PeriodPreset>('30d');
   const periodOptions = getPeriodOptions();
   const usageDates = getPeriodDates(usagePeriod);
@@ -85,11 +74,6 @@ export const SettingsAdminAI = () => {
   const [setDefaultModel] = useMutation(SET_ADMIN_DEFAULT_AI_MODEL, {
     client: apolloAdminClient,
   });
-
-  const { data: providersData, loading: isLoadingProviders } =
-    useQuery<GetAiProvidersResult>(GET_AI_PROVIDERS, {
-      client: apolloAdminClient,
-    });
 
   const { data: usageData, previousData: previousUsageData } = useQuery<{
     getAdminAiUsageByWorkspace: UsageBreakdownItem[];
@@ -107,24 +91,7 @@ export const SettingsAdminAI = () => {
 
   const models = data?.getAdminAiModels?.models ?? [];
 
-  const providerItems = useMemo(
-    () => parseProviderItems(providersData?.getAiProviders ?? {}),
-    [providersData],
-  );
-
-  const catalogProviders = useMemo(
-    () =>
-      providerItems
-        .filter((provider) => provider.source === AI_PROVIDER_SOURCE.CATALOG)
-        .sort((a, b) => (a.label ?? a.id).localeCompare(b.label ?? b.id)),
-    [providerItems],
-  );
-
-  const customProviders = providerItems.filter(
-    (provider) => provider.source === AI_PROVIDER_SOURCE.CUSTOM,
-  );
-
-  if (isLoadingProviders || isLoadingModels) {
+  if (isLoadingModels) {
     return <SettingsSectionSkeletonLoader />;
   }
 
@@ -159,43 +126,6 @@ export const SettingsAdminAI = () => {
 
   return (
     <>
-      <Section.Root>
-        <Section.Header
-          title={t`Providers`}
-          description={t`Built-in providers activated by API key. Click to manage models.`}
-        />
-
-        <SettingsAdminAiProviderListCard
-          providers={catalogProviders}
-          showAddButton={false}
-        />
-      </Section.Root>
-
-      <Section.Root>
-        <Section.Header
-          title={t`Custom Providers`}
-          description={t`Add custom endpoints, private gateways, or additional regions.`}
-          actions={
-            <OrganizationAdornment
-              tooltipContent={customAiProviderTooltipContent}
-            />
-          }
-        />
-
-        <SettingsAdminAiProviderListCard
-          providers={customProviders}
-          showAddButton={hasCustomAiProviderAccess}
-        />
-
-        {!hasCustomAiProviderAccess && (
-          <SettingsEnterpriseFeatureGateCard
-            title={t`Organization feature`}
-            description={customAiProviderGateDescription}
-            buttonTitle={t`Activate`}
-          />
-        )}
-      </Section.Root>
-
       {enabledModels.length > 0 && (
         <Section.Root>
           <Section.Header

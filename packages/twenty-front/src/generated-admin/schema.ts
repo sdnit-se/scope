@@ -430,13 +430,6 @@ export type CreditUsedItem = {
   resource?: Maybe<UsageResourceType>;
 };
 
-export type CustomAiProviderAccessDto = {
-  __typename?: 'CustomAiProviderAccessDTO';
-  hasAccess: Scalars['Boolean']['output'];
-  seatCount: Scalars['Int']['output'];
-  seatThreshold: Scalars['Int']['output'];
-};
-
 export type DeleteJobsResponse = {
   __typename?: 'DeleteJobsResponse';
   deletedCount: Scalars['Int']['output'];
@@ -542,31 +535,8 @@ export enum ModelFamily {
   MISTRAL = 'MISTRAL'
 }
 
-export type ModelsDevModelSuggestion = {
-  __typename?: 'ModelsDevModelSuggestion';
-  cacheCreationCostPerMillionTokens?: Maybe<Scalars['Float']['output']>;
-  cachedInputCostPerMillionTokens?: Maybe<Scalars['Float']['output']>;
-  contextWindowTokens: Scalars['Float']['output'];
-  inputCostPerMillionTokens: Scalars['Float']['output'];
-  maxOutputTokens: Scalars['Float']['output'];
-  modalities: Array<Scalars['String']['output']>;
-  modelId: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  outputCostPerMillionTokens: Scalars['Float']['output'];
-  supportsReasoning: Scalars['Boolean']['output'];
-};
-
-export type ModelsDevProviderSuggestion = {
-  __typename?: 'ModelsDevProviderSuggestion';
-  id: Scalars['String']['output'];
-  modelCount: Scalars['Float']['output'];
-  npm: Scalars['String']['output'];
-};
-
 export type Mutation = {
   __typename?: 'Mutation';
-  addAiProvider: Scalars['Boolean']['output'];
-  addModelToProvider: Scalars['Boolean']['output'];
   clearMaintenanceMode: Scalars['Boolean']['output'];
   createDatabaseConfigVariable: Scalars['Boolean']['output'];
   createWorkspaceDataExport: WorkspaceDataExport;
@@ -577,8 +547,6 @@ export type Mutation = {
   generateTwoFactorAuthenticationRecoveryCodeAsServerAdmin: TwoFactorAuthenticationRecoveryCode;
   grantWorkspaceCredits: AdminPanelWorkspaceCreditGrant;
   refreshUpgradeStatus: InstanceAndAllWorkspacesUpgradeStatus;
-  removeAiProvider: Scalars['Boolean']['output'];
-  removeModelFromProvider: Scalars['Boolean']['output'];
   retryJobs: RetryJobsResponse;
   revokeSigningKey: SigningKeyDto;
   revokeWorkspaceCreditGrant: AdminPanelWorkspaceCreditGrant;
@@ -593,18 +561,6 @@ export type Mutation = {
   updateServerAdminAccess: ServerAdmin;
   updateWorkspaceFeatureFlag: Scalars['Boolean']['output'];
   updateWorkspaceUsageLimit: AdminPanelUsageLimit;
-};
-
-
-export type MutationAddAiProviderArgs = {
-  providerConfig: Scalars['JSON']['input'];
-  providerName: Scalars['String']['input'];
-};
-
-
-export type MutationAddModelToProviderArgs = {
-  modelConfig: Scalars['JSON']['input'];
-  providerName: Scalars['String']['input'];
 };
 
 
@@ -656,17 +612,6 @@ export type MutationGrantWorkspaceCreditsArgs = {
   reason?: InputMaybe<Scalars['String']['input']>;
   type: BillingCreditGrantType;
   workspaceId: Scalars['UUID']['input'];
-};
-
-
-export type MutationRemoveAiProviderArgs = {
-  providerName: Scalars['String']['input'];
-};
-
-
-export type MutationRemoveModelFromProviderArgs = {
-  modelName: Scalars['String']['input'];
-  providerName: Scalars['String']['input'];
 };
 
 
@@ -769,15 +714,11 @@ export type Query = {
   getAdminAiUsageByWorkspace: Array<UsageBreakdownItem>;
   getAdminChatThreadMessages: AdminChatThreadMessages;
   getAdminWorkspaceChatThreads: Array<AdminWorkspaceChatThread>;
-  getAiProviders: Scalars['JSON']['output'];
   getConfigVariablesGrouped: ConfigVariables;
-  getCustomAiProviderAccess: CustomAiProviderAccessDto;
   getDatabaseConfigVariable: ConfigVariable;
   getIndicatorHealthStatus: AdminPanelHealthServiceData;
   getInstanceAndAllWorkspacesUpgradeStatus: InstanceAndAllWorkspacesUpgradeStatus;
   getMaintenanceMode?: Maybe<MaintenanceMode>;
-  getModelsDevProviders: Array<ModelsDevProviderSuggestion>;
-  getModelsDevSuggestions: Array<ModelsDevModelSuggestion>;
   getQueueJobs: QueueJobsResponse;
   getQueueMetrics: QueueMetricsData;
   getServerAdmins: Array<ServerAdmin>;
@@ -865,11 +806,6 @@ export type QueryGetDatabaseConfigVariableArgs = {
 
 export type QueryGetIndicatorHealthStatusArgs = {
   indicatorId: HealthIndicatorId;
-};
-
-
-export type QueryGetModelsDevSuggestionsArgs = {
-  providerType: Scalars['String']['input'];
 };
 
 

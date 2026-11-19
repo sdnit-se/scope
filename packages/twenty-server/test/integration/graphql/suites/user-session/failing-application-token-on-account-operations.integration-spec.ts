@@ -1,7 +1,6 @@
 import { generateAppleAdminApplicationTokenPair } from 'test/integration/utils/generate-apple-admin-application-token-pair.util';
 import { enrichWorkspaceCompany } from 'test/integration/graphql/suites/user-session/utils/enrich-workspace-company.util';
 import { enterpriseSubscriptionStatus } from 'test/integration/graphql/suites/user-session/utils/enterprise-subscription-status.util';
-import { getAiProviders } from 'test/integration/graphql/suites/user-session/utils/get-ai-providers.util';
 import { getInviteSuggestions } from 'test/integration/graphql/suites/user-session/utils/get-invite-suggestions.util';
 import { getTimelineCalendarEventsFromPersonId } from 'test/integration/graphql/suites/user-session/utils/get-timeline-calendar-events-from-person-id.util';
 import { getTimelineThreadsFromPersonId } from 'test/integration/graphql/suites/user-session/utils/get-timeline-threads-from-person-id.util';
@@ -374,15 +373,6 @@ describe('Account operations with an application token should fail', () => {
 
       // One handler per resolver that carries the guard at class level: the
       // stack is shared, so the class is covered by any one of its handlers.
-      it('should refuse an admin panel AI provider query', async () => {
-        const { errors } = await getAiProviders({
-          token: context.token(globalTestContext),
-          expectToFail: true,
-        });
-
-        expectOneNotInternalServerErrorSnapshot({ errors });
-      });
-
       it('should refuse an enterprise query', async () => {
         const { errors } = await enterpriseSubscriptionStatus({
           token: context.token(globalTestContext),

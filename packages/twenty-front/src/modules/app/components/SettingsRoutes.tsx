@@ -625,30 +625,6 @@ const SettingsAdminConfigVariableDetails = lazy(() =>
   ),
 );
 
-const SettingsAdminNewAiProvider = lazy(() =>
-  import('~/pages/settings/admin-panel/SettingsAdminNewAiProvider').then(
-    (module) => ({
-      default: module.SettingsAdminNewAiProvider,
-    }),
-  ),
-);
-
-const SettingsAdminAiProviderDetail = lazy(() =>
-  import('~/pages/settings/admin-panel/SettingsAdminAiProviderDetail').then(
-    (module) => ({
-      default: module.SettingsAdminAiProviderDetail,
-    }),
-  ),
-);
-
-const SettingsAdminNewAiModel = lazy(() =>
-  import('~/pages/settings/admin-panel/SettingsAdminNewAiModel').then(
-    (module) => ({
-      default: module.SettingsAdminNewAiModel,
-    }),
-  ),
-);
-
 const SettingsAdminUserDetail = lazy(() =>
   import('~/pages/settings/admin-panel/SettingsAdminUserDetail').then(
     (module) => ({
@@ -1215,18 +1191,6 @@ const createSettingsRouteElements = ({
         <Route
           path={SettingsPath.AdminPanelConfigVariableDetails}
           element={<SettingsAdminConfigVariableDetails />}
-        />
-        <Route
-          path={SettingsPath.AdminPanelNewAiProvider}
-          element={<SettingsAdminNewAiProvider />}
-        />
-        <Route
-          path={SettingsPath.AdminPanelNewAiModel}
-          element={<SettingsAdminNewAiModel />}
-        />
-        <Route
-          path={SettingsPath.AdminPanelAiProviderDetail}
-          element={<SettingsAdminAiProviderDetail />}
         />
         <Route
           path={SettingsPath.AdminPanelUserDetail}
