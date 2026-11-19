@@ -2,22 +2,17 @@ import { createHmac, randomUUID } from 'node:crypto';
 
 import request from 'supertest';
 
-import { UnsubscribeTokenService } from 'src/engine/core-modules/emailing-domain/services/unsubscribe-token.service';
-import { MessageSuppressionReason } from 'src/engine/core-modules/emailing-domain/types/message-suppression-reason.type';
 import { SEED_APPLE_WORKSPACE_ID } from 'src/engine/workspace-manager/dev-seeder/core/constants/seeder-workspaces.constant';
 import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
 
 import { updateConfigVariable } from 'test/integration/twenty-config/utils/update-config-variable.util';
-import { getAppProviderByClassName } from 'test/integration/utils/get-app-provider-by-class-name.util';
 
 const SECRET_BYTES = Buffer.from('resend-integration-signing-secret');
 const SIGNING_SECRET = `whsec_${SECRET_BYTES.toString('base64')}`;
 
 const RESEND_WEBHOOK_PATH = '/webhooks/messaging/resend';
 
-const SUPPRESSION_WAIT_TIMEOUT_MS = 20_000;
-const SUPPRESSION_POLL_INTERVAL_MS = 250;
-const SUPPRESSION_SETTLE_MS = 5_000;
+const SETTLE_MS = 5_000;
 
 const signRawBody = ({
   svixId,
@@ -52,51 +47,22 @@ const postResendWebhook = (
 };
 
 describe('Resend webhook (integration)', () => {
-  let unsubscribeTokenService: UnsubscribeTokenService;
+  const countSuppressions = async (emailAddress: string) => {
+    const [{ count }] = await global.testDataSource.query(
+      `SELECT COUNT(*)::int AS count FROM "${getWorkspaceSchemaName(SEED_APPLE_WORKSPACE_ID)}"."messageSuppression" WHERE "emailAddress" = $1`,
+      [emailAddress],
+    );
 
-  const readSuppressionReasons = async (emailAddress: string) => {
-    const suppressions: { reason: MessageSuppressionReason }[] =
-      await global.testDataSource.query(
-        `SELECT "reason" FROM "${getWorkspaceSchemaName(SEED_APPLE_WORKSPACE_ID)}"."messageSuppression" WHERE "emailAddress" = $1`,
-        [emailAddress],
-      );
-
-    return suppressions.map((suppression) => suppression.reason);
-  };
-
-  const waitForSuppressionReasons = async (emailAddress: string) => {
-    const deadline = Date.now() + SUPPRESSION_WAIT_TIMEOUT_MS;
-    let reasons = await readSuppressionReasons(emailAddress);
-
-    while (reasons.length === 0 && Date.now() < deadline) {
-      await new Promise((resolve) =>
-        setTimeout(resolve, SUPPRESSION_POLL_INTERVAL_MS),
-      );
-
-      reasons = await readSuppressionReasons(emailAddress);
-    }
-
-    return reasons;
-  };
-
-  const readSuppressionReasonsAfterSettle = async (emailAddress: string) => {
-    await new Promise((resolve) => setTimeout(resolve, SUPPRESSION_SETTLE_MS));
-
-    return readSuppressionReasons(emailAddress);
+    return count;
   };
 
   beforeAll(async () => {
     await updateConfigVariable({
       input: { key: 'RESEND_WEBHOOK_SIGNING_SECRET', value: SIGNING_SECRET },
     });
-
-    unsubscribeTokenService =
-      getAppProviderByClassName<UnsubscribeTokenService>(
-        'UnsubscribeTokenService',
-      );
   }, 60000);
 
-  it('suppresses recipients of a permanently bounced email', async () => {
+  it('accepts a signed bounce and records nothing, since Twenty sends no campaigns', async () => {
     const emailAddress = `bounce-${randomUUID()}@acme.com`;
 
     const response = await postResendWebhook(
@@ -112,89 +78,10 @@ describe('Resend webhook (integration)', () => {
     );
 
     expect(response.status).toBe(200);
-    expect(await waitForSuppressionReasons(emailAddress)).toEqual([
-      MessageSuppressionReason.BOUNCE,
-    ]);
-  }, 60000);
 
-  it('suppresses recipients of a complained email carrying array-shaped tags', async () => {
-    const emailAddress = `complaint-${randomUUID()}@acme.com`;
+    await new Promise((resolve) => setTimeout(resolve, SETTLE_MS));
 
-    const response = await postResendWebhook(
-      JSON.stringify({
-        type: 'email.complained',
-        data: {
-          email_id: `email_${randomUUID()}`,
-          to: [emailAddress],
-          tags: [{ name: 'workspace_id', value: SEED_APPLE_WORKSPACE_ID }],
-        },
-      }),
-    );
-
-    expect(response.status).toBe(200);
-    expect(await waitForSuppressionReasons(emailAddress)).toEqual([
-      MessageSuppressionReason.COMPLAINT,
-    ]);
-  }, 60000);
-
-  it('suppresses nothing for a transient bounce', async () => {
-    const emailAddress = `transient-${randomUUID()}@acme.com`;
-
-    const response = await postResendWebhook(
-      JSON.stringify({
-        type: 'email.bounced',
-        data: {
-          email_id: `email_${randomUUID()}`,
-          to: [emailAddress],
-          bounce: { type: 'Transient' },
-          tags: { workspace_id: SEED_APPLE_WORKSPACE_ID },
-        },
-      }),
-    );
-
-    expect(response.status).toBe(200);
-    expect(await readSuppressionReasonsAfterSettle(emailAddress)).toEqual([]);
-  }, 60000);
-
-  it('suppresses nothing for a bounce without a workspace tag', async () => {
-    const emailAddress = `untagged-${randomUUID()}@acme.com`;
-
-    const response = await postResendWebhook(
-      JSON.stringify({
-        type: 'email.bounced',
-        data: {
-          email_id: `email_${randomUUID()}`,
-          to: [emailAddress],
-          bounce: { type: 'Permanent' },
-        },
-      }),
-    );
-
-    expect(response.status).toBe(200);
-    expect(await readSuppressionReasonsAfterSettle(emailAddress)).toEqual([]);
-  }, 60000);
-
-  it('suppresses the sender of a received email addressed to the unsubscribe mailbox', async () => {
-    const emailAddress = `unsub-${randomUUID()}@acme.com`;
-
-    const response = await postResendWebhook(
-      JSON.stringify({
-        type: 'email.received',
-        data: {
-          email_id: `email_${randomUUID()}`,
-          received_for: ['unsubscribe@campaigns.acme.com'],
-          subject: unsubscribeTokenService.sign({
-            workspaceId: SEED_APPLE_WORKSPACE_ID,
-            emailAddress,
-          }),
-        },
-      }),
-    );
-
-    expect(response.status).toBe(200);
-    expect(await waitForSuppressionReasons(emailAddress)).toEqual([
-      MessageSuppressionReason.UNSUBSCRIBE,
-    ]);
+    expect(await countSuppressions(emailAddress)).toBe(0);
   }, 60000);
 
   it('ignores event types it does not handle', async () => {

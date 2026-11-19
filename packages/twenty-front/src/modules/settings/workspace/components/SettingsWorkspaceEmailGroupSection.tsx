@@ -3,7 +3,6 @@ import { useLingui } from '@lingui/react/macro';
 import { type MessageChannel } from '@/accounts/types/MessageChannel';
 import { useMyMessageChannels } from '@/settings/accounts/hooks/useMyMessageChannels';
 import { SettingsTableListSection } from '@/settings/components/SettingsTableListSection';
-import { SettingsWorkspaceEmailChannelDomainStatusCell } from '@/settings/workspace/components/SettingsWorkspaceEmailChannelDomainStatusCell';
 import { SettingsWorkspaceEmailGroupSourceCell } from '@/settings/workspace/components/SettingsWorkspaceEmailGroupSourceCell';
 import { MessageChannelType, SettingsPath } from 'twenty-shared/types';
 import { useNavigateSettings } from '~/hooks/useNavigateSettings';
@@ -20,17 +19,12 @@ export const SettingsWorkspaceEmailGroupSection = () => {
   return (
     <SettingsTableListSection<MessageChannel>
       title={t`Channels`}
-      description={t`Addresses your workspace uses to send and receive email from shared inboxes`}
+      description={t`Addresses your workspace uses to receive email in shared inboxes`}
       items={emailGroupChannels}
       columns={[
         { label: t`Email`, Cell: SettingsWorkspaceEmailGroupSourceCell },
-        {
-          label: t`Domain`,
-          align: 'right',
-          Cell: SettingsWorkspaceEmailChannelDomainStatusCell,
-        },
       ]}
-      gridAutoColumns="1fr 1fr"
+      gridAutoColumns="1fr"
       showRowChevron
       onRowClick={(channel) =>
         navigateSettings(SettingsPath.EmailGroupChannelDetail, {

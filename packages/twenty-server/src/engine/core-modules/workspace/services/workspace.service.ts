@@ -45,11 +45,6 @@ import { BillingService } from 'src/engine/core-modules/billing/services/billing
 import { DnsManagerService } from 'src/engine/core-modules/dns-manager/services/dns-manager.service';
 import { CustomDomainManagerService } from 'src/engine/core-modules/domain/custom-domain-manager/services/custom-domain-manager.service';
 import { SubdomainManagerService } from 'src/engine/core-modules/domain/subdomain-manager/services/subdomain-manager.service';
-import { EmailingDomainEntity } from 'src/engine/core-modules/emailing-domain/emailing-domain.entity';
-import {
-  EmailingDomainWorkspaceCleanupJob,
-  type EmailingDomainWorkspaceCleanupJobData,
-} from 'src/engine/core-modules/emailing-domain/jobs/emailing-domain-workspace-cleanup.job';
 import { ExceptionHandlerService } from 'src/engine/core-modules/exception-handler/exception-handler.service';
 import { FeatureFlagService } from 'src/engine/core-modules/feature-flag/services/feature-flag.service';
 import { FileCorePictureService } from 'src/engine/core-modules/file/file-core-picture/services/file-core-picture.service';
@@ -153,8 +148,6 @@ export class WorkspaceService {
     aiEvaluationModelId: PermissionFlagType.AI_SETTINGS,
     aiAdditionalInstructions: PermissionFlagType.WORKSPACE,
     isInternalMessagesImportEnabled: PermissionFlagType.WORKSPACE,
-    isCampaignClickTrackingEnabled: PermissionFlagType.WORKSPACE,
-    isCampaignOpenTrackingEnabled: PermissionFlagType.WORKSPACE,
   };
 
   constructor(
@@ -802,24 +795,6 @@ export class WorkspaceService {
           await this.deleteCascadeMessageQueueService.add<FileWorkspaceFolderDeletionJobData>(
             FileWorkspaceFolderDeletionJob.name,
             { workspaceId: workspace.id },
-            {
-              workspaceId: workspace.id,
-              isWorkspaceJob: true,
-            },
-          );
-
-          const emailingDomains = await this.coreDataSource
-            .getRepository(EmailingDomainEntity)
-            .find({ where: { workspaceId: workspace.id } });
-
-          await this.deleteCascadeMessageQueueService.add<EmailingDomainWorkspaceCleanupJobData>(
-            EmailingDomainWorkspaceCleanupJob.name,
-            {
-              workspaceId: workspace.id,
-              domains: emailingDomains.map(
-                (emailingDomain) => emailingDomain.domain,
-              ),
-            },
             {
               workspaceId: workspace.id,
               isWorkspaceJob: true,

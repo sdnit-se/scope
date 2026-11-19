@@ -127,14 +127,12 @@ export class WorkspaceEntity {
   @Column({ default: true })
   isPublicInviteLinkEnabled: boolean;
 
-  @Field()
   @WasIntroducedInUpgrade({
     upgradeCommandName: ADD_CAMPAIGN_TRACKING_FLAGS_UPGRADE_COMMAND_NAME,
   })
   @Column({ default: false })
   isCampaignClickTrackingEnabled: boolean;
 
-  @Field()
   @WasIntroducedInUpgrade({
     upgradeCommandName: ADD_CAMPAIGN_TRACKING_FLAGS_UPGRADE_COMMAND_NAME,
   })

@@ -224,30 +224,6 @@ const SettingsWorkspaceCommunicationGroupChannelDetail = lazy(() =>
   ),
 );
 
-const SettingsWorkspaceNewUnsubscribeTopic = lazy(() =>
-  import('~/pages/settings/communications/SettingsWorkspaceNewUnsubscribeTopic').then(
-    (module) => ({
-      default: module.SettingsWorkspaceNewUnsubscribeTopic,
-    }),
-  ),
-);
-
-const SettingsWorkspaceUnsubscribeTopicDetail = lazy(() =>
-  import('~/pages/settings/communications/SettingsWorkspaceUnsubscribeTopicDetail').then(
-    (module) => ({
-      default: module.SettingsWorkspaceUnsubscribeTopicDetail,
-    }),
-  ),
-);
-
-const SettingsWorkspaceUnsubscribe = lazy(() =>
-  import('~/pages/settings/communications/SettingsWorkspaceUnsubscribe').then(
-    (module) => ({
-      default: module.SettingsWorkspaceUnsubscribe,
-    }),
-  ),
-);
-
 const SettingsWorkspaceBlocklist = lazy(() =>
   import('~/pages/settings/communications/SettingsWorkspaceBlocklist').then(
     (module) => ({
@@ -880,18 +856,6 @@ const createSettingsRouteElements = ({
       <Route
         path={SettingsPath.EmailGroupChannelDetail}
         element={<SettingsWorkspaceCommunicationGroupChannelDetail />}
-      />
-      <Route
-        path={SettingsPath.NewUnsubscribeTopic}
-        element={<SettingsWorkspaceNewUnsubscribeTopic />}
-      />
-      <Route
-        path={SettingsPath.UnsubscribeTopicDetail}
-        element={<SettingsWorkspaceUnsubscribeTopicDetail />}
-      />
-      <Route
-        path={SettingsPath.Unsubscribe}
-        element={<SettingsWorkspaceUnsubscribe />}
       />
       <Route
         path={SettingsPath.WorkspaceBlocklist}

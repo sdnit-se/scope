@@ -56,7 +56,7 @@ usage = 'arg "[shard]" default="1/1"'
 run = "npx nx run twenty-server:test:ci --shard=${usage_shard}"
 
 [tasks."test:server-integration"]
-description = "Reset the test databases of .env.test (PostgreSQL test, ClickHouse twenty) and run the server integration suites for sign-in, permissions, records, webhooks and workflows with billing off, optionally one shard such as 1/4; needs PostgreSQL, Redis, ClickHouse and psql"
+description = "Reset the test databases of .env.test (PostgreSQL test, ClickHouse twenty) and run the server integration suites for sign-in, permissions, records, webhooks, workflows and inbound mail with billing off, optionally one shard such as 1/4; needs PostgreSQL, Redis, ClickHouse and psql"
 dir = "packages/twenty-server"
 usage = 'arg "[shard]" default="1/1"'
 env = { NODE_ENV = "test", IS_BILLING_ENABLED = "false" }
@@ -76,6 +76,6 @@ run = [
     test/integration/metadata/suites/row-level-permission-predicate/ test/integration/metadata/suites/application-default-role/ \
     test/integration/rest/suites/field-permissions test/integration/rest/suites/rest-api-depth-relation-field-permissions \
     test/integration/graphql/suites/object-generated/ test/integration/rest/suites/rest-api-core-create- \
-    test/integration/graphql/suites/workflow/
+    test/integration/graphql/suites/workflow/ test/integration/resend/ test/integration/aws/
   ''',
 ]

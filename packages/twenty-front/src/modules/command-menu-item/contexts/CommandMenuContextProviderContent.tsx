@@ -1,3 +1,4 @@
+import { REMOVED_ENGINE_COMPONENT_KEYS } from '@/command-menu-item/constants/RemovedEngineComponentKeys';
 import { useGlobalRecordCreationCommandMenuItems } from '@/command-menu-item/hooks/useGlobalRecordCreationCommandMenuItems';
 import { CommandMenuItemContainerType } from '@/command-menu-item/types/CommandMenuItemContainerType';
 import {
@@ -125,6 +126,9 @@ export const CommandMenuContextProviderContent = ({
         (item) =>
           item.engineComponentKey !==
           EngineComponentKey.SEE_VERSION_WORKFLOW_RUN,
+      )
+      .filter(
+        (item) => !REMOVED_ENGINE_COMPONENT_KEYS.has(item.engineComponentKey),
       )
       .filter(
         (item) =>

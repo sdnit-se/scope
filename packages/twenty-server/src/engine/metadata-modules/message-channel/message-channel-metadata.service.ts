@@ -18,7 +18,6 @@ import {
 } from 'twenty-shared/types';
 
 import { EmailingDomainDriver } from 'src/engine/core-modules/emailing-domain/drivers/types/emailing-domain-driver.type';
-import { EmailingDomainService } from 'src/engine/core-modules/emailing-domain/services/emailing-domain.service';
 import { StorageDriverType } from 'src/engine/core-modules/file-storage/interfaces/file-storage.interface';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
 import { ConnectedAccountMetadataService } from 'src/engine/metadata-modules/connected-account/connected-account-metadata.service';
@@ -35,7 +34,6 @@ import { WorkspaceEventEmitter } from 'src/engine/workspace-event-emitter/worksp
 import { INBOUND_EMAIL_LOCAL_PART_PREFIX } from 'src/modules/messaging/message-import-manager/drivers/inbound-email/constants/inbound-email-local-part-prefix.constant';
 import { INBOUND_EMAIL_LOCAL_PART_RANDOM_BYTES } from 'src/modules/messaging/message-import-manager/drivers/inbound-email/constants/inbound-email-local-part-random-bytes.constant';
 import { MessageChannelSyncStatusService } from 'src/modules/messaging/common/services/message-channel-sync-status.service';
-import { getDomainFromEmail } from 'src/utils/get-domain-from-email';
 
 @Injectable()
 export class MessageChannelMetadataService {
@@ -44,7 +42,6 @@ export class MessageChannelMetadataService {
     private readonly repository: Repository<MessageChannelEntity>,
     private readonly connectedAccountMetadataService: ConnectedAccountMetadataService,
     private readonly twentyConfigService: TwentyConfigService,
-    private readonly emailingDomainService: EmailingDomainService,
     private readonly workspaceEventEmitter: WorkspaceEventEmitter,
     private readonly messageChannelSyncStatusService: MessageChannelSyncStatusService,
   ) {}
@@ -305,15 +302,6 @@ export class MessageChannelMetadataService {
       );
     }
 
-    const sendDomain = getDomainFromEmail(handle)?.toLowerCase();
-
-    if (isNonEmptyString(sendDomain)) {
-      await this.emailingDomainService.ensureEmailingDomain(
-        sendDomain,
-        workspaceId,
-      );
-    }
-
     const localPart =
       INBOUND_EMAIL_LOCAL_PART_PREFIX +
       randomBytes(INBOUND_EMAIL_LOCAL_PART_RANDOM_BYTES).toString('hex');
@@ -475,51 +463,11 @@ export class MessageChannelMetadataService {
       );
     }
 
-    await this.emailingDomainService.validateNoCampaignSendingOrThrow(
-      workspaceId,
-    );
-
-    const connectedAccount =
-      await this.connectedAccountMetadataService.findById({
-        id: messageChannel.connectedAccountId,
-        workspaceId,
-      });
-    const sendDomain = getDomainFromEmail(
-      connectedAccount?.handle ?? '',
-    )?.toLowerCase();
-
     await this.connectedAccountMetadataService.delete({
       id: messageChannel.connectedAccountId,
       workspaceId,
     });
 
-    if (
-      isNonEmptyString(sendDomain) &&
-      !(await this.hasEmailGroupChannelForDomain(workspaceId, sendDomain))
-    ) {
-      await this.emailingDomainService.deleteEmailingDomainByDomainIfExists(
-        workspaceId,
-        sendDomain,
-      );
-    }
-
     return messageChannel;
-  }
-
-  private async hasEmailGroupChannelForDomain(
-    workspaceId: string,
-    domain: string,
-  ): Promise<boolean> {
-    const emailGroupChannels = await this.repository.find({
-      where: { workspaceId, type: MessageChannelType.EMAIL_GROUP },
-      relations: { connectedAccount: true },
-    });
-
-    return emailGroupChannels.some(
-      (channel) =>
-        isDefined(channel.connectedAccount) &&
-        getDomainFromEmail(channel.connectedAccount.handle)?.toLowerCase() ===
-          domain,
-    );
   }
 }

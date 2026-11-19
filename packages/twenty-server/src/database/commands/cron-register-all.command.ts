@@ -6,7 +6,6 @@ import { MarketplaceCatalogSyncCronCommand } from 'src/engine/core-modules/appli
 import { StaleRegistrationCleanupCronCommand } from 'src/engine/core-modules/application/application-oauth/stale-registration-cleanup/commands/stale-registration-cleanup.cron.command';
 import { ApplicationRecurringChargeCronCommand } from 'src/engine/core-modules/billing/app-billing/crons/commands/application-recurring-charge.cron.command';
 import { BillingReminderCronCommand } from 'src/engine/core-modules/billing/reminders/crons/commands/billing-reminder.cron.command';
-import { CheckEmailingDomainVerificationCronCommand } from 'src/engine/core-modules/emailing-domain/crons/commands/check-emailing-domain-verification.cron.command';
 import { EnterpriseKeyValidationCronCommand } from 'src/engine/core-modules/enterprise/cron/command/organization-key-validation.cron.command';
 import { PendingFileCleanupCronCommand } from 'src/engine/core-modules/file/file-upload/crons/commands/pending-file-cleanup.cron.command';
 import { WorkspaceDataExportCleanupCronCommand } from 'src/engine/core-modules/workspace-data-export/crons/commands/workspace-data-export-cleanup.cron.command';
@@ -18,8 +17,6 @@ import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twent
 import { UserSessionCleanupCronCommand } from 'src/engine/core-modules/user-session/crons/commands/user-session-cleanup.cron.command';
 import { CheckCustomDomainValidRecordsCronCommand } from 'src/engine/core-modules/workspace/crons/commands/check-custom-domain-valid-records.cron.command';
 import { WebhookSubscriptionRenewalCronCommand } from 'src/modules/connected-account/webhook-subscription-manager/crons/commands/webhook-subscription-renewal.cron.command';
-import { EmailingOngoingStaleCronCommand } from 'src/modules/emailing/crons/commands/emailing-ongoing-stale.cron.command';
-import { ReconcileCampaignStatsCronCommand } from 'src/modules/emailing/crons/commands/reconcile-campaign-stats.cron.command';
 import { TrashCleanupCronCommand } from 'src/engine/trash-cleanup/commands/trash-cleanup.cron.command';
 import { DeferredWorkspaceMigrationActionRecoveryCronCommand } from 'src/engine/workspace-manager/workspace-migration/workspace-migration-runner/crons/commands/deferred-workspace-migration-action-recovery.cron.command';
 import { CleanOnboardingWorkspacesCronCommand } from 'src/engine/workspace-manager/workspace-cleaner/commands/clean-onboarding-workspaces.cron.command';
@@ -57,9 +54,6 @@ export class CronRegisterAllCommand extends CommandRunner {
 
     private readonly webhookSubscriptionRenewalCronCommand: WebhookSubscriptionRenewalCronCommand,
 
-    private readonly emailingOngoingStaleCronCommand: EmailingOngoingStaleCronCommand,
-    private readonly reconcileCampaignStatsCronCommand: ReconcileCampaignStatsCronCommand,
-
     private readonly workflowCronTriggerCronCommand: WorkflowCronTriggerCronCommand,
     private readonly workflowRunEnqueueCronCommand: WorkflowRunEnqueueCronCommand,
     private readonly workflowHandleStaledRunsCronCommand: WorkflowHandleStaledRunsCronCommand,
@@ -68,7 +62,6 @@ export class CronRegisterAllCommand extends CommandRunner {
 
     private readonly checkCustomDomainValidRecordsCronCommand: CheckCustomDomainValidRecordsCronCommand,
     private readonly checkPublicDomainsValidRecordsCronCommand: CheckPublicDomainsValidRecordsCronCommand,
-    private readonly checkEmailingDomainVerificationCronCommand: CheckEmailingDomainVerificationCronCommand,
     private readonly cronTriggerCronCommand: CronTriggerCronCommand,
     private readonly agentCronTriggerCronCommand: AgentCronTriggerCronCommand,
     private readonly cleanSuspendedWorkspacesCronCommand: CleanSuspendedWorkspacesCronCommand,
@@ -135,24 +128,12 @@ export class CronRegisterAllCommand extends CommandRunner {
         command: this.webhookSubscriptionRenewalCronCommand,
       },
       {
-        name: 'EmailingOngoingStale',
-        command: this.emailingOngoingStaleCronCommand,
-      },
-      {
-        name: 'ReconcileCampaignStats',
-        command: this.reconcileCampaignStatsCronCommand,
-      },
-      {
         name: 'CheckCustomDomainValidRecords',
         command: this.checkCustomDomainValidRecordsCronCommand,
       },
       {
         name: 'CheckPublicDomainsValidRecords',
         command: this.checkPublicDomainsValidRecordsCronCommand,
-      },
-      {
-        name: 'CheckEmailingDomainVerification',
-        command: this.checkEmailingDomainVerificationCronCommand,
       },
       {
         name: 'WorkflowCronTrigger',

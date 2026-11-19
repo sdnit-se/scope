@@ -21,8 +21,6 @@ export type CurrentWorkspace = Pick<
   | 'isTrialAvailable'
   | 'workspaceMembersCount'
   | 'isPublicInviteLinkEnabled'
-  | 'isCampaignClickTrackingEnabled'
-  | 'isCampaignOpenTrackingEnabled'
   | 'workspaceDiscoverability'
   | 'isGoogleAuthEnabled'
   | 'isGoogleAuthBypassEnabled'

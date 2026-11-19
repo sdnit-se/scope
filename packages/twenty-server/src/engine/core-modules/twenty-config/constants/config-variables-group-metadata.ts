@@ -135,15 +135,13 @@ export const CONFIG_VARIABLES_GROUP_METADATA: Record<
   },
   [ConfigVariablesGroup.AWS_SES_SETTINGS]: {
     position: 2100,
-    description:
-      'Configure AWS SES settings for emailing domains (mass outbound / feature not released yet)',
+    description: 'Configure AWS SES settings for email group inbound mail',
     isHiddenOnLoad: true,
     isHiddenInAdminPanel: true,
   },
   [ConfigVariablesGroup.RESEND_SETTINGS]: {
     position: 2200,
-    description:
-      'Configure Resend settings for emailing domains (mass outbound and email group inbound)',
+    description: 'Configure Resend settings for email group inbound mail',
     isHiddenOnLoad: true,
     isHiddenInAdminPanel: true,
   },

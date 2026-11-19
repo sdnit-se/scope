@@ -3,18 +3,12 @@ import { randomUUID } from 'node:crypto';
 import { http, HttpResponse } from 'msw';
 import request from 'supertest';
 
-import { UnsubscribeTokenService } from 'src/engine/core-modules/emailing-domain/services/unsubscribe-token.service';
-import { MessageSuppressionReason } from 'src/engine/core-modules/emailing-domain/types/message-suppression-reason.type';
-import { SEED_APPLE_WORKSPACE_ID } from 'src/engine/workspace-manager/dev-seeder/core/constants/seeder-workspaces.constant';
-import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
-
 import {
   snsNotification,
   snsSigningCertHandler,
   snsSubscriptionConfirmation,
 } from 'test/integration/aws/mocks/sns-payload.util';
 import { updateConfigVariable } from 'test/integration/twenty-config/utils/update-config-variable.util';
-import { getAppProviderByClassName } from 'test/integration/utils/get-app-provider-by-class-name.util';
 import { setupHttpMock } from 'test/integration/utils/http-mock.util';
 
 const ALLOWED_TOPIC_ARN =
@@ -50,81 +44,10 @@ const postSesInboundWebhook = (payload: Record<string, string>) =>
 describe('SES inbound webhook (integration)', () => {
   const httpMock = setupHttpMock(snsSigningCertHandler());
 
-  let unsubscribeTokenService: UnsubscribeTokenService;
-
-  const findSuppressionReasons = async (emailAddress: string) => {
-    const suppressions: { reason: MessageSuppressionReason }[] =
-      await global.testDataSource.query(
-        `SELECT "reason" FROM "${getWorkspaceSchemaName(SEED_APPLE_WORKSPACE_ID)}"."messageSuppression" WHERE "emailAddress" = $1`,
-        [emailAddress],
-      );
-
-    return suppressions.map((suppression) => suppression.reason);
-  };
-
-  const postUnsubscribeMail = (subject?: string) =>
-    postSesInboundWebhook(
-      snsNotification({
-        topicArn: ALLOWED_TOPIC_ARN,
-        message: inboundNotification({
-          recipients: ['unsubscribe@campaigns.acme.com'],
-          subject,
-        }),
-      }),
-    );
-
   beforeAll(async () => {
     await updateConfigVariable({
       input: { key: 'SES_SNS_TOPIC_ARN_ALLOWLIST', value: ALLOWED_TOPIC_ARN },
     });
-
-    unsubscribeTokenService =
-      getAppProviderByClassName<UnsubscribeTokenService>(
-        'UnsubscribeTokenService',
-      );
-  }, 60000);
-
-  it('suppresses the sender of a valid unsubscribe email', async () => {
-    const emailAddress = `unsub-${randomUUID()}@acme.com`;
-
-    const response = await postUnsubscribeMail(
-      unsubscribeTokenService.sign({
-        workspaceId: SEED_APPLE_WORKSPACE_ID,
-        emailAddress,
-      }),
-    );
-
-    expect(response.status).toBe(200);
-    expect(await findSuppressionReasons(emailAddress)).toEqual([
-      MessageSuppressionReason.UNSUBSCRIBE,
-    ]);
-  }, 60000);
-
-  it('suppresses nothing for a preview unsubscribe token', async () => {
-    const emailAddress = `preview-${randomUUID()}@acme.com`;
-
-    const response = await postUnsubscribeMail(
-      unsubscribeTokenService.sign({
-        workspaceId: SEED_APPLE_WORKSPACE_ID,
-        emailAddress,
-        preview: true,
-      }),
-    );
-
-    expect(response.status).toBe(200);
-    expect(await findSuppressionReasons(emailAddress)).toEqual([]);
-  }, 60000);
-
-  it('ignores an unsubscribe email whose subject is not a valid token', async () => {
-    const response = await postUnsubscribeMail('please unsubscribe me');
-
-    expect(response.status).toBe(200);
-  }, 60000);
-
-  it('ignores an unsubscribe email that carries no subject', async () => {
-    const response = await postUnsubscribeMail();
-
-    expect(response.status).toBe(200);
   }, 60000);
 
   it('ignores an inbound email delivered through an unsupported action', async () => {

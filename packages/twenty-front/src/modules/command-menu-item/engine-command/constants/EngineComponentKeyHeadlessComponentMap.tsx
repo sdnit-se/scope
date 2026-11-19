@@ -4,10 +4,7 @@ import { NewAiChatCommand } from '@/command-menu-item/engine-command/global/comp
 import { HeadlessOpenSidePanelPageEngineCommand } from '@/command-menu-item/engine-command/components/HeadlessOpenSidePanelPageEngineCommand';
 import { NavigationEngineCommand } from '@/command-menu-item/engine-command/components/NavigationEngineCommand';
 import { ComposeCampaignCommand } from '@/command-menu-item/engine-command/global/components/ComposeCampaignCommand';
-import { SendMessageCampaignSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/message-campaign/components/SendMessageCampaignSingleRecordCommand';
-import { CancelMessageCampaignSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/message-campaign/components/CancelMessageCampaignSingleRecordCommand';
 import { DuplicateMessageCampaignSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/message-campaign/components/DuplicateMessageCampaignSingleRecordCommand';
-import { SendMessageCampaignTestSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/message-campaign/components/SendMessageCampaignTestSingleRecordCommand';
 import { OpenEmailBlockSettingsSingleRecordCommand } from '@/command-menu-item/engine-command/record/components/OpenEmailBlockSettingsSingleRecordCommand';
 import { OpenEmailPageStyleSingleRecordCommand } from '@/command-menu-item/engine-command/record/components/OpenEmailPageStyleSingleRecordCommand';
 import { ComposeEmailCommand } from '@/command-menu-item/engine-command/global/components/ComposeEmailCommand';
@@ -302,15 +299,10 @@ export const ENGINE_COMPONENT_KEY_COMPONENT_MAP: Record<
   ),
   [EngineComponentKey.COMPOSE_EMAIL]: <ComposeEmailCommand />,
   [EngineComponentKey.COMPOSE_CAMPAIGN]: <ComposeCampaignCommand />,
-  [EngineComponentKey.SEND_MESSAGE_CAMPAIGN]: (
-    <SendMessageCampaignSingleRecordCommand />
-  ),
-  [EngineComponentKey.SEND_MESSAGE_CAMPAIGN_TEST]: (
-    <SendMessageCampaignTestSingleRecordCommand />
-  ),
-  [EngineComponentKey.CANCEL_MESSAGE_CAMPAIGN]: (
-    <CancelMessageCampaignSingleRecordCommand />
-  ),
+  // Twenty's own campaign sending is removed; existing rows for these keys are hidden from the menu.
+  [EngineComponentKey.SEND_MESSAGE_CAMPAIGN]: null,
+  [EngineComponentKey.SEND_MESSAGE_CAMPAIGN_TEST]: null,
+  [EngineComponentKey.CANCEL_MESSAGE_CAMPAIGN]: null,
   [EngineComponentKey.DUPLICATE_MESSAGE_CAMPAIGN]: (
     <DuplicateMessageCampaignSingleRecordCommand />
   ),

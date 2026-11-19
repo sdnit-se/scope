@@ -973,24 +973,6 @@ export interface CallRecordingTranscriptConfiguration {
     __typename: 'CallRecordingTranscriptConfiguration'
 }
 
-export interface CampaignAudiencePreviewDTO {
-    duplicateEmails: Scalars['Int']
-    globallyUnsubscribed: Scalars['Int']
-    hardSuppressed: Scalars['Int']
-    sendable: Scalars['Int']
-    topicUnsubscribed: Scalars['Int']
-    totalMembers: Scalars['Int']
-    trackingRefused: Scalars['Int']
-    withoutEmail: Scalars['Int']
-    __typename: 'CampaignAudiencePreviewDTO'
-}
-
-export interface CancelMessageCampaignOutputDTO {
-    campaignId: Scalars['String']
-    canceledMessageCount: Scalars['Int']
-    __typename: 'CancelMessageCampaignOutputDTO'
-}
-
 export interface Captcha {
     provider?: CaptchaDriverType
     siteKey?: Scalars['String']
@@ -1120,7 +1102,6 @@ export interface ClientConfig {
     isConfigVariablesInDbEnabled: Scalars['Boolean']
     isCookieSessionEnabled: Scalars['Boolean']
     isEmailVerificationRequired: Scalars['Boolean']
-    isEmailingDomainInDemoMode: Scalars['Boolean']
     isGoogleCalendarEnabled: Scalars['Boolean']
     isGoogleMessagingEnabled: Scalars['Boolean']
     isImapSmtpCaldavEnabled: Scalars['Boolean']
@@ -1351,23 +1332,6 @@ export interface EmailThreadConfiguration {
     configurationType: WidgetConfigurationType
     __typename: 'EmailThreadConfiguration'
 }
-
-export interface EmailingDomain {
-    createdAt: Scalars['DateTime']
-    domain: Scalars['String']
-    id: Scalars['UUID']
-    status: EmailingDomainStatus
-    tenantStatus: EmailingDomainTenantStatus
-    unsubscribeHostnameStatus?: UnsubscribeHostnameStatus
-    updatedAt: Scalars['DateTime']
-    verificationRecords?: VerificationRecord[]
-    verifiedAt?: Scalars['DateTime']
-    __typename: 'EmailingDomain'
-}
-
-export type EmailingDomainStatus = 'FAILED' | 'PENDING' | 'TEMPORARY_FAILURE' | 'VERIFIED'
-
-export type EmailingDomainTenantStatus = 'ACTIVE' | 'PAUSED' | 'SANDBOX'
 
 export interface EmailsConfiguration {
     configurationType: WidgetConfigurationType
@@ -1972,12 +1936,6 @@ export interface MessageCampaignDetailsConfiguration {
     __typename: 'MessageCampaignDetailsConfiguration'
 }
 
-export interface MessageCampaignSendBlockerDTO {
-    code: Scalars['String']
-    message: Scalars['String']
-    __typename: 'MessageCampaignSendBlockerDTO'
-}
-
 export interface MessageChannel {
     connectedAccount?: ConnectedAccountPublicDTO
     connectedAccountId: Scalars['UUID']
@@ -2038,26 +1996,6 @@ export type MessageFolderImportPolicy = 'ALL_FOLDERS' | 'SELECTED_FOLDERS'
 export type MessageFolderPendingSyncAction = 'FOLDER_DELETION' | 'FOLDER_IMPORT' | 'NONE'
 
 export type MessageParticipantRole = 'BCC' | 'CC' | 'FROM' | 'REPLY_TO' | 'TO'
-
-export interface MessageSuppression {
-    createdAt: Scalars['DateTime']
-    emailAddress: Scalars['String']
-    id: Scalars['UUID']
-    reason: MessageSuppressionReason
-    source: MessageSuppressionSource
-    unsubscribeTopicId?: Scalars['UUID']
-    __typename: 'MessageSuppression'
-}
-
-export interface MessageSuppressionList {
-    records: MessageSuppression[]
-    totalCount: Scalars['Int']
-    __typename: 'MessageSuppressionList'
-}
-
-export type MessageSuppressionReason = 'BOUNCE' | 'COMPLAINT' | 'TRACKING' | 'UNSUBSCRIBE'
-
-export type MessageSuppressionSource = 'SYSTEM' | 'WEBHOOK'
 
 export interface MetadataEvent {
     metadataName: Scalars['String']
@@ -2134,7 +2072,6 @@ export interface Mutation {
     assignRoleToApiKey: Scalars['Boolean']
     attachRecordToInboxThread: Scalars['Boolean']
     authorizeApp: AuthorizeApp
-    cancelMessageCampaign: CancelMessageCampaignOutputDTO
     cancelSwitchBillingInterval: BillingUpdate
     cancelSwitchBillingPlan: BillingUpdate
     cancelSwitchResourceCreditPrice: BillingUpdate
@@ -2161,7 +2098,6 @@ export interface Mutation {
     createCommandMenuItem: CommandMenuItem
     createDevelopmentApplication: DevelopmentApplication
     createEmailGroupChannel: CreateEmailGroupChannelOutput
-    createEmailingDomain: EmailingDomain
     createFileUpload: FileUploadTarget
     createFrontComponent: FrontComponent
     createManyNavigationMenuItems: NavigationMenuItem[]
@@ -2169,7 +2105,6 @@ export interface Mutation {
     createManyViewFields: ViewField[]
     createManyViewGroups: ViewGroup[]
     createMcpServer: McpServer
-    createMessageSuppression: MessageSuppression
     createNavigationMenuItem: NavigationMenuItem
     createNewWorkspaceLogoUpload: FileUploadTarget
     createOIDCIdentityProvider: SetupSso
@@ -2188,7 +2123,6 @@ export interface Mutation {
     createSAMLIdentityProvider: SetupSso
     createSkill: Skill
     createSubscriptionPaymentIntent: BillingPaymentIntent
-    createUnsubscribeTopic: UnsubscribeTopic
     createUsageLimit: UsageLimit
     createValidationRule: ValidationRule
     createView: View
@@ -2209,11 +2143,9 @@ export interface Mutation {
     deleteConnectedAccount: ConnectedAccountPublicDTO
     deleteCurrentWorkspace: Workspace
     deleteEmailGroupChannel: MessageChannel
-    deleteEmailingDomain: Scalars['Boolean']
     deleteFrontComponent: FrontComponent
     deleteManyNavigationMenuItems: NavigationMenuItem[]
     deleteMcpServer: McpServer
-    deleteMessageSuppression: Scalars['Boolean']
     deleteNavigationMenuItem: NavigationMenuItem
     deleteOneAgent: Agent
     deleteOneField: Field
@@ -2227,7 +2159,6 @@ export interface Mutation {
     deleteSSOIdentityProvider: DeleteSso
     deleteSkill: Skill
     deleteTwoFactorAuthenticationMethod: DeleteTwoFactorAuthenticationMethod
-    deleteUnsubscribeTopic: Scalars['Boolean']
     deleteUsageLimit: Scalars['Boolean']
     deleteUser: User
     deleteUserFromWorkspace: UserWorkspace
@@ -2317,8 +2248,6 @@ export interface Mutation {
     sendEmail: SendEmailOutput
     sendInboxMessage: SendInboxMessageResult
     sendInvitations: SendInvitations
-    sendMessageCampaign: SendMessageCampaignOutputDTO
-    sendMessageCampaignTest: SendEmailViaDomainOutput
     setAppKeyValue: AppKeyValue
     setEnterpriseKey: EnterpriseLicenseInfoDTO
     setRecordGeneralAccess: RecordSharingDTO
@@ -2385,7 +2314,6 @@ export interface Mutation {
     updatePasswordViaResetToken: InvalidatePassword
     updateSkill: Skill
     updateTimelineActivityType: TimelineActivityType
-    updateUnsubscribeTopic: UnsubscribeTopic
     updateUsageLimit: UsageLimit
     updateUserCreditsFallback: BillingCustomer
     updateUserEmail: Scalars['Boolean']
@@ -2424,7 +2352,6 @@ export interface Mutation {
     validateApprovedAccessDomain: ApprovedAccessDomain
     verifyEmailAndGetLoginToken: VerifyEmailAndGetLoginToken
     verifyEmailAndGetWorkspaceAgnosticToken: AvailableWorkspacesAndAccessTokens
-    verifyEmailingDomain: EmailingDomain
     verifyTwoFactorAuthenticationMethodForAuthenticatedUser: VerifyTwoFactorAuthenticationMethod
     __typename: 'Mutation'
 }
@@ -2785,12 +2712,6 @@ export interface PlaceDetailsResult {
     __typename: 'PlaceDetailsResult'
 }
 
-export interface PreviewMessageCampaignSendOutputDTO {
-    audience?: CampaignAudiencePreviewDTO
-    blockers: MessageCampaignSendBlockerDTO[]
-    __typename: 'PreviewMessageCampaignSendOutputDTO'
-}
-
 export interface PublicApplicationRegistration {
     id: Scalars['UUID']
     logoUrl?: Scalars['String']
@@ -2929,7 +2850,6 @@ export interface Query {
     getAutoCompleteAddress: AutocompleteResult[]
     getAvailablePackages: Scalars['JSON']
     getConnectedImapSmtpCaldavAccount: ConnectedImapSmtpCaldavAccount
-    getEmailingDomains: EmailingDomain[]
     getInviteSuggestions: InviteSuggestion[]
     getJobs: JobStatus[]
     getLogicFunctionSourceCode?: Scalars['String']
@@ -2971,7 +2891,6 @@ export interface Query {
     listPlans: BillingPlan[]
     mcpServer?: McpServer
     mcpServers: McpServer[]
-    messageSuppressions: MessageSuppressionList
     metadataTranslations: MetadataTranslation[]
     minimalMetadata: MinimalMetadata
     mostlyEmptyFieldMetadataIds: Scalars['UUID'][]
@@ -2987,8 +2906,6 @@ export interface Query {
     objectRecordCounts: ObjectRecordCount[]
     objects: ObjectConnection
     pieChartData: PieChartData
-    previewMessageCampaignAudience: CampaignAudiencePreviewDTO
-    previewMessageCampaignSend: PreviewMessageCampaignSendOutputDTO
     publicMarketplaceAppDetail: MarketplaceAppDetail
     publicMarketplaceApps: MarketplaceApp[]
     recordPermissions: RecordPermissionsResult[]
@@ -2998,7 +2915,6 @@ export interface Query {
     skills: Skill[]
     timelineActivityTypes: TimelineActivityType[]
     twoFactorAuthenticationRecoveryStatus: TwoFactorAuthenticationRecoveryStatus
-    unsubscribeTopics: UnsubscribeTopic[]
     usageLimits: UsageLimit[]
     usageQuotaDefinitions: UsageQuotaDefinitions
     usageQuotaScopeConsumption?: UsageQuotaScopeConsumption
@@ -3268,11 +3184,6 @@ export interface SendEmailOutput {
     __typename: 'SendEmailOutput'
 }
 
-export interface SendEmailViaDomainOutput {
-    messageId: Scalars['String']
-    __typename: 'SendEmailViaDomainOutput'
-}
-
 export interface SendInboxMessageResult {
     threadId: Scalars['UUID']
     __typename: 'SendInboxMessageResult'
@@ -3284,13 +3195,6 @@ export interface SendInvitations {
     /** Boolean that confirms query was dispatched */
     success: Scalars['Boolean']
     __typename: 'SendInvitations'
-}
-
-export interface SendMessageCampaignOutputDTO {
-    audience: CampaignAudiencePreviewDTO
-    campaignId: Scalars['String']
-    queuedCount: Scalars['Int']
-    __typename: 'SendMessageCampaignOutputDTO'
 }
 
 export interface Sentry {
@@ -3512,20 +3416,6 @@ export interface TwoFactorAuthenticationRecoveryStatus {
     __typename: 'TwoFactorAuthenticationRecoveryStatus'
 }
 
-export type UnsubscribeHostnameStatus = 'ACTIVE' | 'FAILED' | 'PENDING'
-
-export interface UnsubscribeTopic {
-    createdAt: Scalars['DateTime']
-    description?: Scalars['String']
-    id: Scalars['UUID']
-    name?: Scalars['String']
-    updatedAt: Scalars['DateTime']
-    visibility: UnsubscribeTopicVisibility
-    __typename: 'UnsubscribeTopic'
-}
-
-export type UnsubscribeTopicVisibility = 'PRIVATE' | 'PUBLIC'
-
 export interface UpsertRowLevelPermissionPredicatesResult {
     predicateGroups: RowLevelPermissionPredicateGroup[]
     predicates: RowLevelPermissionPredicate[]
@@ -3740,15 +3630,6 @@ export interface ValidationRule {
     name: Scalars['String']
     objectMetadataId: Scalars['UUID']
     __typename: 'ValidationRule'
-}
-
-export interface VerificationRecord {
-    key: Scalars['String']
-    priority?: Scalars['Float']
-    status?: Scalars['String']
-    type: Scalars['String']
-    value: Scalars['String']
-    __typename: 'VerificationRecord'
 }
 
 export interface VerifyEmailAndGetLoginToken {
@@ -3987,8 +3868,6 @@ export interface Workspace {
     installedApplications: Application[]
     inviteHash?: Scalars['String']
     isAutoModelSelectionEnabled: Scalars['Boolean']
-    isCampaignClickTrackingEnabled: Scalars['Boolean']
-    isCampaignOpenTrackingEnabled: Scalars['Boolean']
     isCustomDomainEnabled: Scalars['Boolean']
     isGoogleAuthBypassEnabled: Scalars['Boolean']
     isGoogleAuthEnabled: Scalars['Boolean']
@@ -5141,28 +5020,6 @@ export interface CallRecordingTranscriptConfigurationGenqlSelection{
     __scalar?: boolean | number
 }
 
-export interface CampaignAudiencePreviewDTOGenqlSelection{
-    duplicateEmails?: boolean | number
-    globallyUnsubscribed?: boolean | number
-    hardSuppressed?: boolean | number
-    sendable?: boolean | number
-    topicUnsubscribed?: boolean | number
-    totalMembers?: boolean | number
-    trackingRefused?: boolean | number
-    withoutEmail?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface CancelMessageCampaignInput {campaignId: Scalars['String']}
-
-export interface CancelMessageCampaignOutputDTOGenqlSelection{
-    campaignId?: boolean | number
-    canceledMessageCount?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
 export interface CaptchaGenqlSelection{
     provider?: boolean | number
     siteKey?: boolean | number
@@ -5297,7 +5154,6 @@ export interface ClientConfigGenqlSelection{
     isConfigVariablesInDbEnabled?: boolean | number
     isCookieSessionEnabled?: boolean | number
     isEmailVerificationRequired?: boolean | number
-    isEmailingDomainInDemoMode?: boolean | number
     isGoogleCalendarEnabled?: boolean | number
     isGoogleMessagingEnabled?: boolean | number
     isImapSmtpCaldavEnabled?: boolean | number
@@ -5460,8 +5316,6 @@ export interface CreateEmailGroupChannelOutputGenqlSelection{
     __scalar?: boolean | number
 }
 
-export interface CreateEmailingDomainInput {domain: Scalars['String']}
-
 export interface CreateFieldInput {defaultValue?: (Scalars['JSON'] | null),description?: (Scalars['String'] | null),icon?: (Scalars['String'] | null),isActive?: (Scalars['Boolean'] | null),isAuditLogged?: (Scalars['Boolean'] | null),isLabelSyncedWithName?: (Scalars['Boolean'] | null),isNullable?: (Scalars['Boolean'] | null),isRemoteCreation?: (Scalars['Boolean'] | null),isSearchable?: (Scalars['Boolean'] | null),isSystem?: (Scalars['Boolean'] | null),isUIEditable?: (Scalars['Boolean'] | null),isUIReadOnly?: (Scalars['Boolean'] | null),isUnique?: (Scalars['Boolean'] | null),label: Scalars['String'],morphRelationsCreationPayload?: (Scalars['JSON'][] | null),name: Scalars['String'],objectMetadataId: Scalars['UUID'],options?: (Scalars['JSON'] | null),relationCreationPayload?: (Scalars['JSON'] | null),settings?: (Scalars['JSON'] | null),type: FieldMetadataType}
 
 export interface CreateFrontComponentInput {builtComponentChecksum: Scalars['String'],builtComponentPath: Scalars['String'],componentName: Scalars['String'],description?: (Scalars['String'] | null),id?: (Scalars['UUID'] | null),name: Scalars['String'],sourceComponentPath: Scalars['String']}
@@ -5473,8 +5327,6 @@ export interface CreateIndexInput {fields: CreateIndexFieldInput[],indexType: In
 export interface CreateLogicFunctionFromSourceInput {cronTriggerSettings?: (Scalars['JSON'] | null),databaseEventTriggerSettings?: (Scalars['JSON'] | null),description?: (Scalars['String'] | null),httpRouteTriggerSettings?: (Scalars['JSON'] | null),id?: (Scalars['UUID'] | null),name: Scalars['String'],serverRouteTriggerSettings?: (Scalars['JSON'] | null),source?: (Scalars['JSON'] | null),timeoutSeconds?: (Scalars['Float'] | null),toolTriggerSettings?: (Scalars['JSON'] | null),universalIdentifier?: (Scalars['UUID'] | null),workflowActionTriggerSettings?: (Scalars['JSON'] | null)}
 
 export interface CreateMcpServerInput {connectionProviderId?: (Scalars['UUID'] | null),id?: (Scalars['UUID'] | null),isActive?: (Scalars['Boolean'] | null),label: Scalars['String'],name: Scalars['String'],url: Scalars['String']}
-
-export interface CreateMessageSuppressionInput {emailAddress: Scalars['String'],unsubscribeTopicId?: (Scalars['UUID'] | null)}
 
 export interface CreateNavigationMenuItemInput {agentChatChannelId?: (Scalars['UUID'] | null),color?: (Scalars['String'] | null),folderId?: (Scalars['UUID'] | null),icon?: (Scalars['String'] | null),id?: (Scalars['UUID'] | null),link?: (Scalars['String'] | null),name?: (Scalars['String'] | null),pageLayoutId?: (Scalars['UUID'] | null),position?: (Scalars['Float'] | null),targetObjectMetadataId?: (Scalars['UUID'] | null),targetRecordId?: (Scalars['UUID'] | null),type: NavigationMenuItemType,userWorkspaceId?: (Scalars['UUID'] | null),viewId?: (Scalars['UUID'] | null)}
 
@@ -5505,8 +5357,6 @@ export interface CreateRelatedRecordPathInput {firstFieldMetadataId?: (Scalars['
 export interface CreateRoleInput {canAccessAllAgentChatChannels?: (Scalars['Boolean'] | null),canAccessAllTools?: (Scalars['Boolean'] | null),canBeAssignedToAgents?: (Scalars['Boolean'] | null),canBeAssignedToApiKeys?: (Scalars['Boolean'] | null),canBeAssignedToUsers?: (Scalars['Boolean'] | null),canDestroyAllObjectRecords?: (Scalars['Boolean'] | null),canReadAllObjectRecords?: (Scalars['Boolean'] | null),canSoftDeleteAllObjectRecords?: (Scalars['Boolean'] | null),canUpdateAllObjectRecords?: (Scalars['Boolean'] | null),canUpdateAllSettings?: (Scalars['Boolean'] | null),description?: (Scalars['String'] | null),icon?: (Scalars['String'] | null),id?: (Scalars['String'] | null),label: Scalars['String']}
 
 export interface CreateSkillInput {content: Scalars['String'],description?: (Scalars['String'] | null),icon?: (Scalars['String'] | null),id?: (Scalars['UUID'] | null),label: Scalars['String'],name: Scalars['String']}
-
-export interface CreateUnsubscribeTopicInput {description?: (Scalars['String'] | null),name: Scalars['String'],visibility?: (UnsubscribeTopicVisibility | null)}
 
 export interface CreateUsageLimitInput {burstValue?: (Scalars['BigInt'] | null),limitKind: Scalars['String'],limitValue: Scalars['BigInt'],operationType: UsageOperationType,periodCount: Scalars['Int'],periodUnit: Scalars['String'],resourceType: UsageResourceType,spenderId?: (Scalars['String'] | null),spenderType: Scalars['String'],unit: UsageUnit}
 
@@ -5700,20 +5550,6 @@ export interface EmailPasswordResetLinkGenqlSelection{
 
 export interface EmailThreadConfigurationGenqlSelection{
     configurationType?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface EmailingDomainGenqlSelection{
-    createdAt?: boolean | number
-    domain?: boolean | number
-    id?: boolean | number
-    status?: boolean | number
-    tenantStatus?: boolean | number
-    unsubscribeHostnameStatus?: boolean | number
-    updatedAt?: boolean | number
-    verificationRecords?: VerificationRecordGenqlSelection
-    verifiedAt?: boolean | number
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -5929,8 +5765,6 @@ export interface FindAvailableSSOIDPGenqlSelection{
     __typename?: boolean | number
     __scalar?: boolean | number
 }
-
-export interface FindMessageSuppressionsInput {limit: Scalars['Int'],offset: Scalars['Int'],reason?: (MessageSuppressionReason | null),searchTerm?: (Scalars['String'] | null),unsubscribeTopicId?: (Scalars['UUID'] | null)}
 
 export interface FormFieldConfigurationGenqlSelection{
     configurationType?: boolean | number
@@ -6391,13 +6225,6 @@ export interface MessageCampaignDetailsConfigurationGenqlSelection{
     __scalar?: boolean | number
 }
 
-export interface MessageCampaignSendBlockerDTOGenqlSelection{
-    code?: boolean | number
-    message?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
 export interface MessageChannelGenqlSelection{
     connectedAccount?: ConnectedAccountPublicDTOGenqlSelection
     connectedAccountId?: boolean | number
@@ -6439,24 +6266,6 @@ export interface MessageFolderGenqlSelection{
     parentFolderId?: boolean | number
     pendingSyncAction?: boolean | number
     updatedAt?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface MessageSuppressionGenqlSelection{
-    createdAt?: boolean | number
-    emailAddress?: boolean | number
-    id?: boolean | number
-    reason?: boolean | number
-    source?: boolean | number
-    unsubscribeTopicId?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface MessageSuppressionListGenqlSelection{
-    records?: MessageSuppressionGenqlSelection
-    totalCount?: boolean | number
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -6531,7 +6340,6 @@ export interface MutationGenqlSelection{
     assignRoleToApiKey?: { __args: {apiKeyId: Scalars['UUID'], roleId: Scalars['UUID']} }
     attachRecordToInboxThread?: { __args: {input: InboxThreadRecordInput} }
     authorizeApp?: (AuthorizeAppGenqlSelection & { __args: {clientId: Scalars['String'], codeChallenge?: (Scalars['String'] | null), issuer?: (Scalars['String'] | null), redirectUrl: Scalars['String'], scope?: (Scalars['String'] | null), state?: (Scalars['String'] | null)} })
-    cancelMessageCampaign?: (CancelMessageCampaignOutputDTOGenqlSelection & { __args: {input: CancelMessageCampaignInput} })
     cancelSwitchBillingInterval?: BillingUpdateGenqlSelection
     cancelSwitchBillingPlan?: BillingUpdateGenqlSelection
     cancelSwitchResourceCreditPrice?: BillingUpdateGenqlSelection
@@ -6558,7 +6366,6 @@ export interface MutationGenqlSelection{
     createCommandMenuItem?: (CommandMenuItemGenqlSelection & { __args: {input: CreateCommandMenuItemInput} })
     createDevelopmentApplication?: (DevelopmentApplicationGenqlSelection & { __args: {name: Scalars['String'], universalIdentifier: Scalars['String']} })
     createEmailGroupChannel?: (CreateEmailGroupChannelOutputGenqlSelection & { __args: {input: CreateEmailGroupChannelInput} })
-    createEmailingDomain?: (EmailingDomainGenqlSelection & { __args: {input: CreateEmailingDomainInput} })
     createFileUpload?: (FileUploadTargetGenqlSelection & { __args: {fieldMetadataId?: (Scalars['String'] | null), fieldMetadataUniversalIdentifier?: (Scalars['String'] | null), fileFolder: FileFolder, filename: Scalars['String'], size: Scalars['Float']} })
     createFrontComponent?: (FrontComponentGenqlSelection & { __args: {input: CreateFrontComponentInput} })
     createManyNavigationMenuItems?: (NavigationMenuItemGenqlSelection & { __args: {inputs: CreateNavigationMenuItemInput[]} })
@@ -6566,7 +6373,6 @@ export interface MutationGenqlSelection{
     createManyViewFields?: (ViewFieldGenqlSelection & { __args: {inputs: CreateViewFieldInput[]} })
     createManyViewGroups?: (ViewGroupGenqlSelection & { __args: {inputs: CreateViewGroupInput[]} })
     createMcpServer?: (McpServerGenqlSelection & { __args: {input: CreateMcpServerInput} })
-    createMessageSuppression?: (MessageSuppressionGenqlSelection & { __args: {input: CreateMessageSuppressionInput} })
     createNavigationMenuItem?: (NavigationMenuItemGenqlSelection & { __args: {input: CreateNavigationMenuItemInput} })
     createNewWorkspaceLogoUpload?: (FileUploadTargetGenqlSelection & { __args: {filename: Scalars['String'], size: Scalars['Float'], workspaceId: Scalars['String']} })
     createOIDCIdentityProvider?: (SetupSsoGenqlSelection & { __args: {input: SetupOIDCSsoInput} })
@@ -6585,7 +6391,6 @@ export interface MutationGenqlSelection{
     createSAMLIdentityProvider?: (SetupSsoGenqlSelection & { __args: {input: SetupSAMLSsoInput} })
     createSkill?: (SkillGenqlSelection & { __args: {input: CreateSkillInput} })
     createSubscriptionPaymentIntent?: (BillingPaymentIntentGenqlSelection & { __args: {idempotencyKey: Scalars['String'], plan: BillingPlanKey, recurringInterval: SubscriptionInterval, requirePaymentMethod: Scalars['Boolean'], successUrlPath?: (Scalars['String'] | null)} })
-    createUnsubscribeTopic?: (UnsubscribeTopicGenqlSelection & { __args: {input: CreateUnsubscribeTopicInput} })
     createUsageLimit?: (UsageLimitGenqlSelection & { __args: {input: CreateUsageLimitInput} })
     createValidationRule?: (ValidationRuleGenqlSelection & { __args: {input: CreateValidationRuleInput} })
     createView?: (ViewGenqlSelection & { __args: {input: CreateViewInput} })
@@ -6606,11 +6411,9 @@ export interface MutationGenqlSelection{
     deleteConnectedAccount?: (ConnectedAccountPublicDTOGenqlSelection & { __args: {id: Scalars['UUID']} })
     deleteCurrentWorkspace?: WorkspaceGenqlSelection
     deleteEmailGroupChannel?: (MessageChannelGenqlSelection & { __args: {id: Scalars['UUID']} })
-    deleteEmailingDomain?: { __args: {id: Scalars['String']} }
     deleteFrontComponent?: (FrontComponentGenqlSelection & { __args: {id: Scalars['UUID']} })
     deleteManyNavigationMenuItems?: (NavigationMenuItemGenqlSelection & { __args: {ids: Scalars['UUID'][]} })
     deleteMcpServer?: (McpServerGenqlSelection & { __args: {id: Scalars['UUID']} })
-    deleteMessageSuppression?: { __args: {id: Scalars['UUID']} }
     deleteNavigationMenuItem?: (NavigationMenuItemGenqlSelection & { __args: {id: Scalars['UUID']} })
     deleteOneAgent?: (AgentGenqlSelection & { __args: {input: AgentIdInput} })
     deleteOneField?: (FieldGenqlSelection & { __args: {input: DeleteOneFieldInput} })
@@ -6624,7 +6427,6 @@ export interface MutationGenqlSelection{
     deleteSSOIdentityProvider?: (DeleteSsoGenqlSelection & { __args: {input: DeleteSsoInput} })
     deleteSkill?: (SkillGenqlSelection & { __args: {id: Scalars['UUID']} })
     deleteTwoFactorAuthenticationMethod?: (DeleteTwoFactorAuthenticationMethodGenqlSelection & { __args: {twoFactorAuthenticationMethodId: Scalars['UUID']} })
-    deleteUnsubscribeTopic?: { __args: {id: Scalars['String']} }
     deleteUsageLimit?: { __args: {usageLimitId: Scalars['UUID']} }
     deleteUser?: UserGenqlSelection
     deleteUserFromWorkspace?: (UserWorkspaceGenqlSelection & { __args: {workspaceMemberIdToDelete: Scalars['String']} })
@@ -6714,8 +6516,6 @@ export interface MutationGenqlSelection{
     sendEmail?: (SendEmailOutputGenqlSelection & { __args: {input: SendEmailInput} })
     sendInboxMessage?: (SendInboxMessageResultGenqlSelection & { __args: {input: SendInboxMessageInput} })
     sendInvitations?: (SendInvitationsGenqlSelection & { __args: {emails: Scalars['String'][], roleId?: (Scalars['UUID'] | null)} })
-    sendMessageCampaign?: (SendMessageCampaignOutputDTOGenqlSelection & { __args: {input: SendMessageCampaignInput} })
-    sendMessageCampaignTest?: (SendEmailViaDomainOutputGenqlSelection & { __args: {input: SendMessageCampaignTestInput} })
     setAppKeyValue?: (AppKeyValueGenqlSelection & { __args: {input: SetAppKeyValueInput} })
     setEnterpriseKey?: (EnterpriseLicenseInfoDTOGenqlSelection & { __args: {enterpriseKey: Scalars['String']} })
     setRecordGeneralAccess?: (RecordSharingDTOGenqlSelection & { __args: {accessLevel: RecordShareAccessLevel, target: RecordTargetInput} })
@@ -6782,7 +6582,6 @@ export interface MutationGenqlSelection{
     updatePasswordViaResetToken?: (InvalidatePasswordGenqlSelection & { __args: {newPassword: Scalars['String'], passwordResetToken: Scalars['String']} })
     updateSkill?: (SkillGenqlSelection & { __args: {input: UpdateSkillInput} })
     updateTimelineActivityType?: (TimelineActivityTypeGenqlSelection & { __args: {input: UpdateTimelineActivityTypeInput} })
-    updateUnsubscribeTopic?: (UnsubscribeTopicGenqlSelection & { __args: {input: UpdateUnsubscribeTopicInput} })
     updateUsageLimit?: (UsageLimitGenqlSelection & { __args: {input: UpdateUsageLimitInput} })
     updateUserCreditsFallback?: (BillingCustomerGenqlSelection & { __args: {userCreditsFallback: UserCreditsFallback} })
     updateUserEmail?: { __args: {newEmail: Scalars['String'], verifyEmailRedirectPath?: (Scalars['String'] | null)} }
@@ -6821,7 +6620,6 @@ export interface MutationGenqlSelection{
     validateApprovedAccessDomain?: (ApprovedAccessDomainGenqlSelection & { __args: {input: ValidateApprovedAccessDomainInput} })
     verifyEmailAndGetLoginToken?: (VerifyEmailAndGetLoginTokenGenqlSelection & { __args: {captchaToken?: (Scalars['String'] | null), email: Scalars['String'], emailVerificationToken: Scalars['String'], origin: Scalars['String']} })
     verifyEmailAndGetWorkspaceAgnosticToken?: (AvailableWorkspacesAndAccessTokensGenqlSelection & { __args: {captchaToken?: (Scalars['String'] | null), email: Scalars['String'], emailVerificationToken: Scalars['String']} })
-    verifyEmailingDomain?: (EmailingDomainGenqlSelection & { __args: {id: Scalars['String']} })
     verifyTwoFactorAuthenticationMethodForAuthenticatedUser?: (VerifyTwoFactorAuthenticationMethodGenqlSelection & { __args: {otp: Scalars['String']} })
     __typename?: boolean | number
     __scalar?: boolean | number
@@ -7207,17 +7005,6 @@ export interface PlaceDetailsResultGenqlSelection{
     __scalar?: boolean | number
 }
 
-export interface PreviewMessageCampaignAudienceInput {listId: Scalars['String'],unsubscribeTopicId?: (Scalars['String'] | null)}
-
-export interface PreviewMessageCampaignSendInput {campaignId: Scalars['String'],scheduledAt?: (Scalars['DateTime'] | null)}
-
-export interface PreviewMessageCampaignSendOutputDTOGenqlSelection{
-    audience?: CampaignAudiencePreviewDTOGenqlSelection
-    blockers?: MessageCampaignSendBlockerDTOGenqlSelection
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
 export interface PublicApplicationRegistrationGenqlSelection{
     id?: boolean | number
     logoUrl?: boolean | number
@@ -7370,7 +7157,6 @@ export interface QueryGenqlSelection{
     getAutoCompleteAddress?: (AutocompleteResultGenqlSelection & { __args: {address: Scalars['String'], country?: (Scalars['String'] | null), isFieldCity?: (Scalars['Boolean'] | null), token: Scalars['String']} })
     getAvailablePackages?: { __args: {input: LogicFunctionIdInput} }
     getConnectedImapSmtpCaldavAccount?: (ConnectedImapSmtpCaldavAccountGenqlSelection & { __args: {id: Scalars['UUID']} })
-    getEmailingDomains?: EmailingDomainGenqlSelection
     getInviteSuggestions?: InviteSuggestionGenqlSelection
     getJobs?: (JobStatusGenqlSelection & { __args: {jobIds: Scalars['String'][]} })
     getLogicFunctionSourceCode?: { __args: {input: LogicFunctionIdInput} }
@@ -7412,7 +7198,6 @@ export interface QueryGenqlSelection{
     listPlans?: BillingPlanGenqlSelection
     mcpServer?: (McpServerGenqlSelection & { __args: {id: Scalars['UUID']} })
     mcpServers?: McpServerGenqlSelection
-    messageSuppressions?: (MessageSuppressionListGenqlSelection & { __args: {input: FindMessageSuppressionsInput} })
     metadataTranslations?: (MetadataTranslationGenqlSelection & { __args: {input: MetadataTranslationsInput} })
     minimalMetadata?: MinimalMetadataGenqlSelection
     mostlyEmptyFieldMetadataIds?: { __args: {objectMetadataId: Scalars['UUID']} }
@@ -7434,8 +7219,6 @@ export interface QueryGenqlSelection{
     /** Limit or page results. */
     paging: CursorPaging} })
     pieChartData?: (PieChartDataGenqlSelection & { __args: {input: PieChartDataInput} })
-    previewMessageCampaignAudience?: (CampaignAudiencePreviewDTOGenqlSelection & { __args: {input: PreviewMessageCampaignAudienceInput} })
-    previewMessageCampaignSend?: (PreviewMessageCampaignSendOutputDTOGenqlSelection & { __args: {input: PreviewMessageCampaignSendInput} })
     publicMarketplaceAppDetail?: (MarketplaceAppDetailGenqlSelection & { __args: {universalIdentifier: Scalars['String']} })
     publicMarketplaceApps?: MarketplaceAppGenqlSelection
     recordPermissions?: (RecordPermissionsResultGenqlSelection & { __args: {targets: RecordTargetInput[]} })
@@ -7445,7 +7228,6 @@ export interface QueryGenqlSelection{
     skills?: SkillGenqlSelection
     timelineActivityTypes?: TimelineActivityTypeGenqlSelection
     twoFactorAuthenticationRecoveryStatus?: (TwoFactorAuthenticationRecoveryStatusGenqlSelection & { __args: {userId: Scalars['UUID']} })
-    unsubscribeTopics?: UnsubscribeTopicGenqlSelection
     usageLimits?: UsageLimitGenqlSelection
     usageQuotaDefinitions?: UsageQuotaDefinitionsGenqlSelection
     usageQuotaScopeConsumption?: (UsageQuotaScopeConsumptionGenqlSelection & { __args: {input: UsageQuotaScopeInput} })
@@ -7750,12 +7532,6 @@ export interface SendEmailOutputGenqlSelection{
 
 export interface SendEmailTargetRecordInput {objectNameSingular: Scalars['String'],recordId: Scalars['UUID']}
 
-export interface SendEmailViaDomainOutputGenqlSelection{
-    messageId?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
 export interface SendInboxMessageInput {idempotencyKey: Scalars['String'],text: Scalars['String'],threadKey: Scalars['String'],title: Scalars['String'],toolCall?: (Scalars['JSON'] | null),workspaceMemberIds: Scalars['UUID'][]}
 
 export interface SendInboxMessageResultGenqlSelection{
@@ -7772,18 +7548,6 @@ export interface SendInvitationsGenqlSelection{
     __typename?: boolean | number
     __scalar?: boolean | number
 }
-
-export interface SendMessageCampaignInput {campaignId: Scalars['String'],scheduledAt?: (Scalars['DateTime'] | null)}
-
-export interface SendMessageCampaignOutputDTOGenqlSelection{
-    audience?: CampaignAudiencePreviewDTOGenqlSelection
-    campaignId?: boolean | number
-    queuedCount?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface SendMessageCampaignTestInput {body: Scalars['String'],fromAddress: Scalars['String'],subject: Scalars['String'],toAddress: Scalars['String'],unsubscribeTopicId?: (Scalars['String'] | null)}
 
 export interface SentryGenqlSelection{
     dsn?: boolean | number
@@ -8048,17 +7812,6 @@ export interface TwoFactorAuthenticationRecoveryStatusGenqlSelection{
 
 export interface UUIDFilterComparison {eq?: (Scalars['UUID'] | null),gt?: (Scalars['UUID'] | null),gte?: (Scalars['UUID'] | null),iLike?: (Scalars['UUID'] | null),in?: (Scalars['UUID'][] | null),is?: (Scalars['Boolean'] | null),isNot?: (Scalars['Boolean'] | null),like?: (Scalars['UUID'] | null),lt?: (Scalars['UUID'] | null),lte?: (Scalars['UUID'] | null),neq?: (Scalars['UUID'] | null),notILike?: (Scalars['UUID'] | null),notIn?: (Scalars['UUID'][] | null),notLike?: (Scalars['UUID'] | null)}
 
-export interface UnsubscribeTopicGenqlSelection{
-    createdAt?: boolean | number
-    description?: boolean | number
-    id?: boolean | number
-    name?: boolean | number
-    updatedAt?: boolean | number
-    visibility?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
 export interface UpdateAgentChatChannelInput {color?: (Scalars['String'] | null),icon?: (Scalars['String'] | null),name?: (Scalars['String'] | null),position?: (Scalars['Float'] | null),roleIds?: (Scalars['UUID'][] | null)}
 
 export interface UpdateAgentInput {description?: (Scalars['String'] | null),icon?: (Scalars['String'] | null),id: Scalars['UUID'],isActive?: (Scalars['Boolean'] | null),label?: (Scalars['String'] | null),modelConfiguration?: (Scalars['JSON'] | null),modelId?: (Scalars['String'] | null),name?: (Scalars['String'] | null),prompt?: (Scalars['String'] | null),responseFormat?: (Scalars['JSON'] | null),roleId?: (Scalars['UUID'] | null),triggers?: (Scalars['JSON'][] | null)}
@@ -8161,8 +7914,6 @@ export interface UpdateSkillInput {content?: (Scalars['String'] | null),descript
 
 export interface UpdateTimelineActivityTypeInput {icon?: (Scalars['String'] | null),id: Scalars['UUID'],isActive?: (Scalars['Boolean'] | null),label?: (Scalars['String'] | null),translations?: (MetadataTranslationOverrideInput[] | null)}
 
-export interface UpdateUnsubscribeTopicInput {description?: (Scalars['String'] | null),id: Scalars['String'],name?: (Scalars['String'] | null),visibility?: (UnsubscribeTopicVisibility | null)}
-
 export interface UpdateUsageLimitInput {id: Scalars['UUID'],payload: CreateUsageLimitInput}
 
 export interface UpdateValidationRuleInput {id: Scalars['UUID'],update: UpdateValidationRuleInputUpdates}
@@ -8225,7 +7976,7 @@ export interface UpdateWebhookInputUpdates {description?: (Scalars['String'] | n
 
 export interface UpdateWorkspaceAllowedIframeOriginsInput {operation: Scalars['String'],origin: Scalars['String']}
 
-export interface UpdateWorkspaceInput {aiAdditionalInstructions?: (Scalars['String'] | null),aiAgentModelTier?: (AiModelTier | null),aiChatModelTier?: (AiModelTier | null),aiEvaluationModelId?: (Scalars['String'] | null),aiModelIdByTier?: (Scalars['JSON'] | null),allowImpersonation?: (Scalars['Boolean'] | null),customDomain?: (Scalars['String'] | null),defaultRoleId?: (Scalars['UUID'] | null),displayName?: (Scalars['String'] | null),editableProfileFields?: (Scalars['String'][] | null),inviteHash?: (Scalars['String'] | null),isAutoModelSelectionEnabled?: (Scalars['Boolean'] | null),isCampaignClickTrackingEnabled?: (Scalars['Boolean'] | null),isCampaignOpenTrackingEnabled?: (Scalars['Boolean'] | null),isGoogleAuthBypassEnabled?: (Scalars['Boolean'] | null),isGoogleAuthEnabled?: (Scalars['Boolean'] | null),isInternalMessagesImportEnabled?: (Scalars['Boolean'] | null),isMicrosoftAuthBypassEnabled?: (Scalars['Boolean'] | null),isMicrosoftAuthEnabled?: (Scalars['Boolean'] | null),isPasswordAuthBypassEnabled?: (Scalars['Boolean'] | null),isPasswordAuthEnabled?: (Scalars['Boolean'] | null),isPublicInviteLinkEnabled?: (Scalars['Boolean'] | null),isTwoFactorAuthenticationEnforced?: (Scalars['Boolean'] | null),logo?: (Scalars['String'] | null),subdomain?: (Scalars['String'] | null),trashRetentionDays?: (Scalars['Float'] | null),workspaceDiscoverability?: (WorkspaceDiscoverability | null)}
+export interface UpdateWorkspaceInput {aiAdditionalInstructions?: (Scalars['String'] | null),aiAgentModelTier?: (AiModelTier | null),aiChatModelTier?: (AiModelTier | null),aiEvaluationModelId?: (Scalars['String'] | null),aiModelIdByTier?: (Scalars['JSON'] | null),allowImpersonation?: (Scalars['Boolean'] | null),customDomain?: (Scalars['String'] | null),defaultRoleId?: (Scalars['UUID'] | null),displayName?: (Scalars['String'] | null),editableProfileFields?: (Scalars['String'][] | null),inviteHash?: (Scalars['String'] | null),isAutoModelSelectionEnabled?: (Scalars['Boolean'] | null),isGoogleAuthBypassEnabled?: (Scalars['Boolean'] | null),isGoogleAuthEnabled?: (Scalars['Boolean'] | null),isInternalMessagesImportEnabled?: (Scalars['Boolean'] | null),isMicrosoftAuthBypassEnabled?: (Scalars['Boolean'] | null),isMicrosoftAuthEnabled?: (Scalars['Boolean'] | null),isPasswordAuthBypassEnabled?: (Scalars['Boolean'] | null),isPasswordAuthEnabled?: (Scalars['Boolean'] | null),isPublicInviteLinkEnabled?: (Scalars['Boolean'] | null),isTwoFactorAuthenticationEnforced?: (Scalars['Boolean'] | null),logo?: (Scalars['String'] | null),subdomain?: (Scalars['String'] | null),trashRetentionDays?: (Scalars['Float'] | null),workspaceDiscoverability?: (WorkspaceDiscoverability | null)}
 
 export interface UpdateWorkspaceMemberSettingsInput {update: Scalars['JSON'],workspaceMemberId: Scalars['UUID']}
 
@@ -8517,16 +8268,6 @@ export interface ValidationRuleGenqlSelection{
     __scalar?: boolean | number
 }
 
-export interface VerificationRecordGenqlSelection{
-    key?: boolean | number
-    priority?: boolean | number
-    status?: boolean | number
-    type?: boolean | number
-    value?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
 export interface VerifyEmailAndGetLoginTokenGenqlSelection{
     loginToken?: AuthTokenGenqlSelection
     workspaceUrls?: WorkspaceUrlsGenqlSelection
@@ -8789,8 +8530,6 @@ export interface WorkspaceGenqlSelection{
     installedApplications?: ApplicationGenqlSelection
     inviteHash?: boolean | number
     isAutoModelSelectionEnabled?: boolean | number
-    isCampaignClickTrackingEnabled?: boolean | number
-    isCampaignOpenTrackingEnabled?: boolean | number
     isCustomDomainEnabled?: boolean | number
     isGoogleAuthBypassEnabled?: boolean | number
     isGoogleAuthEnabled?: boolean | number
@@ -9618,22 +9357,6 @@ export interface WorkspaceUrlsAndIdGenqlSelection{
     
 
 
-    const CampaignAudiencePreviewDTO_possibleTypes: string[] = ['CampaignAudiencePreviewDTO']
-    export const isCampaignAudiencePreviewDTO = (obj?: { __typename?: any } | null): obj is CampaignAudiencePreviewDTO => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isCampaignAudiencePreviewDTO"')
-      return CampaignAudiencePreviewDTO_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
-    const CancelMessageCampaignOutputDTO_possibleTypes: string[] = ['CancelMessageCampaignOutputDTO']
-    export const isCancelMessageCampaignOutputDTO = (obj?: { __typename?: any } | null): obj is CancelMessageCampaignOutputDTO => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isCancelMessageCampaignOutputDTO"')
-      return CancelMessageCampaignOutputDTO_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
     const Captcha_possibleTypes: string[] = ['Captcha']
     export const isCaptcha = (obj?: { __typename?: any } | null): obj is Captcha => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isCaptcha"')
@@ -9910,14 +9633,6 @@ export interface WorkspaceUrlsAndIdGenqlSelection{
     export const isEmailThreadConfiguration = (obj?: { __typename?: any } | null): obj is EmailThreadConfiguration => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isEmailThreadConfiguration"')
       return EmailThreadConfiguration_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
-    const EmailingDomain_possibleTypes: string[] = ['EmailingDomain']
-    export const isEmailingDomain = (obj?: { __typename?: any } | null): obj is EmailingDomain => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isEmailingDomain"')
-      return EmailingDomain_possibleTypes.includes(obj.__typename)
     }
     
 
@@ -10386,14 +10101,6 @@ export interface WorkspaceUrlsAndIdGenqlSelection{
     
 
 
-    const MessageCampaignSendBlockerDTO_possibleTypes: string[] = ['MessageCampaignSendBlockerDTO']
-    export const isMessageCampaignSendBlockerDTO = (obj?: { __typename?: any } | null): obj is MessageCampaignSendBlockerDTO => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isMessageCampaignSendBlockerDTO"')
-      return MessageCampaignSendBlockerDTO_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
     const MessageChannel_possibleTypes: string[] = ['MessageChannel']
     export const isMessageChannel = (obj?: { __typename?: any } | null): obj is MessageChannel => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isMessageChannel"')
@@ -10406,22 +10113,6 @@ export interface WorkspaceUrlsAndIdGenqlSelection{
     export const isMessageFolder = (obj?: { __typename?: any } | null): obj is MessageFolder => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isMessageFolder"')
       return MessageFolder_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
-    const MessageSuppression_possibleTypes: string[] = ['MessageSuppression']
-    export const isMessageSuppression = (obj?: { __typename?: any } | null): obj is MessageSuppression => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isMessageSuppression"')
-      return MessageSuppression_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
-    const MessageSuppressionList_possibleTypes: string[] = ['MessageSuppressionList']
-    export const isMessageSuppressionList = (obj?: { __typename?: any } | null): obj is MessageSuppressionList => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isMessageSuppressionList"')
-      return MessageSuppressionList_possibleTypes.includes(obj.__typename)
     }
     
 
@@ -10714,14 +10405,6 @@ export interface WorkspaceUrlsAndIdGenqlSelection{
     
 
 
-    const PreviewMessageCampaignSendOutputDTO_possibleTypes: string[] = ['PreviewMessageCampaignSendOutputDTO']
-    export const isPreviewMessageCampaignSendOutputDTO = (obj?: { __typename?: any } | null): obj is PreviewMessageCampaignSendOutputDTO => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isPreviewMessageCampaignSendOutputDTO"')
-      return PreviewMessageCampaignSendOutputDTO_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
     const PublicApplicationRegistration_possibleTypes: string[] = ['PublicApplicationRegistration']
     export const isPublicApplicationRegistration = (obj?: { __typename?: any } | null): obj is PublicApplicationRegistration => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isPublicApplicationRegistration"')
@@ -11002,14 +10685,6 @@ export interface WorkspaceUrlsAndIdGenqlSelection{
     
 
 
-    const SendEmailViaDomainOutput_possibleTypes: string[] = ['SendEmailViaDomainOutput']
-    export const isSendEmailViaDomainOutput = (obj?: { __typename?: any } | null): obj is SendEmailViaDomainOutput => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isSendEmailViaDomainOutput"')
-      return SendEmailViaDomainOutput_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
     const SendInboxMessageResult_possibleTypes: string[] = ['SendInboxMessageResult']
     export const isSendInboxMessageResult = (obj?: { __typename?: any } | null): obj is SendInboxMessageResult => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isSendInboxMessageResult"')
@@ -11022,14 +10697,6 @@ export interface WorkspaceUrlsAndIdGenqlSelection{
     export const isSendInvitations = (obj?: { __typename?: any } | null): obj is SendInvitations => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isSendInvitations"')
       return SendInvitations_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
-    const SendMessageCampaignOutputDTO_possibleTypes: string[] = ['SendMessageCampaignOutputDTO']
-    export const isSendMessageCampaignOutputDTO = (obj?: { __typename?: any } | null): obj is SendMessageCampaignOutputDTO => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isSendMessageCampaignOutputDTO"')
-      return SendMessageCampaignOutputDTO_possibleTypes.includes(obj.__typename)
     }
     
 
@@ -11258,14 +10925,6 @@ export interface WorkspaceUrlsAndIdGenqlSelection{
     
 
 
-    const UnsubscribeTopic_possibleTypes: string[] = ['UnsubscribeTopic']
-    export const isUnsubscribeTopic = (obj?: { __typename?: any } | null): obj is UnsubscribeTopic => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isUnsubscribeTopic"')
-      return UnsubscribeTopic_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
     const UpsertRowLevelPermissionPredicatesResult_possibleTypes: string[] = ['UpsertRowLevelPermissionPredicatesResult']
     export const isUpsertRowLevelPermissionPredicatesResult = (obj?: { __typename?: any } | null): obj is UpsertRowLevelPermissionPredicatesResult => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isUpsertRowLevelPermissionPredicatesResult"')
@@ -11406,14 +11065,6 @@ export interface WorkspaceUrlsAndIdGenqlSelection{
     export const isValidationRule = (obj?: { __typename?: any } | null): obj is ValidationRule => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isValidationRule"')
       return ValidationRule_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
-    const VerificationRecord_possibleTypes: string[] = ['VerificationRecord']
-    export const isVerificationRecord = (obj?: { __typename?: any } | null): obj is VerificationRecord => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isVerificationRecord"')
-      return VerificationRecord_possibleTypes.includes(obj.__typename)
     }
     
 
@@ -11908,19 +11559,6 @@ export const enumEmailConnectionSecurity = {
    STARTTLS: 'STARTTLS' as const
 }
 
-export const enumEmailingDomainStatus = {
-   FAILED: 'FAILED' as const,
-   PENDING: 'PENDING' as const,
-   TEMPORARY_FAILURE: 'TEMPORARY_FAILURE' as const,
-   VERIFIED: 'VERIFIED' as const
-}
-
-export const enumEmailingDomainTenantStatus = {
-   ACTIVE: 'ACTIVE' as const,
-   PAUSED: 'PAUSED' as const,
-   SANDBOX: 'SANDBOX' as const
-}
-
 export const enumEngineComponentKey = {
    ACTIVATE_WORKFLOW: 'ACTIVATE_WORKFLOW' as const,
    ADD_NODE_WORKFLOW: 'ADD_NODE_WORKFLOW' as const,
@@ -12183,18 +11821,6 @@ export const enumMessageParticipantRole = {
    TO: 'TO' as const
 }
 
-export const enumMessageSuppressionReason = {
-   BOUNCE: 'BOUNCE' as const,
-   COMPLAINT: 'COMPLAINT' as const,
-   TRACKING: 'TRACKING' as const,
-   UNSUBSCRIBE: 'UNSUBSCRIBE' as const
-}
-
-export const enumMessageSuppressionSource = {
-   SYSTEM: 'SYSTEM' as const,
-   WEBHOOK: 'WEBHOOK' as const
-}
-
 export const enumMetadataEventAction = {
    CREATED: 'CREATED' as const,
    DELETED: 'DELETED' as const,
@@ -12416,17 +12042,6 @@ export const enumSubscriptionStatus = {
 export const enumSupportDriver = {
    FRONT: 'FRONT' as const,
    NONE: 'NONE' as const
-}
-
-export const enumUnsubscribeHostnameStatus = {
-   ACTIVE: 'ACTIVE' as const,
-   FAILED: 'FAILED' as const,
-   PENDING: 'PENDING' as const
-}
-
-export const enumUnsubscribeTopicVisibility = {
-   PRIVATE: 'PRIVATE' as const,
-   PUBLIC: 'PUBLIC' as const
 }
 
 export const enumUsageOperationType = {
