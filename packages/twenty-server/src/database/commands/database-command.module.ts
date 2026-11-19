@@ -29,7 +29,6 @@ import { ApplicationRecurringChargeModule } from 'src/engine/core-modules/billin
 import { BillingReminderModule } from 'src/engine/core-modules/billing/reminders/billing-reminder.module';
 import { EnterpriseKeyValidationCronCommand } from 'src/engine/core-modules/enterprise/cron/command/organization-key-validation.cron.command';
 import { EnterpriseModule } from 'src/engine/core-modules/enterprise/enterprise.module';
-import { EventLogCleanupModule } from 'src/engine/core-modules/event-logs/cleanup/event-log-cleanup.module';
 import { FeatureFlagModule } from 'src/engine/core-modules/feature-flag/feature-flag.module';
 import { FileModule } from 'src/engine/core-modules/file/file.module';
 import { PendingWakeUpModule } from 'src/engine/core-modules/pending-wake-up/pending-wake-up.module';
@@ -95,7 +94,6 @@ import { AutomatedTriggerModule } from 'src/modules/workflow/workflow-trigger/au
     ApplicationRecurringChargeModule,
     CodeInterpreterSessionCleanupModule,
     PublicDomainModule,
-    EventLogCleanupModule,
     EnterpriseModule,
     TwentyConfigModule,
     MarketplaceModule,

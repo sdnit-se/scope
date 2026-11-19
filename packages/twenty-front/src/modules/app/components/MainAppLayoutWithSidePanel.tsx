@@ -2,7 +2,6 @@ import { WorkspaceSetupChatSidePanelEffect } from '@/onboarding/effect-component
 import { CommandMenuForMobile } from '@/command-menu/components/CommandMenuForMobile';
 import { useCommandMenuHotKeys } from '@/command-menu/hooks/useCommandMenuHotKeys';
 import { RouteContextStoreProvider } from '@/context-store/components/RouteContextStoreProvider';
-import { LogConsole } from '@/log-console/components/LogConsole';
 import { SidePanelForDesktop } from '@/side-panel/components/SidePanelForDesktop';
 import { SidePanelPathUrlSyncEffect } from '@/side-panel/routing/components/SidePanelPathUrlSyncEffect';
 import { useIsMobile } from 'twenty-ui/utilities';
@@ -70,7 +69,6 @@ export const MainAppLayoutWithSidePanel = () => {
         <StyledContent>
           <Outlet />
         </StyledContent>
-        <LogConsole />
       </StyledMainColumn>
       {isMobile ? <CommandMenuForMobile /> : <SidePanelForDesktop />}
     </StyledRow>

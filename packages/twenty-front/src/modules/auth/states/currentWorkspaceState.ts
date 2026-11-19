@@ -38,7 +38,6 @@ export type CurrentWorkspace = Pick<
   | 'workspaceUrls'
   | 'isTwoFactorAuthenticationEnforced'
   | 'trashRetentionDays'
-  | 'eventLogRetentionDays'
   | 'aiChatModelTier'
   | 'aiAgentModelTier'
   | 'isAutoModelSelectionEnabled'

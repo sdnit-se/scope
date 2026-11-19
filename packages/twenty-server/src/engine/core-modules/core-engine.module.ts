@@ -11,7 +11,6 @@ import { ApplicationAuthorizationModule } from 'src/engine/core-modules/applicat
 import { ApplicationDevelopmentModule } from 'src/engine/core-modules/application/application-development/application-development.module';
 import { FrontComponentSharedDependenciesModule } from 'src/engine/core-modules/application/front-component-shared-dependencies/front-component-shared-dependencies.module';
 import { ApplicationInstallModule } from 'src/engine/core-modules/application/application-install/application-install.module';
-import { ApplicationMonitoringModule } from 'src/engine/core-modules/application/application-monitoring/application-monitoring.module';
 import { MarketplaceModule } from 'src/engine/core-modules/application/application-marketplace/marketplace.module';
 import { ApplicationOAuthModule } from 'src/engine/core-modules/application/application-oauth/application-oauth.module';
 import { ApplicationRegistrationModule } from 'src/engine/core-modules/application/application-registration/application-registration.module';
@@ -80,7 +79,6 @@ import { TrashCleanupModule } from 'src/engine/trash-cleanup/trash-cleanup.modul
 import { WorkspaceEventEmitterModule } from 'src/engine/workspace-event-emitter/workspace-event-emitter.module';
 import { AiToolCallAnswerModule } from 'src/engine/metadata-modules/ai/ai-tool-call-answer/ai-tool-call-answer.module';
 import { ClientConfigModule } from './client-config/client-config.module';
-import { EventLogsViewerModule } from './event-logs/event-logs-viewer.module';
 import { FileApiModule } from './file/file-api.module';
 
 @Module({
@@ -100,7 +98,6 @@ import { FileApiModule } from './file/file-api.module';
     OpenApiModule,
     WellKnownModule,
     ApplicationRegistrationModule,
-    ApplicationMonitoringModule,
     ApplicationOAuthModule,
     ApplicationAuthorizationModule,
     ApplicationModule,
@@ -171,7 +168,6 @@ import { FileApiModule } from './file/file-api.module';
     ImpersonationModule,
     TrashCleanupModule,
     CodeInterpreterSessionCleanupModule,
-    EventLogsViewerModule,
     PreInstalledAppsModule,
     AppBillingModule,
   ],
@@ -186,7 +182,6 @@ import { FileApiModule } from './file/file-api.module';
     },
   ],
   exports: [
-    EventLogsViewerModule,
     AuthModule,
     FeatureFlagModule,
     UserModule,

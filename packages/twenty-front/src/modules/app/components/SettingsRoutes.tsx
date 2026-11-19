@@ -362,14 +362,6 @@ const SettingsAdminApplicationRegistrationDetail = lazy(() =>
   ),
 );
 
-const SettingsAdminApplicationRegistrationMonitoring = lazy(() =>
-  import('~/pages/settings/admin-panel/SettingsAdminApplicationRegistrationMonitoring').then(
-    (module) => ({
-      default: module.SettingsAdminApplicationRegistrationMonitoring,
-    }),
-  ),
-);
-
 const SettingsAvailableApplicationDetails = lazy(() =>
   import('~/pages/settings/applications/SettingsAvailableApplicationDetails').then(
     (module) => ({
@@ -382,14 +374,6 @@ const SettingsApplicationRegistrationDetails = lazy(() =>
   import('~/pages/settings/applications/SettingsApplicationRegistrationDetails').then(
     (module) => ({
       default: module.SettingsApplicationRegistrationDetails,
-    }),
-  ),
-);
-
-const SettingsApplicationRegistrationMonitoring = lazy(() =>
-  import('~/pages/settings/applications/SettingsApplicationRegistrationMonitoring').then(
-    (module) => ({
-      default: module.SettingsApplicationRegistrationMonitoring,
     }),
   ),
 );
@@ -1140,10 +1124,6 @@ const createSettingsRouteElements = ({
         element={<SettingsApplicationRegistrationDetails />}
       />
       <Route
-        path={SettingsPath.ApplicationRegistrationMonitoring}
-        element={<SettingsApplicationRegistrationMonitoring />}
-      />
-      <Route
         path={LEGACY_APPLICATION_REGISTRATION_DETAIL_PATH}
         element={
           <LegacySettingsPathRedirect
@@ -1304,10 +1284,6 @@ const createSettingsRouteElements = ({
         <Route
           path={SettingsPath.AdminPanelApplicationRegistrationDetail}
           element={<SettingsAdminApplicationRegistrationDetail />}
-        />
-        <Route
-          path={SettingsPath.AdminPanelApplicationRegistrationMonitoring}
-          element={<SettingsAdminApplicationRegistrationMonitoring />}
         />
         <Route
           path={SettingsPath.AdminPanelWorkspaceChatThread}

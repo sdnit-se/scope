@@ -3,7 +3,6 @@ import { useWorkspaceRouteObjects } from '@/app/routing/components/WorkspaceRout
 import { isAppEffectRedirectEnabledState } from '@/auth/states/isAppEffectRedirectEnabledState';
 import { useReturnToPath } from '@/auth/hooks/useReturnToPath';
 import { useIsOnAuthOrOnboardingPage } from '@/auth/hooks/useIsOnAuthOrOnboardingPage';
-import { isLogConsoleFullScreenState } from '@/log-console/states/isLogConsoleFullScreenState';
 import { useSidePanelHistory } from '@/side-panel/hooks/useSidePanelHistory';
 import { useSidePanelMenu } from '@/side-panel/hooks/useSidePanelMenu';
 import { SIDE_PANEL_PATH_SEARCH_PARAM } from '@/side-panel/routing/constants/SidePanelPathSearchParam';
@@ -138,7 +137,6 @@ export const PageChangeEffect = () => {
 
       setPreviousLocation(location.pathname);
       executeTasksOnAnyLocationChange();
-      store.set(isLogConsoleFullScreenState.atom, false);
 
       const newPageLayoutId = getPageLayoutIdForLocation({
         location,

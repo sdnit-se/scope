@@ -654,77 +654,6 @@ export enum ApplicationHealthStatus {
   WARNING = 'WARNING'
 }
 
-export type ApplicationMonitoring = {
-  __typename?: 'ApplicationMonitoring';
-  activity: Array<ApplicationMonitoringActivityBucket>;
-  bucketSizeInSeconds: Scalars['Int']['output'];
-  creditUsage?: Maybe<Array<ApplicationMonitoringCreditBucket>>;
-  creditsUsed?: Maybe<Scalars['Float']['output']>;
-  failedRunCount: Scalars['Int']['output'];
-  functions: Array<ApplicationMonitoringFunction>;
-  issues: Array<ApplicationMonitoringIssue>;
-  lifecycle: Array<ApplicationMonitoringLifecycleBucket>;
-  lifecycleFailureCount: Scalars['Int']['output'];
-  lookbackInHours: Scalars['Int']['output'];
-  periodEnd: Scalars['DateTime']['output'];
-  periodStart: Scalars['DateTime']['output'];
-  rateLimitEventCount: Scalars['Int']['output'];
-  runCount: Scalars['Int']['output'];
-  versions: Array<ApplicationMonitoringVersion>;
-};
-
-export type ApplicationMonitoringActivityBucket = {
-  __typename?: 'ApplicationMonitoringActivityBucket';
-  bucketStart: Scalars['DateTime']['output'];
-  errorCount: Scalars['Int']['output'];
-  rateLimitedJobCount: Scalars['Int']['output'];
-  rateLimitedRequestCount: Scalars['Int']['output'];
-};
-
-export type ApplicationMonitoringCreditBucket = {
-  __typename?: 'ApplicationMonitoringCreditBucket';
-  bucketStart: Scalars['DateTime']['output'];
-  creditsUsed: Scalars['Float']['output'];
-  operationType: Scalars['String']['output'];
-};
-
-export type ApplicationMonitoringFunction = {
-  __typename?: 'ApplicationMonitoringFunction';
-  failedRunCount: Scalars['Int']['output'];
-  logicFunctionName: Scalars['String']['output'];
-  p95DurationMs: Scalars['Float']['output'];
-  runCount: Scalars['Int']['output'];
-};
-
-export type ApplicationMonitoringIssue = {
-  __typename?: 'ApplicationMonitoringIssue';
-  affectedInstallCount: Scalars['Int']['output'];
-  errorCode: Scalars['String']['output'];
-  eventCount: Scalars['Int']['output'];
-  lastSeenAt: Scalars['DateTime']['output'];
-  level: Scalars['String']['output'];
-  logicFunctionName: Scalars['String']['output'];
-  source: Scalars['String']['output'];
-  versions: Array<Scalars['String']['output']>;
-};
-
-export type ApplicationMonitoringLifecycleBucket = {
-  __typename?: 'ApplicationMonitoringLifecycleBucket';
-  bucketStart: Scalars['DateTime']['output'];
-  failedCount: Scalars['Int']['output'];
-  installCount: Scalars['Int']['output'];
-  uninstallCount: Scalars['Int']['output'];
-  upgradeCount: Scalars['Int']['output'];
-};
-
-export type ApplicationMonitoringVersion = {
-  __typename?: 'ApplicationMonitoringVersion';
-  activeInstallCount: Scalars['Int']['output'];
-  failedRunCount: Scalars['Int']['output'];
-  runCount: Scalars['Int']['output'];
-  version: Scalars['String']['output'];
-};
-
 export type ApplicationPreferences = {
   __typename?: 'ApplicationPreferences';
   applicationId: Scalars['UUID']['output'];
@@ -2353,70 +2282,6 @@ export type EnterpriseSubscriptionStatusDto = {
   licensee?: Maybe<Scalars['String']['output']>;
   status: Scalars['String']['output'];
 };
-
-export type EventLogDateRangeInput = {
-  end?: InputMaybe<Scalars['DateTime']['input']>;
-  start?: InputMaybe<Scalars['DateTime']['input']>;
-};
-
-export type EventLogFieldFilterInput = {
-  field: Scalars['String']['input'];
-  operand: EventLogFilterOperand;
-  values: Array<Scalars['String']['input']>;
-};
-
-export enum EventLogFilterOperand {
-  IS = 'IS',
-  IS_NOT = 'IS_NOT'
-}
-
-export type EventLogFiltersInput = {
-  dateRange?: InputMaybe<EventLogDateRangeInput>;
-  eventType?: InputMaybe<Scalars['String']['input']>;
-  fieldFilters?: InputMaybe<Array<EventLogFieldFilterInput>>;
-  objectMetadataId?: InputMaybe<Scalars['String']['input']>;
-  recordId?: InputMaybe<Scalars['String']['input']>;
-  userWorkspaceId?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type EventLogPageInfo = {
-  __typename?: 'EventLogPageInfo';
-  endCursor?: Maybe<Scalars['String']['output']>;
-  hasNextPage: Scalars['Boolean']['output'];
-};
-
-export type EventLogQueryInput = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  filters?: InputMaybe<EventLogFiltersInput>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  table: EventLogTable;
-};
-
-export type EventLogQueryResult = {
-  __typename?: 'EventLogQueryResult';
-  pageInfo: EventLogPageInfo;
-  records: Array<EventLogRecord>;
-  totalCount: Scalars['Int']['output'];
-};
-
-export type EventLogRecord = {
-  __typename?: 'EventLogRecord';
-  event: Scalars['String']['output'];
-  isCustom?: Maybe<Scalars['Boolean']['output']>;
-  objectMetadataId?: Maybe<Scalars['String']['output']>;
-  properties?: Maybe<Scalars['JSON']['output']>;
-  recordId?: Maybe<Scalars['String']['output']>;
-  timestamp: Scalars['DateTime']['output'];
-  userId?: Maybe<Scalars['String']['output']>;
-};
-
-export enum EventLogTable {
-  APPLICATION_LOG = 'APPLICATION_LOG',
-  OBJECT_EVENT = 'OBJECT_EVENT',
-  PAGEVIEW = 'PAGEVIEW',
-  USAGE_EVENT = 'USAGE_EVENT',
-  WORKSPACE_EVENT = 'WORKSPACE_EVENT'
-}
 
 export type EventSubscription = {
   __typename?: 'EventSubscription';
@@ -5782,13 +5647,11 @@ export type Query = {
   enterpriseCheckoutSession?: Maybe<Scalars['String']['output']>;
   enterprisePortalSession?: Maybe<Scalars['String']['output']>;
   enterpriseSubscriptionStatus?: Maybe<EnterpriseSubscriptionStatusDto>;
-  eventLogs: EventLogQueryResult;
   exportApplication: ApplicationExport;
   field: Field;
   fields: FieldConnection;
   findApplicationRegistrationByClientId?: Maybe<PublicApplicationRegistration>;
   findApplicationRegistrationByUniversalIdentifier?: Maybe<ApplicationRegistration>;
-  findApplicationRegistrationMonitoring: ApplicationMonitoring;
   findApplicationRegistrationStats: ApplicationRegistrationStats;
   findApplicationRegistrationVariables: Array<ApplicationRegistrationVariable>;
   findClaimableApplicationRegistration?: Maybe<ClaimableApplicationRegistration>;
@@ -6033,11 +5896,6 @@ export type QueryEnterprisePortalSessionArgs = {
 };
 
 
-export type QueryEventLogsArgs = {
-  input: EventLogQueryInput;
-};
-
-
 export type QueryExportApplicationArgs = {
   shouldIncludeDependencies?: InputMaybe<Scalars['Boolean']['input']>;
   universalIdentifier: Scalars['UUID']['input'];
@@ -6062,13 +5920,6 @@ export type QueryFindApplicationRegistrationByClientIdArgs = {
 
 export type QueryFindApplicationRegistrationByUniversalIdentifierArgs = {
   universalIdentifier: Scalars['String']['input'];
-};
-
-
-export type QueryFindApplicationRegistrationMonitoringArgs = {
-  id: Scalars['String']['input'];
-  periodEnd?: InputMaybe<Scalars['DateTime']['input']>;
-  periodStart?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 
@@ -7003,17 +6854,10 @@ export type SubdomainAvailabilityDto = {
 
 export type Subscription = {
   __typename?: 'Subscription';
-  eventLogsLive?: Maybe<Array<EventLogRecord>>;
   exportRecords: RecordExport;
   logicFunctionLogs: LogicFunctionLogs;
   onAgentChatEvent: AgentChatEvent;
   onEventSubscription?: Maybe<EventSubscription>;
-};
-
-
-export type SubscriptionEventLogsLiveArgs = {
-  fieldFilters?: InputMaybe<Array<EventLogFieldFilterInput>>;
-  table: EventLogTable;
 };
 
 
@@ -7752,7 +7596,6 @@ export type UpdateWorkspaceInput = {
   defaultRoleId?: InputMaybe<Scalars['UUID']['input']>;
   displayName?: InputMaybe<Scalars['String']['input']>;
   editableProfileFields?: InputMaybe<Array<Scalars['String']['input']>>;
-  eventLogRetentionDays?: InputMaybe<Scalars['Float']['input']>;
   inviteHash?: InputMaybe<Scalars['String']['input']>;
   isAutoModelSelectionEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   isCampaignClickTrackingEnabled?: InputMaybe<Scalars['Boolean']['input']>;
@@ -8512,7 +8355,6 @@ export type Workspace = {
   deletedAt?: Maybe<Scalars['DateTime']['output']>;
   displayName?: Maybe<Scalars['String']['output']>;
   editableProfileFields?: Maybe<Array<Scalars['String']['output']>>;
-  eventLogRetentionDays: Scalars['Float']['output'];
   featureFlags?: Maybe<Array<FeatureFlag>>;
   hasValidEnterpriseValidityToken: Scalars['Boolean']['output'];
   hasValidSignedEnterpriseKey: Scalars['Boolean']['output'];

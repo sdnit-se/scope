@@ -595,70 +595,6 @@ enum ApplicationHealthStatus {
   WARNING
 }
 
-type ApplicationMonitoring {
-  activity: [ApplicationMonitoringActivityBucket!]!
-  bucketSizeInSeconds: Int!
-  creditUsage: [ApplicationMonitoringCreditBucket!]
-  creditsUsed: Float
-  failedRunCount: Int!
-  functions: [ApplicationMonitoringFunction!]!
-  issues: [ApplicationMonitoringIssue!]!
-  lifecycle: [ApplicationMonitoringLifecycleBucket!]!
-  lifecycleFailureCount: Int!
-  lookbackInHours: Int!
-  periodEnd: DateTime!
-  periodStart: DateTime!
-  rateLimitEventCount: Int!
-  runCount: Int!
-  versions: [ApplicationMonitoringVersion!]!
-}
-
-type ApplicationMonitoringActivityBucket {
-  bucketStart: DateTime!
-  errorCount: Int!
-  rateLimitedJobCount: Int!
-  rateLimitedRequestCount: Int!
-}
-
-type ApplicationMonitoringCreditBucket {
-  bucketStart: DateTime!
-  creditsUsed: Float!
-  operationType: String!
-}
-
-type ApplicationMonitoringFunction {
-  failedRunCount: Int!
-  logicFunctionName: String!
-  p95DurationMs: Float!
-  runCount: Int!
-}
-
-type ApplicationMonitoringIssue {
-  affectedInstallCount: Int!
-  errorCode: String!
-  eventCount: Int!
-  lastSeenAt: DateTime!
-  level: String!
-  logicFunctionName: String!
-  source: String!
-  versions: [String!]!
-}
-
-type ApplicationMonitoringLifecycleBucket {
-  bucketStart: DateTime!
-  failedCount: Int!
-  installCount: Int!
-  uninstallCount: Int!
-  upgradeCount: Int!
-}
-
-type ApplicationMonitoringVersion {
-  activeInstallCount: Int!
-  failedRunCount: Int!
-  runCount: Int!
-  version: String!
-}
-
 type ApplicationPreferences {
   applicationId: UUID!
   connectionProviders: [ApplicationConnectionProvider!]!
@@ -2224,67 +2160,6 @@ type EnterpriseSubscriptionStatusDTO {
   isCancellationScheduled: Boolean!
   licensee: String
   status: String!
-}
-
-input EventLogDateRangeInput {
-  end: DateTime
-  start: DateTime
-}
-
-input EventLogFieldFilterInput {
-  field: String!
-  operand: EventLogFilterOperand!
-  values: [String!]!
-}
-
-enum EventLogFilterOperand {
-  IS
-  IS_NOT
-}
-
-input EventLogFiltersInput {
-  dateRange: EventLogDateRangeInput
-  eventType: String
-  fieldFilters: [EventLogFieldFilterInput!]
-  objectMetadataId: String
-  recordId: String
-  userWorkspaceId: String
-}
-
-type EventLogPageInfo {
-  endCursor: String
-  hasNextPage: Boolean!
-}
-
-input EventLogQueryInput {
-  after: String
-  filters: EventLogFiltersInput
-  first: Int = 100
-  table: EventLogTable!
-}
-
-type EventLogQueryResult {
-  pageInfo: EventLogPageInfo!
-  records: [EventLogRecord!]!
-  totalCount: Int!
-}
-
-type EventLogRecord {
-  event: String!
-  isCustom: Boolean
-  objectMetadataId: String
-  properties: JSON
-  recordId: String
-  timestamp: DateTime!
-  userId: String
-}
-
-enum EventLogTable {
-  APPLICATION_LOG
-  OBJECT_EVENT
-  PAGEVIEW
-  USAGE_EVENT
-  WORKSPACE_EVENT
 }
 
 type EventSubscription {
@@ -4076,7 +3951,6 @@ type Query {
   enterpriseCheckoutSession(billingInterval: String): String
   enterprisePortalSession(returnUrlPath: String): String
   enterpriseSubscriptionStatus: EnterpriseSubscriptionStatusDTO
-  eventLogs(input: EventLogQueryInput!): EventLogQueryResult!
   exportApplication(shouldIncludeDependencies: Boolean = false, universalIdentifier: UUID!): ApplicationExport!
   field(
     """The id of the record to find."""
@@ -4091,7 +3965,6 @@ type Query {
   ): FieldConnection!
   findApplicationRegistrationByClientId(clientId: String!): PublicApplicationRegistration
   findApplicationRegistrationByUniversalIdentifier(universalIdentifier: String!): ApplicationRegistration
-  findApplicationRegistrationMonitoring(id: String!, periodEnd: DateTime, periodStart: DateTime): ApplicationMonitoring!
   findApplicationRegistrationStats(id: String!, periodEnd: DateTime, periodStart: DateTime): ApplicationRegistrationStats!
   findApplicationRegistrationVariables(applicationRegistrationId: String!): [ApplicationRegistrationVariable!]!
   findClaimableApplicationRegistration(sourcePackage: String, universalIdentifier: String): ClaimableApplicationRegistration
@@ -4740,7 +4613,6 @@ type SubdomainAvailabilityDTO {
 }
 
 type Subscription {
-  eventLogsLive(fieldFilters: [EventLogFieldFilterInput!], table: EventLogTable!): [EventLogRecord!]
   exportRecords(input: CreateRecordExportInput!): RecordExport!
   logicFunctionLogs(input: LogicFunctionLogsInput!): LogicFunctionLogs!
   onAgentChatEvent(threadId: UUID!): AgentChatEvent!
@@ -5459,7 +5331,6 @@ input UpdateWorkspaceInput {
   defaultRoleId: UUID
   displayName: String
   editableProfileFields: [String!]
-  eventLogRetentionDays: Float
   inviteHash: String
   isAutoModelSelectionEnabled: Boolean
   isCampaignClickTrackingEnabled: Boolean
@@ -6209,7 +6080,6 @@ type Workspace {
   deletedAt: DateTime
   displayName: String
   editableProfileFields: [String!]
-  eventLogRetentionDays: Float!
   featureFlags: [FeatureFlag!]
   hasValidEnterpriseValidityToken: Boolean!
   hasValidSignedEnterpriseKey: Boolean!

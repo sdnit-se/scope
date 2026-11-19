@@ -84,7 +84,6 @@ export type {
   EnqueueSnackbarParams,
 } from './EnqueueSnackbarParams';
 export type { EnumFieldMetadataType } from './EnumFieldMetadataType';
-export { EventLogTable } from './EventLogTable';
 export type { ExcludeFunctions } from './ExcludeFunctions';
 export type { ExtractPropertiesThatEndsWithId } from './ExtractPropertiesThatEndsWithId';
 export type { ExtractPropertiesThatEndsWithIds } from './ExtractPropertiesThatEndsWithIds';
