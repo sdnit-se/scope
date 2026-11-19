@@ -1,10 +1,10 @@
 import { isDefined } from 'twenty-shared/utils';
 
-import { type RecordPermissionsDto } from '~/generated-metadata/graphql';
+import { type AgentChatThreadPermissions } from '@/ai/types/AgentChatThreadPermissions';
 
 type GetAiChatThreadAccessParams = {
   isOnNewAiChatSlot: boolean;
-  permissions: RecordPermissionsDto | undefined;
+  permissions: AgentChatThreadPermissions | undefined;
 };
 
 export const getAiChatThreadAccess = ({

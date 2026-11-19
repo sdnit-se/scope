@@ -1,11 +1,9 @@
 import { currentUserWorkspaceState } from '@/auth/states/currentUserWorkspaceState';
 import { useAddAgentChatThreadParticipants } from '@/ai/hooks/useAddAgentChatThreadParticipants';
 import { useFetchAgentChatThreadsPage } from '@/ai/hooks/useFetchAgentChatThreadsPage';
-import { useRefreshAgentChatThreadPermissions } from '@/ai/hooks/useRefreshAgentChatThreadPermissions';
 import { agentChatThreadListState } from '@/ai/states/agentChatThreadListState';
 import { agentChatThreadRecordUpdateCountState } from '@/ai/states/agentChatThreadRecordUpdateCountState';
 import { agentChatUsageFamilyState } from '@/ai/states/agentChatUsageFamilyState';
-import { currentAiChatThreadState } from '@/ai/states/currentAiChatThreadState';
 import { getAgentChatUsageFromThread } from '@/ai/utils/getAgentChatUsageFromThread';
 import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
 import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
@@ -13,13 +11,11 @@ import { useApplyAgentChatThreadUpdate } from '@/ai/hooks/useApplyAgentChatThrea
 import { useUpsertRecordsInStore } from '@/object-record/record-store/hooks/useUpsertRecordsInStore';
 import { useStore } from 'jotai';
 import { useCallback } from 'react';
-import { isDefined, isValidUuid } from 'twenty-shared/utils';
+import { isDefined } from 'twenty-shared/utils';
 
 export const useRefreshAgentChatThreads = () => {
   const store = useStore();
   const { upsertRecordsInStore } = useUpsertRecordsInStore();
-  const { refreshAgentChatThreadPermissions } =
-    useRefreshAgentChatThreadPermissions();
   const { addAgentChatThread } = useApplyAgentChatThreadUpdate();
   const { fetchAgentChatThreadsPage } = useFetchAgentChatThreadsPage();
   const { addAgentChatThreadParticipants } =
@@ -65,18 +61,6 @@ export const useRefreshAgentChatThreads = () => {
           continue;
         }
 
-        const selectedThreadId = store.get(currentAiChatThreadState.atom);
-        await refreshAgentChatThreadPermissions([
-          ...page.threads.map(({ id }) => id),
-          ...(isDefined(selectedThreadId) && isValidUuid(selectedThreadId)
-            ? [selectedThreadId]
-            : []),
-        ]);
-
-        if (!isSameSession() || hasChangedSinceRequest()) {
-          continue;
-        }
-
         upsertRecordsInStore({ partialRecords: page.threads });
         addAgentChatThreadParticipants(page.participants);
 
@@ -103,7 +87,6 @@ export const useRefreshAgentChatThreads = () => {
     [
       addAgentChatThreadParticipants,
       fetchAgentChatThreadsPage,
-      refreshAgentChatThreadPermissions,
       store,
       upsertRecordsInStore,
     ],
@@ -141,8 +124,6 @@ export const useRefreshAgentChatThreads = () => {
           return null;
         }
 
-        await refreshAgentChatThreadPermissions([thread.id]);
-
         if (
           store.get(agentChatThreadRecordUpdateCountState.atom) !==
           updateCountBeforeRequest
@@ -171,7 +152,6 @@ export const useRefreshAgentChatThreads = () => {
       addAgentChatThread,
       addAgentChatThreadParticipants,
       fetchAgentChatThreadsPage,
-      refreshAgentChatThreadPermissions,
       store,
     ],
   );

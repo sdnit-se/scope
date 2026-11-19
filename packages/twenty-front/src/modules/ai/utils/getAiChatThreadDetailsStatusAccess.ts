@@ -3,7 +3,7 @@ import { isDefined } from 'twenty-shared/utils';
 import { type AgentChatThreadRecord } from '@/ai/types/AgentChatThreadRecord';
 import { type AiChatThreadStatusScope } from '@/ai/types/AiChatThreadStatusScope';
 import { type AiChatThreadTriageStatus } from '@/ai/types/AiChatThreadTriageStatus';
-import { type RecordPermissionsDto } from '~/generated-metadata/graphql';
+import { type AgentChatThreadPermissions } from '@/ai/types/AgentChatThreadPermissions';
 
 export const getAiChatThreadDetailsStatusAccess = ({
   thread,
@@ -13,7 +13,9 @@ export const getAiChatThreadDetailsStatusAccess = ({
   isInChannel,
 }: {
   thread: Pick<AgentChatThreadRecord, 'deletedAt'> | null;
-  permissions: Pick<RecordPermissionsDto, 'canRead' | 'canUpdate'> | undefined;
+  permissions:
+    | Pick<AgentChatThreadPermissions, 'canRead' | 'canUpdate'>
+    | undefined;
   triageStatus: AiChatThreadTriageStatus | undefined;
   scope: AiChatThreadStatusScope | undefined;
   isInChannel: boolean;

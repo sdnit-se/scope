@@ -8,9 +8,8 @@ import { IconDotsVertical, IconPencil, IconUnlink } from 'twenty-ui/icon';
 
 import { AiChatThreadRowTriage } from '@/ai/components/AiChatThreadRowTriage';
 import { AiChatThreadCommandMenuItems } from '@/ai/components/AiChatThreadCommandMenuItems';
-import { useRefreshAgentChatThreadPermissions } from '@/ai/hooks/useRefreshAgentChatThreadPermissions';
 import { useTargetAiChatThreadsInContextStore } from '@/ai/hooks/useTargetAiChatThreadsInContextStore';
-import { agentChatThreadPermissionsFamilySelector } from '@/ai/states/selectors/agentChatThreadPermissionsFamilySelector';
+import { agentChatThreadPermissionsSelector } from '@/ai/states/selectors/agentChatThreadPermissionsSelector';
 import { CommandMenuContextProvider } from '@/command-menu-item/contexts/CommandMenuContextProvider';
 import { CommandMenuItemContainerType } from '@/command-menu-item/types/CommandMenuItemContainerType';
 import { getCommandMenuDropdownIdFromCommandMenuId } from '@/command-menu-item/utils/getCommandMenuDropdownIdFromCommandMenuId';
@@ -20,6 +19,7 @@ import { objectMetadataItemFamilySelector } from '@/object-metadata/states/objec
 import { useUpsertRecordsInStore } from '@/object-record/record-store/hooks/useUpsertRecordsInStore';
 import { DropdownContent } from '@/ui/layout/dropdown/components/DropdownContent';
 import { DropdownRoot } from '@/ui/layout/dropdown/components/DropdownRoot';
+import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useAtomFamilySelectorValue } from '@/ui/utilities/state/jotai/hooks/useAtomFamilySelectorValue';
 
 type AiChatThreadActionsDropdownProps = {
@@ -48,8 +48,6 @@ export const AiChatThreadActionsDropdown = ({
   const { upsertRecordsInStore } = useUpsertRecordsInStore();
   const { targetAiChatThreadsInContextStore } =
     useTargetAiChatThreadsInContextStore();
-  const { refreshAgentChatThreadPermissions } =
-    useRefreshAgentChatThreadPermissions();
   const chatObjectMetadataItem = useAtomFamilySelectorValue(
     objectMetadataItemFamilySelector,
     {
@@ -57,15 +55,16 @@ export const AiChatThreadActionsDropdown = ({
       objectNameType: 'singular',
     },
   );
-  const permissions = useAtomFamilySelectorValue(
-    agentChatThreadPermissionsFamilySelector,
-    thread.id,
+  const agentChatThreadPermissions = useAtomStateValue(
+    agentChatThreadPermissionsSelector,
   );
   if (!isDefined(chatObjectMetadataItem)) {
     return null;
   }
 
-  const canUpdate = isDefined(permissions) && permissions.canUpdate;
+  const canUpdate =
+    isDefined(agentChatThreadPermissions) &&
+    agentChatThreadPermissions.canUpdate;
   const isDeleted = isDefined(thread.deletedAt);
 
   const handleRename = (event: MouseEvent) => {
@@ -107,7 +106,6 @@ export const AiChatThreadActionsDropdown = ({
                     },
                   ],
                 });
-                void refreshAgentChatThreadPermissions([thread.id]);
               }
             }}
           >

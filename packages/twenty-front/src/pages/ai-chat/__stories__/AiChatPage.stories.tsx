@@ -16,12 +16,10 @@ import { agentChatDraftsByThreadIdState } from '@/ai/states/agentChatDraftsByThr
 import { currentAiChatThreadState } from '@/ai/states/currentAiChatThreadState';
 import { newAiChatThreadIdState } from '@/ai/states/newAiChatThreadIdState';
 import { initializeNewAiChatStory } from '@/ai/testing/initializeNewAiChatStory';
-import { currentUserWorkspaceState } from '@/auth/states/currentUserWorkspaceState';
 import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
 import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
 import { metadataStoreState } from '@/metadata-store/states/metadataStoreState';
 import { flatObjectMetadataItemsSelector } from '@/object-metadata/states/flatObjectMetadataItemsSelector';
-import { recordPermissionsFamilyState } from '@/object-record/record-sharing/states/recordPermissionsFamilyState';
 import { jotaiStore } from '@/ui/utilities/state/jotai/jotaiStore';
 import { AiChatPage } from '~/pages/ai-chat/AiChatPage';
 import { MemoryRouterAppNavigatorProvider } from '~/testing/components/MemoryRouterAppNavigatorProvider';
@@ -129,25 +127,6 @@ const allowSelectedConversationUpdates = () => {
       ...metadataStore,
       current: [...metadataStore.current, chatObjectMetadataItem],
     }),
-  );
-
-  jotaiStore.set(
-    recordPermissionsFamilyState.atomFamily({
-      objectMetadataId: CHAT_OBJECT_METADATA_ID,
-      recordId: threadId,
-      workspaceId: workspace.id,
-      workspaceMemberId: workspaceMember.id,
-    }),
-    {
-      requestId: 'new-chat-story',
-      permissions: {
-        canRead: true,
-        canUpdate: true,
-        canDelete: true,
-        canSoftDelete: true,
-      },
-      userWorkspace: jotaiStore.get(currentUserWorkspaceState.atom),
-    },
   );
 };
 

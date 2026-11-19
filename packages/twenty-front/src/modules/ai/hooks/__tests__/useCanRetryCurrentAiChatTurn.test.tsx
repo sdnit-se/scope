@@ -35,7 +35,7 @@ describe('Shared chat execution controls', () => {
   ])(
     'uses normal update permission (%s) and the saved sender (%s) for retries',
     (canUpdate, senderWorkspaceMemberId, expected) => {
-      setAgentChatThreadPermissions(jotaiStore, 'thread', {
+      setAgentChatThreadPermissions(jotaiStore, {
         canRead: true,
         canUpdate,
         canDelete: false,

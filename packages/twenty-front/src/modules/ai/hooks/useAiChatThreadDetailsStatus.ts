@@ -2,7 +2,7 @@ import { AI_CHAT_THREAD_INBOX_ACTION_BY_TRIAGE_STATUS } from '@/ai/constants/AiC
 import { useAiChatThreadTriage } from '@/ai/hooks/useAiChatThreadTriage';
 import { useExecuteAgentChatThreadInboxAction } from '@/ai/hooks/useExecuteAgentChatThreadInboxAction';
 import { agentChatChannelsState } from '@/ai/states/agentChatChannelsState';
-import { agentChatThreadPermissionsFamilySelector } from '@/ai/states/selectors/agentChatThreadPermissionsFamilySelector';
+import { agentChatThreadPermissionsSelector } from '@/ai/states/selectors/agentChatThreadPermissionsSelector';
 import { agentChatThreadRecordFamilySelector } from '@/ai/states/selectors/agentChatThreadRecordFamilySelector';
 import { type AiChatThreadTriageStatus } from '@/ai/types/AiChatThreadTriageStatus';
 import { getAiChatThreadChannelIdOutsideInbox } from '@/ai/utils/getAiChatThreadChannelIdOutsideInbox';
@@ -17,9 +17,8 @@ export const useAiChatThreadDetailsStatus = (threadId: string) => {
     agentChatThreadRecordFamilySelector,
     threadId,
   );
-  const permissions = useAtomFamilySelectorValue(
-    agentChatThreadPermissionsFamilySelector,
-    threadId,
+  const agentChatThreadPermissions = useAtomStateValue(
+    agentChatThreadPermissionsSelector,
   );
   const agentChatChannels = useAtomStateValue(agentChatChannelsState);
   const {
@@ -39,7 +38,7 @@ export const useAiChatThreadDetailsStatus = (threadId: string) => {
   });
   const { status, canChangeStatus } = getAiChatThreadDetailsStatusAccess({
     thread,
-    permissions,
+    permissions: agentChatThreadPermissions,
     triageStatus,
     scope,
     isInChannel,

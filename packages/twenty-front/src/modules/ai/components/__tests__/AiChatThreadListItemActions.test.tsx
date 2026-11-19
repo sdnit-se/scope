@@ -154,7 +154,7 @@ const renderThread = async ({
             }
           : null,
       );
-      setAgentChatThreadPermissions(store, THREAD_ID, {
+      setAgentChatThreadPermissions(store, {
         canRead: true,
         canUpdate: true,
         canDelete: true,

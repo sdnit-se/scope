@@ -306,24 +306,6 @@ const meta = {
             });
           },
         ),
-        graphql.query('GetRecordPermissions', () =>
-          HttpResponse.json<GraphQLResponseBody<GraphQLQuery>>({
-            data: {
-              recordPermissions: [
-                {
-                  objectMetadataId: CHAT_OBJECT_ID,
-                  recordId: FIRST_THREAD_ID,
-                  permissions: {
-                    canRead: true,
-                    canUpdate: true,
-                    canDelete: true,
-                    canSoftDelete: true,
-                  },
-                },
-              ],
-            },
-          }),
-        ),
       ],
     },
   },
