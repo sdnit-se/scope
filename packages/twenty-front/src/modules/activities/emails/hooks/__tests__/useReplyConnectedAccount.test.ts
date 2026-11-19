@@ -71,7 +71,7 @@ describe('useReplyConnectedAccount', () => {
     });
   });
 
-  it('returns a workspace-shared mailbox the caller does not own', () => {
+  it('returns no reply account for a shared inbox, which Twenty does not send from', () => {
     stubQueries(
       [{ id: 'channel-group', connectedAccountId: 'account-group' }],
       [
@@ -87,8 +87,8 @@ describe('useReplyConnectedAccount', () => {
       useReplyConnectedAccount('channel-group'),
     );
 
-    expect(result.current.connectedAccountId).toBe('account-group');
-    expect(result.current.connectedAccountHandle).toBe('support@example.com');
+    expect(result.current.connectedAccountId).toBeNull();
+    expect(result.current.connectedAccountProvider).toBeNull();
   });
 
   it('returns null when the thread channel is not accessible to the current user', () => {
