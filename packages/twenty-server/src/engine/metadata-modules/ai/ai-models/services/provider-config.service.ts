@@ -16,23 +16,10 @@ export class ProviderConfigService {
     private readonly defaultAiCatalogService: DefaultAiCatalogService,
   ) {}
 
-  getCatalogProviderNames(): Set<string> {
-    return new Set(
-      Object.keys(this.defaultAiCatalogService.getDefaultAiCatalog()),
-    );
-  }
-
-  getResolvedProviders({
-    includeCustomProviders = true,
-  }: { includeCustomProviders?: boolean } = {}): AiProvidersConfig {
+  getResolvedProviders(): AiProvidersConfig {
     const rawCatalog = this.defaultAiCatalogService.getDefaultAiCatalog();
     // never resolve {{VAR}} templates in custom providers, to prevent config variable exfiltration
     const catalog = this.resolveTemplates(rawCatalog);
-
-    // dropping custom entries, rather than filtering the merged map, also restores catalog providers a same-named custom entry shadowed
-    if (!includeCustomProviders) {
-      return catalog;
-    }
 
     return mergeCustomProvidersIntoCatalog({
       catalog,

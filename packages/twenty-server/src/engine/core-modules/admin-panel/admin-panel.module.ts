@@ -4,7 +4,6 @@ import { TerminusModule } from '@nestjs/terminus';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { CoreEntityCacheModule } from 'src/engine/core-entity-cache/core-entity-cache.module';
-import { AdminPanelAiProviderResolver } from 'src/engine/core-modules/admin-panel/admin-panel-ai-provider.resolver';
 import { AdminPanelApplicationRegistrationResolver } from 'src/engine/core-modules/admin-panel/admin-panel-application-registration.resolver';
 import { AdminPanelUsageLimitResolver } from 'src/engine/core-modules/admin-panel/admin-panel-usage-limit.resolver';
 import { AdminPanelWorkspaceDataExportResolver } from 'src/engine/core-modules/admin-panel/admin-panel-workspace-data-export.resolver';
@@ -17,7 +16,6 @@ import { DatabaseHealthIndicator } from 'src/engine/core-modules/admin-panel/ind
 import { RedisHealthIndicator } from 'src/engine/core-modules/admin-panel/indicators/redis.health';
 import { WorkerHealthIndicator } from 'src/engine/core-modules/admin-panel/indicators/worker.health';
 import { MaintenanceModeService } from 'src/engine/core-modules/admin-panel/maintenance-mode.service';
-import { AdminPanelAiProviderService } from 'src/engine/core-modules/admin-panel/services/admin-panel-ai-provider.service';
 import { AdminPanelUsageLimitService } from 'src/engine/core-modules/admin-panel/services/admin-panel-usage-limit.service';
 import { AdminPanelBillingService } from 'src/engine/core-modules/admin-panel/services/admin-panel-billing.service';
 import { AdminPanelChatService } from 'src/engine/core-modules/admin-panel/services/admin-panel-chat.service';
@@ -90,12 +88,10 @@ import { provideWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspac
   ],
   providers: [
     AdminPanelResolver,
-    AdminPanelAiProviderResolver,
     AdminPanelApplicationRegistrationResolver,
     AdminPanelUsageLimitResolver,
     AdminPanelWorkspaceDataExportResolver,
     AdminPanelUsageLimitService,
-    AdminPanelAiProviderService,
     AdminPanelUserLookupService,
     AdminPanelServerAdminService,
     AdminPanelStatisticsService,

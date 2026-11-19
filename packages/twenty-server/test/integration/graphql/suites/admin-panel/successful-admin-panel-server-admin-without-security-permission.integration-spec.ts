@@ -25,22 +25,6 @@ describe('Admin panel access for a server admin without the SECURITY permission'
     expect(response.body.data.getServerAdmins.length).toBeGreaterThan(0);
   });
 
-  it('should load AI providers', async () => {
-    const response = await makeAdminPanelApiRequest(
-      {
-        query: gql`
-          query GetAiProviders {
-            getAiProviders
-          }
-        `,
-      },
-      APPLE_PHIL_GUEST_ACCESS_TOKEN,
-    );
-
-    expect(response.body.errors).toBeUndefined();
-    expect(response.body.data.getAiProviders).toBeDefined();
-  });
-
   it('should load workspace usage limits', async () => {
     const response = await makeAdminPanelApiRequest(
       {
