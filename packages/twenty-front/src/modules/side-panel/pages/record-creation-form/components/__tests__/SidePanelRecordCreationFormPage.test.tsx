@@ -1,4 +1,3 @@
-import { CombinedGraphQLErrors } from '@apollo/client/errors';
 import { i18n } from '@lingui/core';
 import { I18nProvider } from '@lingui/react';
 import {
@@ -7,7 +6,6 @@ import {
   render,
   screen,
   waitFor,
-  within,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Provider as JotaiProvider } from 'jotai';
@@ -22,7 +20,6 @@ import {
   jotaiStore,
   resetJotaiStore,
 } from '@/ui/utilities/state/jotai/jotaiStore';
-import { type ValidationRule } from '@/validation-rules/types/ValidationRule';
 import {
   FieldMetadataType,
   PageLayoutTabLayoutMode,
@@ -71,40 +68,8 @@ const COMPANY_OBJECT = {
   ],
 };
 
-const NICKNAME_RULE: ValidationRule = {
-  id: 'nickname-rule',
-  objectMetadataId: OBJECT_METADATA_ID,
-  name: 'Nickname is required',
-  description: null,
-  icon: null,
-  errorFieldMetadataId: NICKNAME_FIELD.id,
-  expression: 'isNonEmptyString(nickname)',
-  message: 'A company needs a nickname',
-  isActive: true,
-};
-
 const settleRecordCreationDraft = jest.fn();
 
-const buildValidationRuleViolationError = (fieldMetadataId: string) =>
-  new CombinedGraphQLErrors({
-    data: null,
-    errors: [
-      {
-        message: 'A company needs a nickname',
-        extensions: {
-          subCode: 'VALIDATION_RULE_VIOLATION',
-          validationRuleViolations: [
-            {
-              ruleId: 'nickname-rule',
-              message: 'A company needs a nickname',
-              fieldMetadataId,
-            },
-          ],
-        },
-      },
-    ],
-  });
-let mockValidationRules: ValidationRule[] = [];
 const openRecordCreationFormSettingsInSidePanel = jest.fn();
 const mockHasPermissionFlag = jest.fn();
 const mockEnqueueToast = jest.fn();
@@ -138,10 +103,6 @@ jest.mock(
     useRecordCreationFormSettle: () => ({ settleRecordCreationDraft }),
   }),
 );
-
-jest.mock('@/validation-rules/hooks/useValidationRules', () => ({
-  useValidationRules: () => ({ validationRules: mockValidationRules }),
-}));
 
 jest.mock('@/settings/roles/hooks/useHasPermissionFlag', () => ({
   useHasPermissionFlag: () => mockHasPermissionFlag(),
@@ -187,17 +148,12 @@ jest.mock(
       RecordFormFieldInputs: ({
         fieldMetadataItems,
         draftRecord,
-        validationRuleViolationsByFieldMetadataId = {},
         onFieldValueChange,
         onFieldValueClear,
         formInstanceId,
       }: {
         fieldMetadataItems: { id: string; name: string; label: string }[];
         draftRecord: Record<string, unknown>;
-        validationRuleViolationsByFieldMetadataId?: Record<
-          string,
-          { ruleId: string; message: string }[]
-        >;
         onFieldValueChange: (gqlFieldName: string, value: string) => void;
         onFieldValueClear: (gqlFieldName: string) => void;
         formInstanceId: string;
@@ -249,17 +205,6 @@ jest.mock(
                   );
                 },
               }),
-              (
-                validationRuleViolationsByFieldMetadataId[
-                  fieldMetadataItem.id
-                ] ?? []
-              ).map((violation) =>
-                ReactForMock.createElement(
-                  'div',
-                  { key: violation.ruleId, role: 'alert' },
-                  violation.message,
-                ),
-              ),
             ),
           ),
         ),
@@ -347,7 +292,6 @@ describe('SidePanelRecordCreationFormPage', () => {
     jest.clearAllMocks();
     Element.prototype.scrollIntoView = scrollIntoView;
     resetJotaiStore();
-    mockValidationRules = [];
     settleRecordCreationDraft.mockResolvedValue({});
     mockLookUpPointOfContact.mockResolvedValue(undefined);
     mockHasPermissionFlag.mockReturnValue(true);
@@ -514,25 +458,6 @@ describe('SidePanelRecordCreationFormPage', () => {
     );
   });
 
-  it('lets Create run again after a validation error', async () => {
-    mockValidationRules = [NICKNAME_RULE];
-    const user = userEvent.setup();
-
-    renderPage();
-
-    await user.click(screen.getByTestId('record-creation-form-create-button'));
-
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'A company needs a nickname',
-    );
-    expect(settleRecordCreationDraft).not.toHaveBeenCalled();
-
-    await user.type(screen.getByLabelText('Nickname'), 'Big Apple');
-    await user.click(screen.getByTestId('record-creation-form-create-button'));
-
-    expect(settleRecordCreationDraft).toHaveBeenCalledTimes(1);
-  });
-
   it('lets Create run again after the server refuses the record', async () => {
     settleRecordCreationDraft.mockResolvedValueOnce({
       error: new Error('Network error'),
@@ -563,95 +488,7 @@ describe('SidePanelRecordCreationFormPage', () => {
     expect(screen.getByLabelText('Nickname')).toHaveValue('Big Apple');
   });
 
-  it('reveals a hidden field targeted by a validation error and shows the message under it', async () => {
-    const user = userEvent.setup();
-
-    mockValidationRules = [NICKNAME_RULE];
-
-    renderPage();
-
-    await user.click(screen.getByTestId('record-creation-form-create-button'));
-
-    const nicknameAlert = within(
-      screen.getByRole('group', { name: 'Nickname field' }),
-    ).getByRole('alert');
-
-    expect(nicknameAlert).toHaveTextContent('A company needs a nickname');
-    expect(screen.getByLabelText('Nickname')).toBeInTheDocument();
-    expect(settleRecordCreationDraft).not.toHaveBeenCalled();
-    await waitFor(() => expect(scrollIntoView).toHaveBeenCalledTimes(1));
-    expect(scrollIntoView.mock.contexts[0]).toBe(nicknameAlert);
-  });
-
-  it('keeps hidden fields collapsed and shows a validation error on the whole record below the fields', async () => {
-    const user = userEvent.setup();
-
-    mockValidationRules = [{ ...NICKNAME_RULE, errorFieldMetadataId: null }];
-
-    renderPage();
-
-    await user.click(screen.getByTestId('record-creation-form-create-button'));
-
-    expect(screen.getByRole('alert')).toHaveTextContent(
-      'A company needs a nickname',
-    );
-    expect(screen.getByRole('alert').closest('[role="group"]')).toBeNull();
-    expect(screen.queryByLabelText('Nickname')).not.toBeInTheDocument();
-  });
-
-  it('reveals a hidden field the server rejected through a validation rule and shows the message under it', async () => {
-    const user = userEvent.setup();
-
-    settleRecordCreationDraft.mockResolvedValue({
-      error: buildValidationRuleViolationError(NICKNAME_FIELD.id),
-    });
-
-    renderPage();
-
-    await user.click(screen.getByTestId('record-creation-form-create-button'));
-
-    expect(settleRecordCreationDraft).toHaveBeenCalledTimes(1);
-    expect(settleRecordCreationDraft).toHaveBeenCalledWith({
-      requestId: REQUEST_ID,
-      draftRecord: {},
-      shouldKeepOpen: false,
-    });
-    expect(screen.getByLabelText('Nickname')).toBeInTheDocument();
-
-    const nicknameAlert = within(
-      screen.getByRole('group', { name: 'Nickname field' }),
-    ).getByRole('alert');
-
-    expect(nicknameAlert).toHaveTextContent('A company needs a nickname');
-    expect(mockEnqueueToast).not.toHaveBeenCalled();
-    await waitFor(() => expect(scrollIntoView).toHaveBeenCalledTimes(1));
-    expect(scrollIntoView.mock.contexts[0]).toBe(nicknameAlert);
-  });
-
-  it('keeps a message from the server under its field while the user edits, until the next create', async () => {
-    const user = userEvent.setup();
-
-    settleRecordCreationDraft.mockResolvedValueOnce({
-      error: buildValidationRuleViolationError(NAME_FIELD.id),
-    });
-
-    renderPage();
-
-    await user.click(screen.getByTestId('record-creation-form-create-button'));
-    await user.type(screen.getByLabelText('Domain'), 'apple.com');
-
-    expect(
-      within(screen.getByRole('group', { name: 'Name field' })).getByRole(
-        'alert',
-      ),
-    ).toHaveTextContent('A company needs a nickname');
-
-    await user.click(screen.getByTestId('record-creation-form-create-button'));
-
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-  });
-
-  it('shows a server error that is not a validation rule violation as a toast', async () => {
+  it('shows a server error as a toast', async () => {
     const user = userEvent.setup();
 
     settleRecordCreationDraft.mockResolvedValue({
@@ -667,26 +504,6 @@ describe('SidePanelRecordCreationFormPage', () => {
       expect.objectContaining({ status: 'error', children: 'Network error' }),
     );
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-  });
-
-  it('keeps hidden fields collapsed when the server rejects a visible field', async () => {
-    const user = userEvent.setup();
-
-    settleRecordCreationDraft.mockResolvedValue({
-      error: buildValidationRuleViolationError(NAME_FIELD.id),
-    });
-
-    renderPage();
-
-    await user.click(screen.getByTestId('record-creation-form-create-button'));
-
-    expect(settleRecordCreationDraft).toHaveBeenCalledTimes(1);
-    expect(settleRecordCreationDraft).toHaveBeenCalledWith({
-      requestId: REQUEST_ID,
-      draftRecord: {},
-      shouldKeepOpen: false,
-    });
-    expect(screen.queryByLabelText('Nickname')).not.toBeInTheDocument();
   });
 
   it('opens the form configuration from the options menu for members allowed to edit layouts', async () => {

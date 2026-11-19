@@ -10,11 +10,7 @@ describe('useGetBrowsingContext', () => {
   });
 
   it('describes a settings page by its path', () => {
-    window.history.pushState(
-      {},
-      '',
-      '/settings/objects/opportunities/validation-rules/rule-1',
-    );
+    window.history.pushState({}, '', '/settings/objects/opportunities');
     const store = createStore();
 
     const { result } = renderHook(() => useGetBrowsingContext(), {
@@ -25,7 +21,7 @@ describe('useGetBrowsingContext', () => {
 
     expect(result.current.getBrowsingContext()).toEqual({
       type: 'settingsPage',
-      path: '/settings/objects/opportunities/validation-rules/rule-1',
+      path: '/settings/objects/opportunities',
     });
   });
 });

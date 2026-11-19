@@ -263,7 +263,7 @@ export interface AiSystemPromptSection {
     __typename: 'AiSystemPromptSection'
 }
 
-export type AllMetadataName = 'agent' | 'agentChatChannel' | 'agentChatChannelRole' | 'applicationVariable' | 'commandMenuItem' | 'connectionProvider' | 'fieldMetadata' | 'fieldPermission' | 'frontComponent' | 'index' | 'logicFunction' | 'mcpServer' | 'messagingProvider' | 'navigationMenuItem' | 'objectMetadata' | 'objectPermission' | 'pageLayout' | 'pageLayoutTab' | 'pageLayoutWidget' | 'permissionFlag' | 'role' | 'rolePermissionFlag' | 'roleTarget' | 'rowLevelPermissionPredicate' | 'rowLevelPermissionPredicateGroup' | 'searchFieldMetadata' | 'settingsMenuItem' | 'skill' | 'timelineActivityType' | 'validationRule' | 'view' | 'viewField' | 'viewFieldGroup' | 'viewFilter' | 'viewFilterGroup' | 'viewGroup' | 'viewSort' | 'webhook' | 'workflow' | 'workflowVersion'
+export type AllMetadataName = 'agent' | 'agentChatChannel' | 'agentChatChannelRole' | 'applicationVariable' | 'commandMenuItem' | 'connectionProvider' | 'fieldMetadata' | 'fieldPermission' | 'frontComponent' | 'index' | 'logicFunction' | 'mcpServer' | 'messagingProvider' | 'navigationMenuItem' | 'objectMetadata' | 'objectPermission' | 'pageLayout' | 'pageLayoutTab' | 'pageLayoutWidget' | 'permissionFlag' | 'role' | 'rolePermissionFlag' | 'roleTarget' | 'rowLevelPermissionPredicate' | 'rowLevelPermissionPredicateGroup' | 'searchFieldMetadata' | 'settingsMenuItem' | 'skill' | 'timelineActivityType' | 'view' | 'viewField' | 'viewFieldGroup' | 'viewFilter' | 'viewFilterGroup' | 'viewGroup' | 'viewSort' | 'webhook' | 'workflow' | 'workflowVersion'
 
 export interface Analytics {
     /** Boolean that confirms query was dispatched */
@@ -2065,7 +2065,6 @@ export interface Mutation {
     createSkill: Skill
     createSubscriptionPaymentIntent: BillingPaymentIntent
     createUsageLimit: UsageLimit
-    createValidationRule: ValidationRule
     createView: View
     createViewField: ViewField
     createViewFieldGroup: ViewFieldGroup
@@ -2100,7 +2099,6 @@ export interface Mutation {
     deleteUsageLimit: Scalars['Boolean']
     deleteUser: User
     deleteUserFromWorkspace: UserWorkspace
-    deleteValidationRule: ValidationRule
     deleteView: Scalars['Boolean']
     deleteViewField: ViewField
     deleteViewFieldGroup: ViewFieldGroup
@@ -2253,7 +2251,6 @@ export interface Mutation {
     updateUsageLimit: UsageLimit
     updateUserCreditsFallback: BillingCustomer
     updateUserEmail: Scalars['Boolean']
-    updateValidationRule: ValidationRule
     updateView: View
     updateViewField: ViewField
     updateViewFieldGroup: ViewFieldGroup
@@ -2844,7 +2841,6 @@ export interface Query {
     usageQuotaScopeConsumption?: UsageQuotaScopeConsumption
     usageQuotasWithConsumption: UsageQuotaWithConsumption[]
     validatePasswordResetToken: ValidatePasswordResetToken
-    validationRules: ValidationRule[]
     webhook?: Webhook
     webhooks: Webhook[]
     __typename: 'Query'
@@ -3503,19 +3499,6 @@ export interface ValidatePasswordResetToken {
     hasPassword: Scalars['Boolean']
     id: Scalars['UUID']
     __typename: 'ValidatePasswordResetToken'
-}
-
-export interface ValidationRule {
-    description?: Scalars['String']
-    errorFieldMetadataId?: Scalars['UUID']
-    expression: Scalars['String']
-    icon?: Scalars['String']
-    id: Scalars['UUID']
-    isActive: Scalars['Boolean']
-    message: Scalars['String']
-    name: Scalars['String']
-    objectMetadataId: Scalars['UUID']
-    __typename: 'ValidationRule'
 }
 
 export interface VerifyEmailAndGetLoginToken {
@@ -5235,8 +5218,6 @@ export interface CreateSkillInput {content: Scalars['String'],description?: (Sca
 
 export interface CreateUsageLimitInput {burstValue?: (Scalars['BigInt'] | null),limitKind: Scalars['String'],limitValue: Scalars['BigInt'],operationType: UsageOperationType,periodCount: Scalars['Int'],periodUnit: Scalars['String'],resourceType: UsageResourceType,spenderId?: (Scalars['String'] | null),spenderType: Scalars['String'],unit: UsageUnit}
 
-export interface CreateValidationRuleInput {description?: (Scalars['String'] | null),errorFieldMetadataId?: (Scalars['UUID'] | null),expression: Scalars['String'],icon?: (Scalars['String'] | null),isActive?: (Scalars['Boolean'] | null),message: Scalars['String'],name: Scalars['String'],objectMetadataId: Scalars['UUID']}
-
 export interface CreateViewFieldGroupInput {id?: (Scalars['UUID'] | null),isVisible?: (Scalars['Boolean'] | null),name: Scalars['String'],position?: (Scalars['Float'] | null),viewId: Scalars['UUID']}
 
 export interface CreateViewFieldInput {aggregateOperation?: (AggregateOperations | null),fieldMetadataId: Scalars['UUID'],id?: (Scalars['UUID'] | null),isVisible?: (Scalars['Boolean'] | null),position?: (Scalars['Float'] | null),size?: (Scalars['Float'] | null),viewFieldGroupId?: (Scalars['UUID'] | null),viewId: Scalars['UUID']}
@@ -6201,7 +6182,6 @@ export interface MutationGenqlSelection{
     createSkill?: (SkillGenqlSelection & { __args: {input: CreateSkillInput} })
     createSubscriptionPaymentIntent?: (BillingPaymentIntentGenqlSelection & { __args: {idempotencyKey: Scalars['String'], plan: BillingPlanKey, recurringInterval: SubscriptionInterval, requirePaymentMethod: Scalars['Boolean'], successUrlPath?: (Scalars['String'] | null)} })
     createUsageLimit?: (UsageLimitGenqlSelection & { __args: {input: CreateUsageLimitInput} })
-    createValidationRule?: (ValidationRuleGenqlSelection & { __args: {input: CreateValidationRuleInput} })
     createView?: (ViewGenqlSelection & { __args: {input: CreateViewInput} })
     createViewField?: (ViewFieldGenqlSelection & { __args: {input: CreateViewFieldInput} })
     createViewFieldGroup?: (ViewFieldGroupGenqlSelection & { __args: {input: CreateViewFieldGroupInput} })
@@ -6236,7 +6216,6 @@ export interface MutationGenqlSelection{
     deleteUsageLimit?: { __args: {usageLimitId: Scalars['UUID']} }
     deleteUser?: UserGenqlSelection
     deleteUserFromWorkspace?: (UserWorkspaceGenqlSelection & { __args: {workspaceMemberIdToDelete: Scalars['String']} })
-    deleteValidationRule?: (ValidationRuleGenqlSelection & { __args: {id: Scalars['UUID']} })
     deleteView?: { __args: {id: Scalars['String']} }
     deleteViewField?: (ViewFieldGenqlSelection & { __args: {input: DeleteViewFieldInput} })
     deleteViewFieldGroup?: (ViewFieldGroupGenqlSelection & { __args: {input: DeleteViewFieldGroupInput} })
@@ -6389,7 +6368,6 @@ export interface MutationGenqlSelection{
     updateUsageLimit?: (UsageLimitGenqlSelection & { __args: {input: UpdateUsageLimitInput} })
     updateUserCreditsFallback?: (BillingCustomerGenqlSelection & { __args: {userCreditsFallback: UserCreditsFallback} })
     updateUserEmail?: { __args: {newEmail: Scalars['String'], verifyEmailRedirectPath?: (Scalars['String'] | null)} }
-    updateValidationRule?: (ValidationRuleGenqlSelection & { __args: {input: UpdateValidationRuleInput} })
     updateView?: (ViewGenqlSelection & { __args: {id: Scalars['String'], input: UpdateViewInput} })
     updateViewField?: (ViewFieldGenqlSelection & { __args: {input: UpdateViewFieldInput} })
     updateViewFieldGroup?: (ViewFieldGroupGenqlSelection & { __args: {input: UpdateViewFieldGroupInput} })
@@ -7024,7 +7002,6 @@ export interface QueryGenqlSelection{
     usageQuotaScopeConsumption?: (UsageQuotaScopeConsumptionGenqlSelection & { __args: {input: UsageQuotaScopeInput} })
     usageQuotasWithConsumption?: UsageQuotaWithConsumptionGenqlSelection
     validatePasswordResetToken?: (ValidatePasswordResetTokenGenqlSelection & { __args: {passwordResetToken: Scalars['String']} })
-    validationRules?: (ValidationRuleGenqlSelection & { __args: {objectMetadataId: Scalars['UUID']} })
     webhook?: (WebhookGenqlSelection & { __args: {id: Scalars['UUID']} })
     webhooks?: WebhookGenqlSelection
     __typename?: boolean | number
@@ -7663,10 +7640,6 @@ export interface UpdateTimelineActivityTypeInput {icon?: (Scalars['String'] | nu
 
 export interface UpdateUsageLimitInput {id: Scalars['UUID'],payload: CreateUsageLimitInput}
 
-export interface UpdateValidationRuleInput {id: Scalars['UUID'],update: UpdateValidationRuleInputUpdates}
-
-export interface UpdateValidationRuleInputUpdates {description?: (Scalars['String'] | null),errorFieldMetadataId?: (Scalars['UUID'] | null),expression?: (Scalars['String'] | null),icon?: (Scalars['String'] | null),isActive?: (Scalars['Boolean'] | null),message?: (Scalars['String'] | null),name?: (Scalars['String'] | null)}
-
 export interface UpdateViewFieldGroupInput {
 /** The id of the view field group to update */
 id: Scalars['UUID'],
@@ -7997,20 +7970,6 @@ export interface ValidatePasswordResetTokenGenqlSelection{
     email?: boolean | number
     hasPassword?: boolean | number
     id?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface ValidationRuleGenqlSelection{
-    description?: boolean | number
-    errorFieldMetadataId?: boolean | number
-    expression?: boolean | number
-    icon?: boolean | number
-    id?: boolean | number
-    isActive?: boolean | number
-    message?: boolean | number
-    name?: boolean | number
-    objectMetadataId?: boolean | number
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -10713,14 +10672,6 @@ export interface WorkspaceUrlsAndIdGenqlSelection{
     
 
 
-    const ValidationRule_possibleTypes: string[] = ['ValidationRule']
-    export const isValidationRule = (obj?: { __typename?: any } | null): obj is ValidationRule => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isValidationRule"')
-      return ValidationRule_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
     const VerifyEmailAndGetLoginToken_possibleTypes: string[] = ['VerifyEmailAndGetLoginToken']
     export const isVerifyEmailAndGetLoginToken = (obj?: { __typename?: any } | null): obj is VerifyEmailAndGetLoginToken => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isVerifyEmailAndGetLoginToken"')
@@ -11026,7 +10977,6 @@ export const enumAllMetadataName = {
    settingsMenuItem: 'settingsMenuItem' as const,
    skill: 'skill' as const,
    timelineActivityType: 'timelineActivityType' as const,
-   validationRule: 'validationRule' as const,
    view: 'view' as const,
    viewField: 'viewField' as const,
    viewFieldGroup: 'viewFieldGroup' as const,

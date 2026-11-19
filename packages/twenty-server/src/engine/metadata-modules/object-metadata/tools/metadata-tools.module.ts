@@ -17,17 +17,11 @@ import { GetObjectMetadataTool } from 'src/engine/metadata-modules/object-metada
 import { MetadataToolIdentifierService } from 'src/engine/metadata-modules/object-metadata/tools/services/metadata-tool-identifier.service';
 import { UpdateManyObjectMetadataTool } from 'src/engine/metadata-modules/object-metadata/tools/update-many-object-metadata.tool';
 import { UpdateObjectMetadataTool } from 'src/engine/metadata-modules/object-metadata/tools/update-object-metadata.tool';
-import { CreateValidationRuleTool } from 'src/engine/metadata-modules/validation-rule/tools/create-validation-rule.tool';
-import { GetValidationRulesTool } from 'src/engine/metadata-modules/validation-rule/tools/get-validation-rules.tool';
-import { UpdateValidationRuleTool } from 'src/engine/metadata-modules/validation-rule/tools/update-validation-rule.tool';
-import { ValidateValidationRuleExpressionTool } from 'src/engine/metadata-modules/validation-rule/tools/validate-validation-rule-expression.tool';
-import { ValidationRuleModule } from 'src/engine/metadata-modules/validation-rule/validation-rule.module';
 
 @Module({
   imports: [
     ObjectMetadataModule,
     FieldMetadataModule,
-    ValidationRuleModule,
     WorkspaceManyOrAllFlatEntityMapsCacheModule,
   ],
   providers: [
@@ -45,10 +39,6 @@ import { ValidationRuleModule } from 'src/engine/metadata-modules/validation-rul
     CreateManyFieldMetadataTool,
     UpdateManyFieldMetadataTool,
     CreateManyRelationFieldsTool,
-    GetValidationRulesTool,
-    ValidateValidationRuleExpressionTool,
-    CreateValidationRuleTool,
-    UpdateValidationRuleTool,
   ],
 })
 export class MetadataToolsModule {}

@@ -14,7 +14,6 @@ exports[`sortMetadataNamesChildrenFirst should return metadata names sorted with
   "pageLayoutWidget",
   "rolePermissionFlag",
   "roleTarget",
-  "validationRule",
   "viewSort",
   "index",
   "mcpServer",

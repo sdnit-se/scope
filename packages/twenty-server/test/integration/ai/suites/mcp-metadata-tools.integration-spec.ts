@@ -3,15 +3,13 @@ import { getMcpToolCatalog } from 'test/integration/graphql/suites/application-r
 import { deleteOneObjectMetadata } from 'test/integration/metadata/suites/object-metadata/utils/delete-one-object-metadata.util';
 import { findManyObjectMetadata } from 'test/integration/metadata/suites/object-metadata/utils/find-many-object-metadata.util';
 import { updateOneObjectMetadata } from 'test/integration/metadata/suites/object-metadata/utils/update-one-object-metadata.util';
-import { updateFeatureFlag } from 'test/integration/metadata/suites/utils/update-feature-flag.util';
 import { waitForDeferredWorkspaceMigrationActionsOrThrow } from 'test/integration/utils/wait-for-deferred-workspace-migration-actions-or-throw.util';
 import { jestExpectToBeDefined } from 'test/utils/jest-expect-to-be-defined.util.test';
 import { ToolCategory } from 'twenty-shared/ai';
-import { FeatureFlagKey } from 'twenty-shared/types';
 
 import { type ToolOutput } from 'src/engine/core-modules/tool/types/tool-output.type';
 
-const OBJECT_AND_FIELD_TOOL_NAMES = [
+const METADATA_TOOL_NAMES = [
   'get_object_metadata',
   'create_object_metadata',
   'update_object_metadata',
@@ -25,18 +23,6 @@ const OBJECT_AND_FIELD_TOOL_NAMES = [
   'create_many_field_metadata',
   'update_many_field_metadata',
   'create_many_relation_fields',
-];
-
-const VALIDATION_RULE_TOOL_NAMES = [
-  'get_validation_rules',
-  'validate_validation_rule_expression',
-  'create_validation_rule',
-  'update_validation_rule',
-];
-
-const METADATA_TOOL_NAMES = [
-  ...OBJECT_AND_FIELD_TOOL_NAMES,
-  ...VALIDATION_RULE_TOOL_NAMES,
 ];
 
 const OBJECT_NAME_PREFIX = 'mcpMetadataTools';
@@ -53,7 +39,6 @@ type ObjectSummary = {
   namePlural: string;
   fields?: FieldSummary[];
 };
-type ValidationRuleSummary = { id: string; name: string };
 
 const callMetadataTool = async ({
   toolName,
@@ -436,65 +421,6 @@ describe('MCP metadata tools (integration)', () => {
 
     expect(
       await runMetadataTool({
-        toolName: 'get_validation_rules',
-        toolArguments: { objectName: PET_NAME_SINGULAR },
-      }),
-    ).toEqual([]);
-
-    expect(
-      await runMetadataTool({
-        toolName: 'validate_validation_rule_expression',
-        toolArguments: {
-          objectName: PET_NAME_SINGULAR,
-          expression: 'age >= 0',
-        },
-      }),
-    ).toBeUndefined();
-
-    const validationRule = await runMetadataTool<ValidationRuleSummary>({
-      toolName: 'create_validation_rule',
-      toolArguments: {
-        objectName: PET_NAME_PLURAL,
-        name: 'Non-negative age',
-        expression: 'age >= 0',
-        message: 'Age cannot be negative',
-        errorFieldMetadataId: ageField.id,
-      },
-    });
-
-    jestExpectToBeDefined(validationRule);
-    expect(validationRule).toMatchObject({
-      name: 'Non-negative age',
-      expression: 'age >= 0',
-      message: 'Age cannot be negative',
-      errorFieldMetadataId: ageField.id,
-      objectMetadataId: petId,
-    });
-
-    expect(
-      await runMetadataTool({
-        toolName: 'update_validation_rule',
-        toolArguments: {
-          id: validationRule.id,
-          message: 'An age cannot be negative',
-          isActive: false,
-        },
-      }),
-    ).toMatchObject({
-      id: validationRule.id,
-      message: 'An age cannot be negative',
-      isActive: false,
-    });
-
-    expect(
-      await runMetadataTool<ValidationRuleSummary[]>({
-        toolName: 'get_validation_rules',
-        toolArguments: { objectName: PET_NAME_SINGULAR },
-      }),
-    ).toEqual([expect.objectContaining({ id: validationRule.id })]);
-
-    expect(
-      await runMetadataTool({
         toolName: 'delete_field_metadata',
         toolArguments: { id: nicknameField.id },
       }),
@@ -525,19 +451,6 @@ describe('MCP metadata tools (integration)', () => {
       toolName: 'get_field_metadata',
       toolArguments: { objectName: 'unknownObject' },
     },
-    {
-      toolName: 'get_validation_rules',
-      toolArguments: { objectName: 'unknownObject' },
-    },
-    {
-      toolName: 'create_validation_rule',
-      toolArguments: {
-        objectName: 'unknownObject',
-        name: 'Rule',
-        expression: 'true',
-        message: 'Message',
-      },
-    },
   ])(
     'should refuse $toolName on an unknown object name',
     async ({ toolName, toolArguments }) => {
@@ -551,21 +464,6 @@ describe('MCP metadata tools (integration)', () => {
       );
     },
   );
-
-  it('should refuse an expression on an unknown field', async () => {
-    expect(
-      await runFailingMetadataTool({
-        toolName: 'validate_validation_rule_expression',
-        toolArguments: {
-          objectName: 'company',
-          expression: 'unknownField > 1',
-        },
-      }),
-    ).toMatchObject({
-      success: false,
-      message: 'Failed to execute validate_validation_rule_expression',
-    });
-  });
 
   // The seeded member and guest roles cannot update settings, so they lack DATA_MODEL
   describe.each([
@@ -587,50 +485,5 @@ describe('MCP metadata tools (integration)', () => {
         message: `Tool "${toolName}" not found`,
       });
     });
-  });
-
-  describe('with IS_RECORD_CREATION_FORM_ENABLED off', () => {
-    beforeAll(async () => {
-      await updateFeatureFlag({
-        featureFlag: FeatureFlagKey.IS_RECORD_CREATION_FORM_ENABLED,
-        value: false,
-        expectToFail: false,
-      });
-    });
-
-    // The flag is seeded on
-    afterAll(async () => {
-      await updateFeatureFlag({
-        featureFlag: FeatureFlagKey.IS_RECORD_CREATION_FORM_ENABLED,
-        value: true,
-        expectToFail: false,
-      });
-    });
-
-    it('should list the object and field tools only', async () => {
-      const catalog = await getMcpToolCatalog({ token: API_KEY_ACCESS_TOKEN });
-
-      expect(catalog[ToolCategory.METADATA].map(({ name }) => name)).toEqual(
-        OBJECT_AND_FIELD_TOOL_NAMES,
-      );
-    });
-
-    it('should still run an object tool', async () => {
-      expect(await findObjectOrThrow('company')).toMatchObject({
-        nameSingular: 'company',
-      });
-    });
-
-    it.each(VALIDATION_RULE_TOOL_NAMES)(
-      'should refuse %s',
-      async (toolName) => {
-        expect(
-          await runFailingMetadataTool({ toolName, toolArguments: {} }),
-        ).toMatchObject({
-          success: false,
-          message: `Tool "${toolName}" not found`,
-        });
-      },
-    );
   });
 });

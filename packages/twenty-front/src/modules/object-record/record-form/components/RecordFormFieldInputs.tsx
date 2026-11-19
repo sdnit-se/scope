@@ -10,7 +10,6 @@ import { getRecordFormCurrencyFieldDefaultValue } from '@/object-record/record-f
 import { getRecordFormFieldPlaceholders } from '@/object-record/record-form/utils/getRecordFormFieldPlaceholders';
 import { getRecordFormFieldInputInstanceId } from '@/object-record/record-form/utils/getRecordFormFieldInputInstanceId';
 import { type ObjectRecord } from '@/object-record/types/ObjectRecord';
-import { type ValidationRuleViolation } from '@/validation-rules/types/ValidationRuleViolation';
 import { styled } from '@linaria/react';
 import { type JsonValue } from 'type-fest';
 import { Field } from 'twenty-ui/primitives/input';
@@ -26,10 +25,6 @@ type RecordFormFieldInputsProps = {
   objectMetadataItem: EnrichedObjectMetadataItem;
   fieldMetadataItems: FieldMetadataItem[];
   draftRecord: Partial<ObjectRecord>;
-  validationRuleViolationsByFieldMetadataId?: Record<
-    string,
-    ValidationRuleViolation[]
-  >;
   onFieldValueChange: (gqlFieldName: string, value: JsonValue) => void;
   onFieldValueClear: (gqlFieldName: string) => void;
   formInstanceId: string;
@@ -39,7 +34,6 @@ export const RecordFormFieldInputs = ({
   objectMetadataItem,
   fieldMetadataItems,
   draftRecord,
-  validationRuleViolationsByFieldMetadataId = {},
   onFieldValueChange,
   onFieldValueClear,
   formInstanceId,
@@ -90,15 +84,6 @@ export const RecordFormFieldInputs = ({
                   placeholder={placeholder}
                   subFieldPlaceholders={subFieldPlaceholders}
                 />
-                {(
-                  validationRuleViolationsByFieldMetadataId[
-                    fieldMetadataItem.id
-                  ] ?? []
-                ).map((violation) => (
-                  <Field.Error key={violation.ruleId} match role="alert">
-                    {violation.message}
-                  </Field.Error>
-                ))}
               </Field.Root>
             </RecordFieldComponentInstanceContext.Provider>
           );

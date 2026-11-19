@@ -30,8 +30,6 @@ import { type FlatMessagingProviderMaps } from 'src/engine/metadata-modules/flat
 import { type FlatMessagingProvider } from 'src/engine/metadata-modules/flat-messaging-provider/types/flat-messaging-provider.type';
 import { type FlatTimelineActivityTypeMaps } from 'src/engine/metadata-modules/flat-timeline-activity-type/types/flat-timeline-activity-type-maps.type';
 import { type FlatTimelineActivityType } from 'src/engine/metadata-modules/flat-timeline-activity-type/types/flat-timeline-activity-type.type';
-import { type FlatValidationRuleMaps } from 'src/engine/metadata-modules/flat-validation-rule/types/flat-validation-rule-maps.type';
-import { type FlatValidationRule } from 'src/engine/metadata-modules/flat-validation-rule/types/flat-validation-rule.type';
 import { type FlatCommandMenuItem } from 'src/engine/metadata-modules/flat-command-menu-item/types/flat-command-menu-item.type';
 import { type MetadataEntity } from 'src/engine/metadata-modules/flat-entity/types/metadata-entity.type';
 import { type FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
@@ -98,7 +96,6 @@ import { type UniversalFlatCommandMenuItem } from 'src/engine/workspace-manager/
 import { type UniversalFlatConnectionProvider } from 'src/engine/workspace-manager/workspace-migration/universal-flat-entity/types/universal-flat-connection-provider.type';
 import { type UniversalFlatMessagingProvider } from 'src/engine/workspace-manager/workspace-migration/universal-flat-entity/types/universal-flat-messaging-provider.type';
 import { type UniversalFlatTimelineActivityType } from 'src/engine/workspace-manager/workspace-migration/universal-flat-entity/types/universal-flat-timeline-activity-type.type';
-import { type UniversalFlatValidationRule } from 'src/engine/workspace-manager/workspace-migration/universal-flat-entity/types/universal-flat-validation-rule.type';
 import { type UniversalFlatEntityFrom } from 'src/engine/workspace-manager/workspace-migration/universal-flat-entity/types/universal-flat-entity-from.type';
 import { type UniversalFlatFieldPermission } from 'src/engine/workspace-manager/workspace-migration/universal-flat-entity/types/universal-flat-field-permission.type';
 import { type UniversalFlatFrontComponent } from 'src/engine/workspace-manager/workspace-migration/universal-flat-entity/types/universal-flat-front-component.type';
@@ -168,14 +165,6 @@ import {
   type UniversalDeleteTimelineActivityTypeAction,
   type UniversalUpdateTimelineActivityTypeAction,
 } from 'src/engine/workspace-manager/workspace-migration/workspace-migration-builder/builders/timeline-activity-type/types/workspace-migration-timeline-activity-type-action.type';
-import {
-  type FlatCreateValidationRuleAction,
-  type FlatDeleteValidationRuleAction,
-  type FlatUpdateValidationRuleAction,
-  type UniversalCreateValidationRuleAction,
-  type UniversalDeleteValidationRuleAction,
-  type UniversalUpdateValidationRuleAction,
-} from 'src/engine/workspace-manager/workspace-migration/workspace-migration-builder/builders/validation-rule/types/workspace-migration-validation-rule-action.type';
 import {
   type FlatCreateFieldPermissionAction,
   type FlatDeleteFieldPermissionAction,
@@ -1037,22 +1026,6 @@ export type AllFlatEntityTypesByMetadataName = {
     flatEntity: FlatSettingsMenuItem;
     universalFlatEntity: UniversalFlatSettingsMenuItem;
     entity: MetadataEntity<'settingsMenuItem'>;
-  };
-  validationRule: {
-    flatEntityMaps: FlatValidationRuleMaps;
-    universalActions: {
-      create: UniversalCreateValidationRuleAction;
-      update: UniversalUpdateValidationRuleAction;
-      delete: UniversalDeleteValidationRuleAction;
-    };
-    flatActions: {
-      create: FlatCreateValidationRuleAction;
-      update: FlatUpdateValidationRuleAction;
-      delete: FlatDeleteValidationRuleAction;
-    };
-    flatEntity: FlatValidationRule;
-    universalFlatEntity: UniversalFlatValidationRule;
-    entity: MetadataEntity<'validationRule'>;
   };
   workflow: {
     flatEntityMaps: FlatWorkflowMaps;
