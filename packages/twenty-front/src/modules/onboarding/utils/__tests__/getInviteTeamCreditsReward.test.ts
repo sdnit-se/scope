@@ -5,7 +5,6 @@ const onboardingConfig: OnboardingConfig = {
   importContactsCreditsReward: 1,
   inviteTeamCreditsRewardPerUser: 0.5,
   createProfileCreditsReward: 0.5,
-  upgradeCreditsReward: 2,
   inviteTeamMaxInvites: 3,
 };
 

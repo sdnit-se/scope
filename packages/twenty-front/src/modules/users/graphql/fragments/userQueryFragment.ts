@@ -4,8 +4,6 @@ import {
 } from '@/auth/graphql/fragments/authFragments';
 import { OBJECT_PERMISSION_FRAGMENT } from '@/settings/roles/graphql/fragments/objectPermissionFragment';
 import { ROLE_FRAGMENT } from '@/settings/roles/graphql/fragments/roleFragment';
-import { BILLING_SUBSCRIPTION_FRAGMENT } from '@/users/graphql/fragments/billingSubscriptionsFragment';
-import { CURRENT_BILLING_SUBSCRIPTION_FRAGMENT } from '@/users/graphql/fragments/currentBillingSubscriptionFragment';
 import { WORKSPACE_URLS_FRAGMENT } from '@/users/graphql/fragments/workspaceUrlsFragment';
 import { DELETED_WORKSPACE_MEMBER_QUERY_FRAGMENT } from '@/workspace-member/graphql/fragments/deletedWorkspaceMemberQueryFragment';
 import { PARTIAL_WORKSPACE_MEMBER_QUERY_FRAGMENT } from '@/workspace-member/graphql/fragments/partialWorkspaceMemberQueryFragment';
@@ -64,8 +62,6 @@ export const USER_QUERY_FRAGMENT = gql`
       isPasswordAuthBypassEnabled
       subdomain
       customDomain
-      hasValidSignedEnterpriseKey
-      hasValidEnterpriseValidityToken
       workspaceCustomApplication {
         id
       }
@@ -85,22 +81,6 @@ export const USER_QUERY_FRAGMENT = gql`
         key
         value
       }
-      currentBillingSubscription {
-        ...CurrentBillingSubscriptionFragment
-      }
-      billingCustomer {
-        id
-        hasPaymentMethod
-        userCreditsFallback
-      }
-      billingSubscriptions {
-        ...BillingSubscriptionFragment
-      }
-      billingEntitlements {
-        key
-        value
-      }
-      isTrialAvailable
       workspaceMembersCount
       defaultRole {
         ...RoleFragment
@@ -129,6 +109,4 @@ export const USER_QUERY_FRAGMENT = gql`
   ${ROLE_FRAGMENT}
   ${AVAILABLE_WORKSPACES_FOR_AUTH_FRAGMENT}
   ${AVAILABLE_WORKSPACE_FOR_AUTH_FRAGMENT}
-  ${CURRENT_BILLING_SUBSCRIPTION_FRAGMENT}
-  ${BILLING_SUBSCRIPTION_FRAGMENT}
 `;

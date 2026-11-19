@@ -3,7 +3,6 @@ import {
   type Meta,
   type StoryObj,
 } from '@storybook/react-vite';
-import { graphql, HttpResponse } from 'msw';
 import { MemoryRouter, Route, Routes, useNavigate } from 'react-router-dom';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { AppPath, CoreObjectNameSingular } from 'twenty-shared/types';
@@ -164,13 +163,6 @@ const meta = {
   beforeEach: initializeChatPageStory,
   parameters: {
     container: { width: 1000, height: 784 },
-    msw: {
-      handlers: [
-        graphql.query('GetAiChatUsage', () =>
-          HttpResponse.json({ data: { aiChatUsage: null } }),
-        ),
-      ],
-    },
   },
 } satisfies Meta<typeof AiChatPage>;
 

@@ -208,7 +208,6 @@ describe('useInviteTeam', () => {
       importContactsCreditsReward: 1,
       inviteTeamCreditsRewardPerUser: 0.5,
       createProfileCreditsReward: 0.5,
-      upgradeCreditsReward: 2,
       inviteTeamMaxInvites: 2,
     });
     jotaiStore.set(onboardingInviteTeamEmailsDraftState.atom, [

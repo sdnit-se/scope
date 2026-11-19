@@ -49,9 +49,6 @@ describe('title-utils', () => {
     expect(getPageTitleFromPath('/settings/app-preferences/google')).toBe(
       'Apps preferences - Settings',
     );
-    expect(getPageTitleFromPath('/settings/billing/plans')).toBe(
-      'Billing - Settings',
-    );
     expect(getPageTitleFromPath('/settings/members')).toBe(
       'Members - Settings',
     );

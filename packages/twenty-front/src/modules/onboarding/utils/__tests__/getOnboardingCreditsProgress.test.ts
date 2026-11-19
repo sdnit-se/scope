@@ -9,7 +9,6 @@ const onboardingConfig: OnboardingConfig = {
   importContactsCreditsReward: 2,
   inviteTeamCreditsRewardPerUser: 0.5,
   createProfileCreditsReward: 0.5,
-  upgradeCreditsReward: 0.5,
   inviteTeamMaxInvites: 4,
 };
 
@@ -72,8 +71,6 @@ describe('getOnboardingCreditsProgress', () => {
         onboardingConfig,
         onboardingStatus: OnboardingStatus.SYNC_EMAIL,
         isWorkspaceCreator: true,
-        isPlanRequired: true,
-        isTrialAvailable: true,
         profileName: null,
         inviteTeamValidEmailsCount: 0,
       }),
@@ -82,7 +79,6 @@ describe('getOnboardingCreditsProgress', () => {
         importContacts: 2,
         createProfile: 0.5,
         inviteTeam: 2,
-        upgradeTrial: 0.5,
       },
       earnedCredits: 0,
       earnedCreditsByStep: [],
@@ -91,7 +87,6 @@ describe('getOnboardingCreditsProgress', () => {
       currentStepCredits: 2,
       seenCredits: 0,
       newlyEarnedCredits: 0,
-      lostCredits: 0,
       isFirstCreditsGain: true,
       inviteTeamButtonReward: { creditsReward: 0.5, isRewardPerItem: true },
     });
@@ -103,19 +98,16 @@ describe('getOnboardingCreditsProgress', () => {
         importContacts: 2,
         createProfile: 0.5,
         inviteTeam: 1,
-        upgradeTrial: 0.5,
         seenCredits: 3,
       }),
       onboardingConfig,
       onboardingStatus: OnboardingStatus.COMPLETED,
       isWorkspaceCreator: true,
-      isPlanRequired: true,
-      isTrialAvailable: true,
       profileName: null,
       inviteTeamValidEmailsCount: 0,
     });
 
-    expect(progress.earnedCredits).toBe(4);
+    expect(progress.earnedCredits).toBe(3.5);
   });
 
   it('should announce the counted credits not seen yet', () => {
@@ -127,8 +119,6 @@ describe('getOnboardingCreditsProgress', () => {
       onboardingConfig,
       onboardingStatus: OnboardingStatus.PROFILE_CREATION,
       isWorkspaceCreator: true,
-      isPlanRequired: false,
-      isTrialAvailable: true,
       profileName: null,
       inviteTeamValidEmailsCount: 0,
     });
@@ -144,8 +134,6 @@ describe('getOnboardingCreditsProgress', () => {
       onboardingConfig,
       onboardingStatus: OnboardingStatus.PROFILE_CREATION,
       isWorkspaceCreator: true,
-      isPlanRequired: false,
-      isTrialAvailable: true,
       profileName: null,
       inviteTeamValidEmailsCount: 0,
     });
@@ -165,8 +153,6 @@ describe('getOnboardingCreditsProgress', () => {
         onboardingConfig,
         onboardingStatus: OnboardingStatus.SYNC_EMAIL,
         isWorkspaceCreator: true,
-        isPlanRequired: true,
-        isTrialAvailable: true,
         profileName: null,
         inviteTeamValidEmailsCount: 0,
       }),
@@ -175,7 +161,6 @@ describe('getOnboardingCreditsProgress', () => {
         importContacts: 2,
         createProfile: 0.5,
         inviteTeam: 2,
-        upgradeTrial: 0.5,
       },
       earnedCredits: 0,
       earnedCreditsByStep: [],
@@ -184,7 +169,6 @@ describe('getOnboardingCreditsProgress', () => {
       currentStepCredits: 2,
       seenCredits: 0,
       newlyEarnedCredits: 0,
-      lostCredits: 0,
       isFirstCreditsGain: true,
       inviteTeamButtonReward: { creditsReward: 0.5, isRewardPerItem: true },
     });
@@ -196,8 +180,6 @@ describe('getOnboardingCreditsProgress', () => {
       onboardingConfig,
       onboardingStatus: OnboardingStatus.PROFILE_CREATION,
       isWorkspaceCreator: true,
-      isPlanRequired: false,
-      isTrialAvailable: true,
       profileName: null,
       inviteTeamValidEmailsCount: 0,
     });
@@ -213,8 +195,6 @@ describe('getOnboardingCreditsProgress', () => {
       onboardingConfig,
       onboardingStatus: OnboardingStatus.INVITE_TEAM,
       isWorkspaceCreator: true,
-      isPlanRequired: false,
-      isTrialAvailable: true,
       profileName: null,
       inviteTeamValidEmailsCount: 0,
     });
@@ -235,137 +215,12 @@ describe('getOnboardingCreditsProgress', () => {
       onboardingConfig,
       onboardingStatus: OnboardingStatus.BOOK_CALL,
       isWorkspaceCreator: true,
-      isPlanRequired: true,
-      isTrialAvailable: true,
       profileName: null,
       inviteTeamValidEmailsCount: 0,
     });
 
     expect(progress.earnedCredits).toBe(3.5);
     expect(progress.goalCredits).toBe(3.5);
-  });
-
-  it('should point at the upgrade reward on the plan step', () => {
-    const progress = getOnboardingCreditsProgress({
-      onboardingFreeCredits: buildOnboardingFreeCredits({ importContacts: 2 }),
-      onboardingConfig,
-      onboardingStatus: OnboardingStatus.PLAN_REQUIRED,
-      isWorkspaceCreator: true,
-      isPlanRequired: true,
-      isTrialAvailable: true,
-      profileName: null,
-      inviteTeamValidEmailsCount: 0,
-    });
-
-    expect(progress.goalCredits).toBe(3);
-    expect(progress.currentStep).toBe('upgradeTrial');
-    expect(progress.currentStepCredits).toBe(0.5);
-  });
-
-  it('should leave out the upgrade reward when no trial is available', () => {
-    const progress = getOnboardingCreditsProgress({
-      onboardingFreeCredits: buildOnboardingFreeCredits({ importContacts: 2 }),
-      onboardingConfig,
-      onboardingStatus: OnboardingStatus.PLAN_REQUIRED,
-      isWorkspaceCreator: true,
-      isPlanRequired: true,
-      isTrialAvailable: false,
-      profileName: null,
-      inviteTeamValidEmailsCount: 0,
-    });
-
-    expect(progress.goalCredits).toBe(2.5);
-    expect(progress.currentStep).toBeNull();
-  });
-
-  it('should stop pointing at the upgrade once the trial is upgraded', () => {
-    const progress = getOnboardingCreditsProgress({
-      onboardingFreeCredits: buildOnboardingFreeCredits({
-        importContacts: 2,
-        upgradeTrial: 0.5,
-      }),
-      onboardingConfig,
-      onboardingStatus: OnboardingStatus.PLAN_REQUIRED,
-      isWorkspaceCreator: true,
-      isPlanRequired: true,
-      isTrialAvailable: true,
-      profileName: null,
-      inviteTeamValidEmailsCount: 0,
-    });
-
-    expect(progress.earnedCredits).toBe(2.5);
-    expect(progress.currentStep).toBeNull();
-  });
-
-  it('should announce the lost upgrade credits', () => {
-    const progress = getOnboardingCreditsProgress({
-      onboardingFreeCredits: buildOnboardingFreeCredits({
-        importContacts: 2,
-        seenCredits: 2,
-      }),
-      onboardingConfig,
-      onboardingStatus: OnboardingStatus.PLAN_REQUIRED,
-      isWorkspaceCreator: true,
-      isPlanRequired: true,
-      isTrialAvailable: true,
-      profileName: null,
-      inviteTeamValidEmailsCount: 0,
-      upgradeTrialLostCredits: 0.5,
-    });
-
-    expect(progress.lostCredits).toBe(0.5);
-  });
-
-  it('should hold the lost upgrade credits while earned credits are announced', () => {
-    const progress = getOnboardingCreditsProgress({
-      onboardingFreeCredits: buildOnboardingFreeCredits({ importContacts: 2 }),
-      onboardingConfig,
-      onboardingStatus: OnboardingStatus.PLAN_REQUIRED,
-      isWorkspaceCreator: true,
-      isPlanRequired: true,
-      isTrialAvailable: true,
-      profileName: null,
-      inviteTeamValidEmailsCount: 0,
-      upgradeTrialLostCredits: 0.5,
-    });
-
-    expect(progress.newlyEarnedCredits).toBe(2);
-    expect(progress.lostCredits).toBe(0);
-  });
-
-  it('should leave out the upgrade reward once the workspace has a plan', () => {
-    const progress = getOnboardingCreditsProgress({
-      onboardingFreeCredits: buildOnboardingFreeCredits(),
-      onboardingConfig,
-      onboardingStatus: OnboardingStatus.COMPLETED,
-      isWorkspaceCreator: true,
-      isPlanRequired: false,
-      isTrialAvailable: true,
-      profileName: null,
-      inviteTeamValidEmailsCount: 0,
-    });
-
-    expect(progress.goalCredits).toBe(2.5);
-  });
-
-  it('should keep the earned upgrade reward in the goal once the workspace has a plan', () => {
-    const progress = getOnboardingCreditsProgress({
-      onboardingFreeCredits: buildOnboardingFreeCredits({
-        importContacts: 2,
-        createProfile: 0.5,
-        upgradeTrial: 0.5,
-      }),
-      onboardingConfig,
-      onboardingStatus: OnboardingStatus.COMPLETED,
-      isWorkspaceCreator: true,
-      isPlanRequired: false,
-      isTrialAvailable: true,
-      profileName: null,
-      inviteTeamValidEmailsCount: 0,
-    });
-
-    expect(progress.earnedCredits).toBe(3);
-    expect(progress.goalCredits).toBe(3);
   });
 
   it('should recap what each step done earned out of its reward', () => {
@@ -376,10 +231,8 @@ describe('getOnboardingCreditsProgress', () => {
         inviteTeam: 0.5,
       }),
       onboardingConfig,
-      onboardingStatus: OnboardingStatus.PLAN_REQUIRED,
+      onboardingStatus: OnboardingStatus.COMPLETED,
       isWorkspaceCreator: true,
-      isPlanRequired: true,
-      isTrialAvailable: true,
       profileName: null,
       inviteTeamValidEmailsCount: 0,
     });
@@ -388,7 +241,6 @@ describe('getOnboardingCreditsProgress', () => {
       { step: 'importContacts', credits: 2, rewardCredits: 2 },
       { step: 'createProfile', credits: 0.5, rewardCredits: 0.5 },
       { step: 'inviteTeam', credits: 0.5, rewardCredits: 2 },
-      { step: 'upgradeTrial', credits: 0, rewardCredits: 0.5 },
     ]);
   });
 
@@ -398,8 +250,6 @@ describe('getOnboardingCreditsProgress', () => {
       onboardingConfig,
       onboardingStatus: OnboardingStatus.PROFILE_CREATION,
       isWorkspaceCreator: true,
-      isPlanRequired: false,
-      isTrialAvailable: true,
       profileName: null,
       inviteTeamValidEmailsCount: 0,
     });
@@ -415,8 +265,6 @@ describe('getOnboardingCreditsProgress', () => {
       onboardingConfig,
       onboardingStatus: OnboardingStatus.SYNC_EMAIL,
       isWorkspaceCreator: false,
-      isPlanRequired: false,
-      isTrialAvailable: true,
       profileName: null,
       inviteTeamValidEmailsCount: 0,
     });
@@ -434,8 +282,6 @@ describe('getOnboardingCreditsProgress', () => {
         onboardingConfig,
         onboardingStatus,
         isWorkspaceCreator,
-        isPlanRequired: false,
-        isTrialAvailable: true,
         profileName,
         inviteTeamValidEmailsCount: 0,
       });
@@ -450,8 +296,6 @@ describe('getOnboardingCreditsProgress', () => {
       onboardingConfig,
       onboardingStatus: OnboardingStatus.INVITE_TEAM,
       isWorkspaceCreator: true,
-      isPlanRequired: false,
-      isTrialAvailable: true,
       profileName: null,
       inviteTeamValidEmailsCount: 0,
     });
@@ -466,8 +310,6 @@ describe('getOnboardingCreditsProgress', () => {
         onboardingConfig,
         onboardingStatus: OnboardingStatus.INVITE_TEAM,
         isWorkspaceCreator: true,
-        isPlanRequired: false,
-        isTrialAvailable: true,
         profileName: null,
         inviteTeamValidEmailsCount,
       }).inviteTeamButtonReward;

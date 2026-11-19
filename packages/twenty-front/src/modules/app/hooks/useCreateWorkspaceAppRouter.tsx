@@ -65,18 +65,6 @@ const InviteTeam = lazyWithPreload(() =>
   })),
 );
 
-const ChooseYourPlan = lazyWithPreload(() =>
-  import('~/pages/onboarding/ChooseYourPlan').then((module) => ({
-    default: module.ChooseYourPlan,
-  })),
-);
-
-const PaymentSuccess = lazy(() =>
-  import('~/pages/onboarding/PaymentSuccess').then((module) => ({
-    default: module.PaymentSuccess,
-  })),
-);
-
 const BookCall = lazyWithPreload(() =>
   import('~/pages/onboarding/BookCall').then((module) => ({
     default: module.BookCall,
@@ -89,7 +77,6 @@ const preloadOnboardingPages = () => {
   SyncEmails.preload();
   InviteTeam.preload();
   BookCall.preload();
-  ChooseYourPlan.preload();
 
   return null;
 };
@@ -142,14 +129,6 @@ const createWorkspaceAppRouter = ({
                   element: (
                     <LazyRoute fallback={null}>
                       <PasswordReset />
-                    </LazyRoute>
-                  ),
-                },
-                {
-                  path: AppPath.PlanRequiredSuccess,
-                  element: (
-                    <LazyRoute fallback={<OnboardingPageLoader />}>
-                      <PaymentSuccess />
                     </LazyRoute>
                   ),
                 },
@@ -228,14 +207,6 @@ const createWorkspaceAppRouter = ({
                       element: (
                         <LazyRoute fallback={<OnboardingStepPageLoader />}>
                           <BookCall />
-                        </LazyRoute>
-                      ),
-                    },
-                    {
-                      path: AppPath.PlanRequired,
-                      element: (
-                        <LazyRoute fallback={<OnboardingStepPageLoader />}>
-                          <ChooseYourPlan />
                         </LazyRoute>
                       ),
                     },

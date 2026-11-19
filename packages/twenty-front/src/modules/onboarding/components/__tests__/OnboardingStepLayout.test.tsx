@@ -25,13 +25,6 @@ import {
   mockedUserData,
 } from '~/testing/mock-data/users';
 
-jest.mock(
-  '@/onboarding/effect-components/PrefetchPlanRequiredStepEffect',
-  () => ({
-    PrefetchPlanRequiredStepEffect: () => null,
-  }),
-);
-
 jest.mock('@/onboarding/components/OnboardingTransitionOutlet', () => ({
   OnboardingTransitionOutlet: () => null,
 }));
@@ -43,7 +36,6 @@ const onboardingConfig: OnboardingConfig = {
   importContactsCreditsReward: 2,
   inviteTeamCreditsRewardPerUser: 3,
   createProfileCreditsReward: 0.5,
-  upgradeCreditsReward: 5,
   inviteTeamMaxInvites: 3,
 };
 

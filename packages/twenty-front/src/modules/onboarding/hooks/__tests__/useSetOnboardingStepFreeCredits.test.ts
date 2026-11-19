@@ -44,7 +44,6 @@ describe('useSetOnboardingStepFreeCredits', () => {
       importContactsCreditsReward: 2,
       inviteTeamCreditsRewardPerUser: 0.5,
       createProfileCreditsReward: 0.5,
-      upgradeCreditsReward: 4,
       inviteTeamMaxInvites: 4,
     });
     jotaiStore.set(currentUserState.atom, {
@@ -92,7 +91,7 @@ describe('useSetOnboardingStepFreeCredits', () => {
     const result = renderSetStepFreeCreditsHook();
 
     act(() => {
-      result.current.setOnboardingStepFreeCredits('upgradeTrial', 4, {
+      result.current.setOnboardingStepFreeCredits('createProfile', 4, {
         isQuiet: true,
       });
     });
@@ -101,7 +100,7 @@ describe('useSetOnboardingStepFreeCredits', () => {
       ...ONBOARDING_FREE_CREDITS_DEFAULT_VALUE,
       importContacts: 2,
       inviteTeam: 1,
-      upgradeTrial: 4,
+      createProfile: 4,
       seenCredits: 6,
     });
   });
@@ -119,7 +118,7 @@ describe('useSetOnboardingStepFreeCredits', () => {
     const result = renderSetStepFreeCreditsHook();
 
     act(() => {
-      result.current.setOnboardingStepFreeCredits('upgradeTrial', 0.5, {
+      result.current.setOnboardingStepFreeCredits('createProfile', 0.5, {
         isQuiet: true,
       });
     });
@@ -127,12 +126,12 @@ describe('useSetOnboardingStepFreeCredits', () => {
     expect(result.current.onboardingFreeCredits).toEqual({
       ...ONBOARDING_FREE_CREDITS_DEFAULT_VALUE,
       importContacts: 2,
-      upgradeTrial: 0.5,
+      createProfile: 0.5,
       seenCredits: 0.5,
     });
 
     act(() => {
-      result.current.setOnboardingStepFreeCredits('upgradeTrial', 0, {
+      result.current.setOnboardingStepFreeCredits('createProfile', 0, {
         isQuiet: true,
       });
     });

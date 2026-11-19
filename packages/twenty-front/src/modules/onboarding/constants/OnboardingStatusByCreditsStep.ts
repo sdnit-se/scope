@@ -8,5 +8,4 @@ export const ONBOARDING_STATUS_BY_CREDITS_STEP: Record<
   importContacts: OnboardingStatus.SYNC_EMAIL,
   createProfile: OnboardingStatus.PROFILE_CREATION,
   inviteTeam: OnboardingStatus.INVITE_TEAM,
-  upgradeTrial: OnboardingStatus.PLAN_REQUIRED,
 };

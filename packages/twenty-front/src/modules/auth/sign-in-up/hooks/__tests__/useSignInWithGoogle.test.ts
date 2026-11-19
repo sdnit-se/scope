@@ -1,6 +1,5 @@
 import { useAuth } from '@/auth/hooks/useAuth';
 import { useSignInWithGoogle } from '@/auth/sign-in-up/hooks/useSignInWithGoogle';
-import { BILLING_CHECKOUT_SESSION_DEFAULT_VALUE } from '@/settings/billing/constants/BillingCheckoutSessionDefaultValue';
 import { renderHook } from '@testing-library/react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { getJestMetadataAndApolloMocksWrapper } from '~/testing/jest/getJestMetadataAndApolloMocksWrapper';
@@ -24,9 +23,7 @@ describe('useSignInWithGoogle', () => {
     const signInWithGoogleMock = jest.fn();
     const mockUseParams = { workspaceInviteHash: 'testHash' };
 
-    const mockSearchParams = new URLSearchParams(
-      'inviteToken=testToken&billingCheckoutSessionState={"plan":"Pro","interval":"Month","requirePaymentMethod":true}',
-    );
+    const mockSearchParams = new URLSearchParams('inviteToken=testToken');
 
     (useParams as jest.Mock).mockReturnValue(mockUseParams);
     (useSearchParams as jest.Mock).mockReturnValue([mockSearchParams]);
@@ -45,7 +42,6 @@ describe('useSignInWithGoogle', () => {
       action: 'join-workspace',
       workspaceInviteHash: 'testHash',
       workspacePersonalInviteToken: 'testToken',
-      billingCheckoutSession: BILLING_CHECKOUT_SESSION_DEFAULT_VALUE,
     });
   });
 
@@ -71,7 +67,6 @@ describe('useSignInWithGoogle', () => {
       action: 'join-workspace',
       workspaceInviteHash: 'testHash',
       workspacePersonalInviteToken: undefined,
-      billingCheckoutSession: BILLING_CHECKOUT_SESSION_DEFAULT_VALUE,
     });
   });
 });
