@@ -11,7 +11,6 @@ import {
   IconAt,
   IconCoins,
   type IconComponent,
-  IconCreditCard,
   IconInfoCircle,
   IconMail,
   IconSettingsAutomation,
@@ -69,7 +68,6 @@ export const OnboardingFreeCreditsPopoverContent = ({
     importContacts: { Icon: IconAt, label: t`Import contacts` },
     createProfile: { Icon: IconUserCircle, label: t`Create profile` },
     inviteTeam: { Icon: IconUserPlus, label: t`Invite your team` },
-    upgradeTrial: { Icon: IconCreditCard, label: t`Upgrade your trial` },
   };
 
   const {

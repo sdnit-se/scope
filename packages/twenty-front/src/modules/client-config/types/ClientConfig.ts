@@ -1,7 +1,6 @@
 import {
   type ApiConfig,
   type AuthProviders,
-  type Billing,
   type Captcha,
   type ClientAiEvaluationModelConfig,
   type ClientAiModelConfig,
@@ -11,7 +10,6 @@ import {
   type Sentry,
   type Support,
 } from '~/generated-metadata/graphql';
-import { type EnterpriseInstanceType } from 'twenty-shared/constants';
 import { type OnboardingConfig } from '@/client-config/types/OnboardingConfig';
 
 export type ClientConfig = {
@@ -22,7 +20,6 @@ export type ClientConfig = {
   analyticsEnabled: boolean;
   api: ApiConfig;
   authProviders: AuthProviders;
-  billing: Billing;
   calendarBookingPageId?: string;
   isBookCallOnboardingStepEnabled: boolean;
   isCompanyEnrichmentEnabled: boolean;
@@ -52,5 +49,4 @@ export type ClientConfig = {
   isTwoFactorAuthenticationEnabled: boolean;
   allowRequestsToTwentyIcons: boolean;
   maintenance?: ClientConfigMaintenanceMode;
-  enterpriseInstanceType?: EnterpriseInstanceType;
 };

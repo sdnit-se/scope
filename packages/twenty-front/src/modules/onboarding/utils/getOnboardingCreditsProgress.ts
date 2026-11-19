@@ -16,11 +16,8 @@ type GetOnboardingCreditsProgressArgs = {
   onboardingConfig: OnboardingConfig;
   onboardingStatus: OnboardingStatus | null | undefined;
   isWorkspaceCreator: boolean;
-  isPlanRequired: boolean;
-  isTrialAvailable: boolean;
   profileName: FullNameMetadata | null | undefined;
   inviteTeamValidEmailsCount: number;
-  upgradeTrialLostCredits?: number;
 };
 
 export const getOnboardingCreditsProgress = ({
@@ -28,11 +25,8 @@ export const getOnboardingCreditsProgress = ({
   onboardingConfig,
   onboardingStatus,
   isWorkspaceCreator,
-  isPlanRequired,
-  isTrialAvailable,
   profileName,
   inviteTeamValidEmailsCount,
-  upgradeTrialLostCredits = 0,
 }: GetOnboardingCreditsProgressArgs): OnboardingCreditsProgress => {
   const rewardCreditsByStep: Record<OnboardingCreditsStep, number> = {
     importContacts: isWorkspaceCreator
@@ -44,10 +38,6 @@ export const getOnboardingCreditsProgress = ({
     inviteTeam:
       onboardingConfig.inviteTeamCreditsRewardPerUser *
       onboardingConfig.inviteTeamMaxInvites,
-    upgradeTrial:
-      isPlanRequired && isTrialAvailable
-        ? onboardingConfig.upgradeCreditsReward
-        : 0,
   };
 
   const statusIndex = isDefined(onboardingStatus)
@@ -59,9 +49,7 @@ export const getOnboardingCreditsProgress = ({
       ONBOARDING_STATUS_BY_CREDITS_STEP[step],
     );
 
-    return step === 'upgradeTrial'
-      ? statusIndex >= stepStatusIndex
-      : statusIndex > stepStatusIndex;
+    return statusIndex > stepStatusIndex;
   };
 
   const onboardingStep = ONBOARDING_CREDITS_STEPS.find(
@@ -146,7 +134,6 @@ export const getOnboardingCreditsProgress = ({
     currentStepCredits,
     seenCredits,
     newlyEarnedCredits,
-    lostCredits: newlyEarnedCredits > 0 ? 0 : upgradeTrialLostCredits,
     isFirstCreditsGain: seenCredits === 0,
     inviteTeamButtonReward,
   };

@@ -1,11 +1,9 @@
 import { currentUserState } from '@/auth/states/currentUserState';
 import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
-import { billingState } from '@/client-config/states/billingState';
 import { canManageFeatureFlagsState } from '@/client-config/states/canManageFeatureFlagsState';
 import { labPublicFeatureFlagsState } from '@/client-config/states/labPublicFeatureFlagsState';
 import { AI_ADMIN_PATH } from '@/settings/admin-panel/ai/constants/AiAdminPath';
 import { useApolloAdminClient } from '@/settings/admin-panel/apollo/hooks/useApolloAdminClient';
-import { SettingsAdminWorkspaceBillingContent } from '@/settings/admin-panel/components/SettingsAdminWorkspaceBillingContent';
 import { SettingsAdminWorkspaceContent } from '@/settings/admin-panel/components/SettingsAdminWorkspaceContent';
 import { SETTINGS_ADMIN_FEATURE_FLAG_METADATA } from '@/settings/admin-panel/constants/SettingsAdminFeatureFlagMetadata';
 import { GET_ADMIN_WORKSPACE_CHAT_THREADS } from '@/settings/admin-panel/graphql/queries/getAdminWorkspaceChatThreads';
@@ -43,7 +41,6 @@ import { getSettingsPath, isDefined } from 'twenty-shared/utils';
 import { useToast } from 'twenty-ui/components/feedback';
 import { Section } from 'twenty-ui/components/layout';
 import {
-  IconCreditCard,
   IconEyeShare,
   IconFlag,
   IconMessage,
@@ -73,7 +70,6 @@ const WORKSPACE_DETAIL_TABS_ID = 'settings-admin-workspace-detail-tabs';
 
 const WORKSPACE_DETAIL_TAB_IDS = {
   INFO: 'info',
-  BILLING: 'billing',
   MEMBERS: 'members',
   FEATURE_FLAGS: 'feature-flags',
   CHATS: 'chats',
@@ -90,9 +86,7 @@ export const SettingsAdminWorkspaceDetail = () => {
 
   const currentUser = useAtomStateValue(currentUserState);
   const currentWorkspace = useAtomStateValue(currentWorkspaceState);
-  const billing = useAtomStateValue(billingState);
   const labPublicFeatureFlags = useAtomStateValue(labPublicFeatureFlagsState);
-  const isBillingEnabled = billing?.isBillingEnabled ?? false;
   const canManageFeatureFlags = useAtomStateValue(canManageFeatureFlagsState);
   const { enqueueToast } = useToast();
   const { updateFeatureFlagState } = useAdminUpdateFeatureFlag();
@@ -174,15 +168,6 @@ export const SettingsAdminWorkspaceDetail = () => {
       title: t`Info`,
       Icon: IconSettings2,
     },
-    ...(isBillingEnabled
-      ? [
-          {
-            id: WORKSPACE_DETAIL_TAB_IDS.BILLING,
-            title: t`Billing`,
-            Icon: IconCreditCard,
-          },
-        ]
-      : []),
     ...(currentUser?.canImpersonate
       ? [
           {
@@ -344,14 +329,6 @@ export const SettingsAdminWorkspaceDetail = () => {
                 )}
               />
             )}
-
-            {effectiveTabId === WORKSPACE_DETAIL_TAB_IDS.BILLING &&
-              isBillingEnabled &&
-              workspaceId && (
-                <SettingsAdminWorkspaceBillingContent
-                  workspaceId={workspaceId}
-                />
-              )}
 
             {effectiveTabId === WORKSPACE_DETAIL_TAB_IDS.MEMBERS &&
               workspace && (

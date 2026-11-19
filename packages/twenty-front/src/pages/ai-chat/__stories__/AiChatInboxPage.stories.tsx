@@ -316,9 +316,6 @@ const meta = {
     container: { width: 1200, height: 784 },
     msw: {
       handlers: [
-        graphql.query('GetAiChatUsage', () =>
-          HttpResponse.json({ data: { aiChatUsage: null } }),
-        ),
         graphql.query('MyConnectedAccounts', () =>
           HttpResponse.json({ data: { myConnectedAccounts: [] } }),
         ),

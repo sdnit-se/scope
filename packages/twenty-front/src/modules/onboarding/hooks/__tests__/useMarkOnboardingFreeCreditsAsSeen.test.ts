@@ -49,7 +49,6 @@ describe('useMarkOnboardingFreeCreditsAsSeen', () => {
       importContactsCreditsReward: 2,
       inviteTeamCreditsRewardPerUser: 0.5,
       createProfileCreditsReward: 0.5,
-      upgradeCreditsReward: 0.5,
       inviteTeamMaxInvites: 4,
     });
   });

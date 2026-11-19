@@ -27,20 +27,6 @@ export const mockedClientConfig: ClientConfig = {
     release: 'MOCKED_RELEASE',
     environment: 'MOCKED_ENVIRONMENT',
   },
-  billing: {
-    isBillingEnabled: true,
-    billingUrl: '',
-    trialPeriods: [
-      {
-        duration: 30,
-        isCreditCardRequired: true,
-      },
-      {
-        duration: 7,
-        isCreditCardRequired: false,
-      },
-    ],
-  },
   captcha: {
     provider: CaptchaDriverType.GOOGLE_RECAPTCHA,
     siteKey: 'MOCKED_SITE_KEY',
@@ -50,7 +36,6 @@ export const mockedClientConfig: ClientConfig = {
     importContactsCreditsReward: 2,
     inviteTeamCreditsRewardPerUser: 3,
     createProfileCreditsReward: 0.5,
-    upgradeCreditsReward: 2,
     inviteTeamMaxInvites: 10,
   },
   canManageFeatureFlags: true,

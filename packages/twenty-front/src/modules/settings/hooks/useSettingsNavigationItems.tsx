@@ -3,7 +3,6 @@ import { SettingsPath } from 'twenty-shared/types';
 import { useAuth } from '@/auth/hooks/useAuth';
 import { currentUserState } from '@/auth/states/currentUserState';
 import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
-import { billingState } from '@/client-config/states/billingState';
 import { supportChatState } from '@/client-config/states/supportChatState';
 import { permissionFlagMapSelector } from '@/settings/roles/states/permissionFlagMapSelector';
 import { getDocumentationUrl } from '@/support/utils/getDocumentationUrl';
@@ -21,7 +20,6 @@ import {
   IconCode,
   IconColorSwatch,
   type IconComponent,
-  IconCreditCard,
   IconDoorEnter,
   IconHelpCircle,
   IconHierarchy,
@@ -58,12 +56,10 @@ export type SettingsNavigationItem = {
 };
 
 const useSettingsNavigationItems = (): SettingsNavigationSection[] => {
-  const billing = useAtomStateValue(billingState);
   const { signOut } = useAuth();
   const supportChat = useAtomStateValue(supportChatState);
   const currentWorkspaceMember = useAtomStateValue(currentWorkspaceMemberState);
 
-  const isBillingEnabled = billing?.isBillingEnabled ?? false;
   const currentUser = useAtomStateValue(currentUserState);
   const isAdminEnabled =
     (currentUser?.canImpersonate || currentUser?.canAccessFullAdminPanel) ??
@@ -147,14 +143,6 @@ const useSettingsNavigationItems = (): SettingsNavigationSection[] => {
           path: SettingsPath.WorkspaceMembersPage,
           Icon: IconUsers,
           isHidden: !permissionFlagMap[PermissionFlagType.WORKSPACE_MEMBERS],
-        },
-        {
-          label: t`Billing`,
-          path: SettingsPath.Billing,
-          Icon: IconCreditCard,
-          isHidden:
-            !isBillingEnabled ||
-            !permissionFlagMap[PermissionFlagType.WORKSPACE],
         },
         {
           label: t`Developers`,

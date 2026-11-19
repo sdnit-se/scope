@@ -7,13 +7,11 @@ import { StyledOnboardingFreeCreditsLabel } from '@/onboarding/components/free-c
 import { StyledOnboardingFreeCreditsText } from '@/onboarding/components/free-credits/StyledOnboardingFreeCreditsText';
 import { useOnboardingFreeCreditsTooltipContent } from '@/onboarding/hooks/useOnboardingFreeCreditsTooltipContent';
 import { useMarkOnboardingFreeCreditsAsSeen } from '@/onboarding/hooks/useMarkOnboardingFreeCreditsAsSeen';
-import { onboardingUpgradeTrialLostCreditsState } from '@/onboarding/states/onboardingUpgradeTrialLostCreditsState';
 import { type OnboardingCreditsProgress } from '@/onboarding/types/OnboardingCreditsProgress';
 import { formatOnboardingCredits } from '@/onboarding/utils/formatOnboardingCredits';
 import { currentFocusedItemSelector } from '@/ui/utilities/focus/states/currentFocusedItemSelector';
 import { FocusComponentType } from '@/ui/utilities/focus/types/FocusComponentType';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
-import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
 import { styled } from '@linaria/react';
 import { plural } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
@@ -141,13 +139,9 @@ export const OnboardingFreeCreditsPill = ({
     currentStepCredits,
     seenCredits,
     newlyEarnedCredits,
-    lostCredits,
     isFirstCreditsGain,
   } = progress;
   const markCreditsAsSeen = useMarkOnboardingFreeCreditsAsSeen();
-  const setOnboardingUpgradeTrialLostCredits = useSetAtomState(
-    onboardingUpgradeTrialLostCreditsState,
-  );
   const tooltipContent = useOnboardingFreeCreditsTooltipContent({
     currentStep,
     newlyEarnedCredits,
@@ -181,17 +175,6 @@ export const OnboardingFreeCreditsPill = ({
             label={`+${formatOnboardingCredits(newlyEarnedCredits, numberFormat)}`}
             delay={creditsChangeDelay}
             onDisplayed={markCreditsAsSeen}
-          />
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {lostCredits > 0 && (
-          <OnboardingFreeCreditsChange
-            key={`lost-${lostCredits}`}
-            label={`−${formatOnboardingCredits(lostCredits, numberFormat)}`}
-            isLost
-            delay={creditsChangeDelay}
-            onDisplayed={() => setOnboardingUpgradeTrialLostCredits(0)}
           />
         )}
       </AnimatePresence>

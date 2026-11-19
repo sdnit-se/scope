@@ -1,7 +1,6 @@
 import { type Meta, type StoryObj } from '@storybook/react-vite';
 import { styled } from '@linaria/react';
 import { useStore } from 'jotai';
-import { graphql, HttpResponse } from 'msw';
 import { Suspense, useEffect, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { assertIsDefinedOrThrow } from 'twenty-shared/utils';
@@ -78,16 +77,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const newChatParameters = {
-  msw: {
-    handlers: [
-      graphql.query('GetAiChatUsage', () =>
-        HttpResponse.json({ data: { aiChatUsage: null } }),
-      ),
-    ],
-  },
-};
-
 const expectNewChatWelcome = async (canvasElement: HTMLElement) => {
   const canvas = within(canvasElement);
   const heading = await canvas.findByRole('heading', {
@@ -130,7 +119,6 @@ export const FullPageNewChat: Story = {
   decorators: [ObjectMetadataItemsDecorator],
   beforeEach: () => initializeNewAiChatStory({ isInboxEnabled: false }),
   parameters: {
-    ...newChatParameters,
     container: { width: 1000, height: 784 },
   },
   render: () => <NewChatStory />,
@@ -141,7 +129,6 @@ export const InboxNewChat: Story = {
   ...FullPageNewChat,
   beforeEach: () => initializeNewAiChatStory({ isInboxEnabled: true }),
   parameters: {
-    ...newChatParameters,
     container: { width: 660, height: 784 },
   },
 };

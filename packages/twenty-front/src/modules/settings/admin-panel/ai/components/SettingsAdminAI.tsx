@@ -1,68 +1,32 @@
-import { useState } from 'react';
 import { useToast } from 'twenty-ui/components/feedback';
 import { Section } from 'twenty-ui/components/layout';
 
 import { useMutation, useQuery } from '@apollo/client/react';
 import { t } from '@lingui/core/macro';
 import { AI_MODEL_TIERS, type AiModelTier } from 'twenty-shared/ai';
-import { SettingsPath } from 'twenty-shared/types';
-import { getSettingsPath, isDefined } from 'twenty-shared/utils';
+import { isDefined } from 'twenty-shared/utils';
 import { Card } from 'twenty-ui/primitives/surfaces';
-import { themeCssVariables } from 'twenty-ui/theme';
 
 import { getAiModelTierLabel } from '@/ai/utils/getAiModelTierLabel';
-import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
 import { useClientConfig } from '@/client-config/hooks/useClientConfig';
-import { billingState } from '@/client-config/states/billingState';
 import { SET_ADMIN_DEFAULT_AI_MODEL } from '@/settings/admin-panel/ai/graphql/mutations/setAdminDefaultAiModel';
 import { GET_ADMIN_AI_MODELS } from '@/settings/admin-panel/ai/graphql/queries/getAdminAiModels';
-import { GET_ADMIN_AI_USAGE_BY_WORKSPACE } from '@/settings/admin-panel/ai/graphql/queries/getAdminAiUsageByWorkspace';
 import { useApolloAdminClient } from '@/settings/admin-panel/apollo/hooks/useApolloAdminClient';
 import { AiModelPinSelect } from '@/ai/components/AiModelPinSelect';
-import { SettingsEnterpriseFeatureGateCard } from '@/settings/components/SettingsEnterpriseFeatureGateCard';
 import { SettingsOptionCardContentSelect } from '@/settings/components/SettingsOptions/SettingsOptionCardContentSelect';
 import { StyledSettingsSelectGroup } from '@/settings/components/SettingsOptions/StyledSettingsSelectGroup';
 import { SettingsSectionSkeletonLoader } from '@/settings/components/SettingsSectionSkeletonLoader';
-import { useUsageValueFormatter } from '@/settings/usage/hooks/useUsageValueFormatter';
-import { getPeriodDates } from '@/settings/usage/utils/getPeriodDates';
-import { getPeriodOptions } from '@/settings/usage/utils/getPeriodOptions';
-import { type PeriodPreset } from '@/settings/usage/utils/periodPreset';
-import { Select } from '@/ui/input/components/Select';
 import { GenericDropdownContentWidth } from '@/ui/layout/dropdown/constants/GenericDropdownContentWidth';
-import { Table } from '@/ui/layout/table/components/Table';
-import { TableCell } from '@/ui/layout/table/components/TableCell';
-import { TableHeader } from '@/ui/layout/table/components/TableHeader';
-import { TableRow } from '@/ui/layout/table/components/TableRow';
-import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import {
   type AdminAiModelConfig,
   type AdminAiModelTierDefault,
   AiModelTier as GraphqlAiModelTier,
 } from '~/generated-admin/graphql';
-import { OrganizationAdornment } from '@/settings/enterprise/components/OrganizationAdornment';
-
-const USAGE_TABLE_GRID_TEMPLATE_COLUMNS = '1fr 120px';
-
-type UsageBreakdownItem = {
-  key: string;
-  label?: string | null;
-  creditsUsed: number;
-};
 
 export const SettingsAdminAI = () => {
   const apolloAdminClient = useApolloAdminClient();
   const { enqueueToast } = useToast();
   const { refetch: refetchClientConfig } = useClientConfig();
-  const { formatUsageValue } = useUsageValueFormatter();
-  const currentWorkspace = useAtomStateValue(currentWorkspaceState);
-  const billing = useAtomStateValue(billingState);
-  const isBillingEnabled = billing?.isBillingEnabled ?? false;
-  const hasEnterpriseAccess =
-    isBillingEnabled ||
-    currentWorkspace?.hasValidEnterpriseValidityToken === true;
-  const [usagePeriod, setUsagePeriod] = useState<PeriodPreset>('30d');
-  const periodOptions = getPeriodOptions();
-  const usageDates = getPeriodDates(usagePeriod);
 
   const { data, loading: isLoadingModels } = useQuery<{
     getAdminAiModels: {
@@ -74,20 +38,6 @@ export const SettingsAdminAI = () => {
   const [setDefaultModel] = useMutation(SET_ADMIN_DEFAULT_AI_MODEL, {
     client: apolloAdminClient,
   });
-
-  const { data: usageData, previousData: previousUsageData } = useQuery<{
-    getAdminAiUsageByWorkspace: UsageBreakdownItem[];
-  }>(GET_ADMIN_AI_USAGE_BY_WORKSPACE, {
-    client: apolloAdminClient,
-    variables: {
-      periodStart: usageDates.periodStart,
-      periodEnd: usageDates.periodEnd,
-    },
-    skip: !hasEnterpriseAccess,
-  });
-
-  const effectiveUsageData = usageData ?? previousUsageData;
-  const usageByWorkspace = effectiveUsageData?.getAdminAiUsageByWorkspace ?? [];
 
   const models = data?.getAdminAiModels?.models ?? [];
 
@@ -163,70 +113,6 @@ export const SettingsAdminAI = () => {
           </Card.Root>
         </Section.Root>
       )}
-
-      <Section.Root>
-        <Section.Header
-          title={t`AI Usage by Workspace`}
-          description={t`AI consumption across all workspaces.`}
-          actions={
-            hasEnterpriseAccess ? (
-              <Select
-                dropdownId="admin-ai-usage-period"
-                value={usagePeriod}
-                options={periodOptions}
-                onChange={setUsagePeriod}
-                needIconCheck
-                selectSizeVariant="small"
-              />
-            ) : (
-              <OrganizationAdornment />
-            )
-          }
-        />
-        {hasEnterpriseAccess ? (
-          usageByWorkspace.length > 0 ? (
-            <Table>
-              <TableRow gridTemplateColumns={USAGE_TABLE_GRID_TEMPLATE_COLUMNS}>
-                <TableHeader>{t`Workspace`}</TableHeader>
-                <TableHeader align="right">{t`Usage`}</TableHeader>
-              </TableRow>
-              {usageByWorkspace.map((item) => (
-                <TableRow
-                  key={item.key}
-                  gridTemplateColumns={USAGE_TABLE_GRID_TEMPLATE_COLUMNS}
-                  to={getSettingsPath(SettingsPath.AdminPanelWorkspaceDetail, {
-                    workspaceId: item.key,
-                  })}
-                >
-                  <TableCell color={themeCssVariables.font.color.primary}>
-                    {item.label ?? item.key}
-                  </TableCell>
-                  <TableCell align="right">
-                    {formatUsageValue(item.creditsUsed)}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </Table>
-          ) : (
-            <Card.Root>
-              <TableRow gridTemplateColumns="1fr">
-                <TableCell
-                  color={themeCssVariables.font.color.tertiary}
-                  align="center"
-                >
-                  {t`No AI usage data recorded yet.`}
-                </TableCell>
-              </TableRow>
-            </Card.Root>
-          )
-        ) : (
-          <SettingsEnterpriseFeatureGateCard
-            title={t`Organization feature`}
-            description={t`AI usage analytics across workspaces is available with an Organization key.`}
-            buttonTitle={t`Activate`}
-          />
-        )}
-      </Section.Root>
     </>
   );
 };

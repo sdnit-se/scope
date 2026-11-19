@@ -54,10 +54,6 @@ export const useOnboardingFreeCreditsTooltipContent = ({
     onboardingConfig.inviteTeamCreditsRewardPerUser,
     numberFormat,
   );
-  const formattedUpgradeCreditsReward = formatOnboardingCredits(
-    onboardingConfig.upgradeCreditsReward,
-    numberFormat,
-  );
   const formattedNewlyEarnedCredits = formatOnboardingCredits(
     newlyEarnedCredits,
     numberFormat,
@@ -84,13 +80,6 @@ export const useOnboardingFreeCreditsTooltipContent = ({
         other: `Earn ${formattedInviteTeamCreditsRewardPerUser} free credits per teammate who joins`,
       }),
       description: t`Credits are added when they accept your invite.`,
-    },
-    upgradeTrial: {
-      title: plural(onboardingConfig.upgradeCreditsReward, {
-        one: `Upgrade your trial to earn ${formattedUpgradeCreditsReward} free credit`,
-        other: `Upgrade your trial to earn ${formattedUpgradeCreditsReward} free credits`,
-      }),
-      description: t`Credits are added when your trial starts.`,
     },
   };
 

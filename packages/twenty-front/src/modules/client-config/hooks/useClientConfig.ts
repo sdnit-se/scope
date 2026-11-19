@@ -5,7 +5,6 @@ import { apiConfigState } from '@/client-config/states/apiConfigState';
 import { onboardingConfigState } from '@/client-config/states/onboardingConfigState';
 import { appVersionState } from '@/client-config/states/appVersionState';
 import { authProvidersState } from '@/client-config/states/authProvidersState';
-import { billingState } from '@/client-config/states/billingState';
 import { calendarBookingPageIdState } from '@/client-config/states/calendarBookingPageIdState';
 import { canManageFeatureFlagsState } from '@/client-config/states/canManageFeatureFlagsState';
 import { captchaState } from '@/client-config/states/captchaState';
@@ -17,7 +16,6 @@ import { isConfigVariablesInDbEnabledState } from '@/client-config/states/isConf
 import { isDeveloperDefaultSignInPrefilledState } from '@/client-config/states/isDeveloperDefaultSignInPrefilledState';
 import { isClickHouseConfiguredState } from '@/client-config/states/isClickHouseConfiguredState';
 import { isDDLLockedState } from '@/client-config/states/isDDLLockedState';
-import { enterpriseInstanceTypeState } from '@/client-config/states/enterpriseInstanceTypeState';
 import { isEmailVerificationRequiredState } from '@/client-config/states/isEmailVerificationRequiredState';
 import { isGoogleCalendarEnabledState } from '@/client-config/states/isGoogleCalendarEnabledState';
 import { isGoogleMessagingEnabledState } from '@/client-config/states/isGoogleMessagingEnabledState';
@@ -39,7 +37,6 @@ import { getInitialClientConfig } from '@/client-config/utils/getInitialClientCo
 import { allowRequestsToTwentyIconsState } from '@/client-config/states/allowRequestsToTwentyIcons';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
 import { useAtomState } from '@/ui/utilities/state/jotai/hooks/useAtomState';
-import { ENTERPRISE_INSTANCE_TYPE } from 'twenty-shared/constants';
 import { t } from '@lingui/core/macro';
 
 type UseClientConfigResult = {
@@ -68,7 +65,6 @@ export const useClientConfig = (): UseClientConfigResult => {
     isEmailVerificationRequiredState,
   );
 
-  const setBilling = useSetAtomState(billingState);
   const setSupportChat = useSetAtomState(supportChatState);
 
   const setSentryConfig = useSetAtomState(sentryConfigState);
@@ -139,10 +135,6 @@ export const useClientConfig = (): UseClientConfigResult => {
 
   const setMaintenanceMode = useSetAtomState(maintenanceModeState);
 
-  const setEnterpriseInstanceType = useSetAtomState(
-    enterpriseInstanceTypeState,
-  );
-
   const setAppVersion = useSetAtomState(appVersionState);
 
   const loadClientConfig = useCallback(
@@ -183,7 +175,6 @@ export const useClientConfig = (): UseClientConfigResult => {
         setIsEmailVerificationRequired(
           clientConfig.isEmailVerificationRequired,
         );
-        setBilling(clientConfig.billing);
         setSupportChat(clientConfig.support);
 
         setSentryConfig({
@@ -240,10 +231,6 @@ export const useClientConfig = (): UseClientConfigResult => {
           clientConfig?.isOnboardingAiChatEnabled ?? false,
         );
         setMaintenanceMode(clientConfig?.maintenance ?? null);
-        setEnterpriseInstanceType(
-          clientConfig?.enterpriseInstanceType ??
-            ENTERPRISE_INSTANCE_TYPE.PRODUCTION,
-        );
       } catch (err) {
         const error =
           err instanceof Error
@@ -266,7 +253,6 @@ export const useClientConfig = (): UseClientConfigResult => {
       setOnboardingConfig,
       setAppVersion,
       setAuthProviders,
-      setBilling,
       setCalendarBookingPageId,
       setCanManageFeatureFlags,
       setCaptcha,
@@ -288,7 +274,6 @@ export const useClientConfig = (): UseClientConfigResult => {
       setIsOnboardingAiChatEnabled,
       setLabPublicFeatureFlags,
       setMaintenanceMode,
-      setEnterpriseInstanceType,
       setIsMicrosoftCalendarEnabled,
       setIsMicrosoftMessagingEnabled,
       setSentryConfig,
