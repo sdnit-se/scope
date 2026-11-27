@@ -6,7 +6,7 @@ import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/Enriche
 import { AggregateOperations } from '@/object-record/record-table/constants/AggregateOperations';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
 import { jotaiStore } from '@/ui/utilities/state/jotai/jotaiStore';
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { Provider as JotaiProvider } from 'jotai';
 import { createElement, useEffect, type ReactNode } from 'react';
 import { DEFAULT_VIEW_GROUP_LOAD_LIMIT } from 'twenty-shared/constants';
@@ -397,6 +397,33 @@ describe('useDefaultHomePagePath', () => {
       withExistingView: false,
       objectMetadataItems: [],
       navigationMenuItems: [],
+    });
+
+    await waitFor(() => {
+      expect(result.current.defaultHomePagePath).toEqual('/shebang/welcome');
+    });
+  });
+  it('should wait for metadata on a fresh mobile sign-in before choosing the welcome page', async () => {
+    mockIsMobile = true;
+
+    const { result } = renderHooks({
+      withCurrentUser: true,
+      withExistingView: false,
+      withObjectMetadataLoaded: false,
+      withNavigationMenuItemsLoaded: false,
+    });
+
+    await waitFor(() => {
+      expect(result.current.defaultHomePagePath).toEqual(AppPath.Index);
+    });
+
+    act(() => {
+      setTestObjectMetadataItemsInMetadataStore(jotaiStore, []);
+      jotaiStore.set(metadataStoreState.atomFamily('navigationMenuItems'), {
+        current: [],
+        draft: [],
+        status: 'up-to-date',
+      });
     });
 
     await waitFor(() => {

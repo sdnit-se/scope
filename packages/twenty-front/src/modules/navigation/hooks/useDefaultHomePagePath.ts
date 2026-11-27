@@ -102,20 +102,17 @@ export const useDefaultHomePagePath = () => {
     const areMetadataStoresLoaded =
       areObjectMetadataItemsLoaded && areNavigationMenuItemsLoaded;
 
-    if (
-      areMetadataStoresLoaded &&
-      isEmpty(readableNonSystemObjectMetadataItems)
-    ) {
+    // Both stores are empty right after login; deciding now would pick a wrong fallback.
+    if (!areMetadataStoresLoaded) {
+      return AppPath.Index;
+    }
+
+    if (isEmpty(readableNonSystemObjectMetadataItems)) {
       return `${HOSTED_PAGE_ROUTE_PREFIX}welcome`;
     }
 
     if (isMobile) {
       return AppPath.Home;
-    }
-
-    // Both stores are empty right after login; deciding now would pick a wrong fallback.
-    if (!areMetadataStoresLoaded) {
-      return AppPath.Index;
     }
 
     if (isDefined(firstNavigationMenuItemLink)) {
