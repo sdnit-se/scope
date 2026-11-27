@@ -119,7 +119,7 @@ export const SettingsAdminUserDetail = () => {
       ? [
           {
             Icon: IconLock,
-            label: t`Server access`,
+            label: t`Server tools`,
             value: (
               <SettingsAdminServerAdminAccess
                 userId={userId}

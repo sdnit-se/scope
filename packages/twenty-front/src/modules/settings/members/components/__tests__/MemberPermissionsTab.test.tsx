@@ -122,4 +122,38 @@ describe('MemberPermissionsTab', () => {
       getPermissionCheckbox('Destroy Records on All Objects'),
     ).not.toBeChecked();
   });
+
+  it('should point a member without a role to Åtkomst', () => {
+    render(
+      <JotaiProvider store={createStore()}>
+        <MockedProvider>
+          <ThemeProvider colorScheme="light">
+            <I18nProvider i18n={i18n}>
+              <MemoryRouter>
+                <MemberPermissionsTab
+                  member={MEMBER}
+                  roles={[]}
+                  allRoles={[PERSISTED_ROLE]}
+                />
+              </MemoryRouter>
+            </I18nProvider>
+          </ThemeProvider>
+        </MockedProvider>
+      </JotaiProvider>,
+    );
+
+    expect(
+      screen.getByText('No role assigned to this member'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'To give someone access to the CRM, choose their role in Åtkomst.',
+        { exact: false },
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Open Åtkomst' })).toHaveAttribute(
+      'href',
+      '/shebang/access',
+    );
+  });
 });

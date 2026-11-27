@@ -1,5 +1,7 @@
+import { HOSTED_PAGE_ROUTE_PREFIX } from '@/hosted-page/constants/HostedPageRoutePrefix';
 import { useApolloAdminClient } from '@/settings/admin-panel/apollo/hooks/useApolloAdminClient';
 import { SettingsSectionSkeletonLoader } from '@/settings/components/SettingsSectionSkeletonLoader';
+import { SettingsTextLink } from '@/settings/components/SettingsTextLink';
 import { Table } from '@/ui/layout/table/components/Table';
 import { TableBody } from '@/ui/layout/table/components/TableBody';
 import { TableCell } from '@/ui/layout/table/components/TableCell';
@@ -36,8 +38,17 @@ export const SettingsAdminServerAdmins = () => {
   return (
     <Section.Root>
       <Section.Header
-        title={t`Administrators`}
-        description={t`Users with server-level access. Open a user to grant or revoke access; use the search below to find anyone.`}
+        title={t`Server administrators`}
+        description={
+          <>
+            {t`Server tools only: the admin panel and impersonation. They give no access to CRM records.`}{' '}
+            {t`To give someone access to the CRM, choose their role in Åtkomst.`}{' '}
+            <SettingsTextLink
+              to={`${HOSTED_PAGE_ROUTE_PREFIX}access`}
+              variant="secondary"
+            >{t`Open Åtkomst`}</SettingsTextLink>
+          </>
+        }
       />
       {loading ? (
         <SettingsSectionSkeletonLoader />

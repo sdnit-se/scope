@@ -6,12 +6,12 @@ import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/Enriche
 import { AggregateOperations } from '@/object-record/record-table/constants/AggregateOperations';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
 import { jotaiStore } from '@/ui/utilities/state/jotai/jotaiStore';
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { Provider as JotaiProvider } from 'jotai';
 import { createElement, useEffect, type ReactNode } from 'react';
 import { DEFAULT_VIEW_GROUP_LOAD_LIMIT } from 'twenty-shared/constants';
-import { AppPath, SettingsPath } from 'twenty-shared/types';
-import { getSettingsPath, isDefined } from 'twenty-shared/utils';
+import { AppPath } from 'twenty-shared/types';
+import { isDefined } from 'twenty-shared/utils';
 import {
   type NavigationMenuItem,
   NavigationMenuItemType,
@@ -340,7 +340,7 @@ describe('useDefaultHomePagePath', () => {
     });
   });
 
-  it('should redirect to profile settings when there is no readable object', async () => {
+  it('should open the hosted welcome page when there is no readable object', async () => {
     const { result } = renderHooks({
       withCurrentUser: true,
       withExistingView: false,
@@ -349,12 +349,10 @@ describe('useDefaultHomePagePath', () => {
     });
 
     await waitFor(() => {
-      expect(result.current.defaultHomePagePath).toEqual(
-        getSettingsPath(SettingsPath.ProfilePage),
-      );
+      expect(result.current.defaultHomePagePath).toEqual('/shebang/welcome');
     });
   });
-  // Metadata may not be loaded yet right after login; don't fall back to /settings/profile.
+  // Metadata may not be loaded yet right after login; don't fall back to the welcome page.
   it('should defer to AppPath.Index when currentUser is defined but object metadata is not loaded yet', async () => {
     const { result } = renderHooks({
       withCurrentUser: true,
@@ -389,6 +387,47 @@ describe('useDefaultHomePagePath', () => {
 
     await waitFor(() => {
       expect(result.current.defaultHomePagePath).toEqual(AppPath.Home);
+    });
+  });
+  it('should open the hosted welcome page on mobile when there is no readable object', async () => {
+    mockIsMobile = true;
+
+    const { result } = renderHooks({
+      withCurrentUser: true,
+      withExistingView: false,
+      objectMetadataItems: [],
+      navigationMenuItems: [],
+    });
+
+    await waitFor(() => {
+      expect(result.current.defaultHomePagePath).toEqual('/shebang/welcome');
+    });
+  });
+  it('should wait for metadata on a fresh mobile sign-in before choosing the welcome page', async () => {
+    mockIsMobile = true;
+
+    const { result } = renderHooks({
+      withCurrentUser: true,
+      withExistingView: false,
+      withObjectMetadataLoaded: false,
+      withNavigationMenuItemsLoaded: false,
+    });
+
+    await waitFor(() => {
+      expect(result.current.defaultHomePagePath).toEqual(AppPath.Index);
+    });
+
+    act(() => {
+      setTestObjectMetadataItemsInMetadataStore(jotaiStore, []);
+      jotaiStore.set(metadataStoreState.atomFamily('navigationMenuItems'), {
+        current: [],
+        draft: [],
+        status: 'up-to-date',
+      });
+    });
+
+    await waitFor(() => {
+      expect(result.current.defaultHomePagePath).toEqual('/shebang/welcome');
     });
   });
   it('should still return the sign in page on mobile when there is no currentUser', async () => {

@@ -1,4 +1,5 @@
 import { currentUserState } from '@/auth/states/currentUserState';
+import { HOSTED_PAGE_ROUTE_PREFIX } from '@/hosted-page/constants/HostedPageRoutePrefix';
 import { metadataStoreState } from '@/metadata-store/states/metadataStoreState';
 import { metadataStoreStatusFamilySelector } from '@/metadata-store/states/metadataStoreStatusFamilySelector';
 import { useNavigationMenuItemSectionItems } from '@/navigation-menu-item/display/hooks/useNavigationMenuItemSectionItems';
@@ -16,8 +17,8 @@ import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomState
 import { viewsSelector } from '@/views/states/selectors/viewsSelector';
 import isEmpty from 'lodash.isempty';
 import { useCallback, useMemo } from 'react';
-import { AppPath, SettingsPath } from 'twenty-shared/types';
-import { getAppPath, getSettingsPath, isDefined } from 'twenty-shared/utils';
+import { AppPath } from 'twenty-shared/types';
+import { getAppPath, isDefined } from 'twenty-shared/utils';
 
 export const useDefaultHomePagePath = () => {
   const currentUser = useAtomStateValue(currentUserState);
@@ -98,17 +99,20 @@ export const useDefaultHomePagePath = () => {
       return AppPath.SignInUp;
     }
 
-    if (isMobile) {
-      return AppPath.Home;
-    }
+    const areMetadataStoresLoaded =
+      areObjectMetadataItemsLoaded && areNavigationMenuItemsLoaded;
 
     // Both stores are empty right after login; deciding now would pick a wrong fallback.
-    if (!areObjectMetadataItemsLoaded || !areNavigationMenuItemsLoaded) {
+    if (!areMetadataStoresLoaded) {
       return AppPath.Index;
     }
 
     if (isEmpty(readableNonSystemObjectMetadataItems)) {
-      return getSettingsPath(SettingsPath.ProfilePage);
+      return `${HOSTED_PAGE_ROUTE_PREFIX}welcome`;
+    }
+
+    if (isMobile) {
+      return AppPath.Home;
     }
 
     if (isDefined(firstNavigationMenuItemLink)) {
