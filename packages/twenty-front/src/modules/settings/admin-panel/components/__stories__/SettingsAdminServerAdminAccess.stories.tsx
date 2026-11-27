@@ -82,3 +82,25 @@ export const LastAdministratorProtection: Story = {
     );
   },
 };
+
+export const GrantingServerToolsIsNotCrmAccess: Story = {
+  args: { userId: 'new-colleague', userLabel: 'New colleague' },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement.ownerDocument.body);
+    await canvas.findByText('No access');
+    await userEvent.click(canvas.getByRole('button', { name: 'More options' }));
+    await userEvent.click(
+      await canvas.findByRole('menuitem', { name: 'Grant all server tools' }),
+    );
+
+    const confirmation = await canvas.findByRole('dialog', {
+      name: 'Grant access',
+    });
+    await expect(confirmation).toHaveTextContent(
+      'This will grant all server tools to New colleague.',
+    );
+    await expect(confirmation).toHaveTextContent(
+      'This does not give access to CRM records.',
+    );
+  },
+};

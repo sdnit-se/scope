@@ -10,8 +10,8 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { Provider as JotaiProvider } from 'jotai';
 import { createElement, useEffect, type ReactNode } from 'react';
 import { DEFAULT_VIEW_GROUP_LOAD_LIMIT } from 'twenty-shared/constants';
-import { AppPath, SettingsPath } from 'twenty-shared/types';
-import { getSettingsPath, isDefined } from 'twenty-shared/utils';
+import { AppPath } from 'twenty-shared/types';
+import { isDefined } from 'twenty-shared/utils';
 import {
   type NavigationMenuItem,
   NavigationMenuItemType,
@@ -340,7 +340,7 @@ describe('useDefaultHomePagePath', () => {
     });
   });
 
-  it('should redirect to profile settings when there is no readable object', async () => {
+  it('should open the hosted welcome page when there is no readable object', async () => {
     const { result } = renderHooks({
       withCurrentUser: true,
       withExistingView: false,
@@ -349,12 +349,10 @@ describe('useDefaultHomePagePath', () => {
     });
 
     await waitFor(() => {
-      expect(result.current.defaultHomePagePath).toEqual(
-        getSettingsPath(SettingsPath.ProfilePage),
-      );
+      expect(result.current.defaultHomePagePath).toEqual('/shebang/welcome');
     });
   });
-  // Metadata may not be loaded yet right after login; don't fall back to /settings/profile.
+  // Metadata may not be loaded yet right after login; don't fall back to the welcome page.
   it('should defer to AppPath.Index when currentUser is defined but object metadata is not loaded yet', async () => {
     const { result } = renderHooks({
       withCurrentUser: true,

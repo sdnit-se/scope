@@ -2733,11 +2733,6 @@ msgstr "Administration"
 msgid "Administrator"
 msgstr "Administratör"
 
-#. js-lingui-id: 3zE1mx
-#: src/modules/settings/admin-panel/components/SettingsAdminServerAdmins.tsx
-msgid "Administrators"
-msgstr "Administratörer"
-
 #. js-lingui-id: sxkWRg
 #: src/modules/ai/components/AiModelPicker.tsx
 #: src/modules/settings/components/SettingsMorphRelationMultiSelect.tsx
@@ -3233,6 +3228,11 @@ msgstr "alla poster"
 #: src/modules/settings/roles/components/SettingsRolesList.tsx
 msgid "All roles"
 msgstr "Alla roller"
+
+#. js-lingui-id: yZhj8b
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdminAccess.tsx
+msgid "all server tools"
+msgstr "alla serververktyg"
 
 #. js-lingui-id: shNsiv
 #: src/modules/settings/admin-panel/config-variables/constants/ConfigVariableSourceOptions.ts
@@ -13311,11 +13311,6 @@ msgstr "Helsida"
 msgid "Full screen"
 msgstr "Helskärm"
 
-#. js-lingui-id: CU/Sq6
-#: src/modules/settings/admin-panel/components/SettingsAdminServerAdminAccess.tsx
-msgid "full server access"
-msgstr "full serveråtkomst"
-
 #. js-lingui-id: Fcl4s2
 #: src/modules/side-panel/components/hooks/usePageLayoutHeaderInfo.ts
 msgid "Full-height Widget"
@@ -13626,16 +13621,16 @@ msgstr "Ge åtkomst till din arbetsyta så att vi kan lösa problem."
 msgid "Grant admin panel access"
 msgstr "Bevilja åtkomst till adminpanelen"
 
+#. js-lingui-id: d66uh5
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdminAccess.tsx
+msgid "Grant all server tools"
+msgstr "Bevilja alla serververktyg"
+
 #. js-lingui-id: 5O8DG6
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceCreditGrantModal.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceCreditGrantsTable.tsx
 msgid "Grant credits"
 msgstr "Bevilja krediter"
-
-#. js-lingui-id: FdPN4f
-#: src/modules/settings/admin-panel/components/SettingsAdminServerAdminAccess.tsx
-msgid "Grant full access"
-msgstr "Bevilja full åtkomst"
 
 #. js-lingui-id: E0rSFg
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceCreditGrantsTable.tsx
@@ -20073,6 +20068,12 @@ msgstr "Öppna en e-postredigerare för att redigera sidans stil."
 msgid "Open as link"
 msgstr "Öppna som länk"
 
+#. js-lingui-id: kMJGZx
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdmins.tsx
+#: src/modules/settings/members/components/MemberPermissionsTab.tsx
+msgid "Open Åtkomst"
+msgstr "Öppna Åtkomst"
+
 #. js-lingui-id: 6I7cJR
 #: src/modules/command-menu-item/engine-command/constants/EngineComponentKeyHeadlessComponentMap.tsx
 msgid "Open chat"
@@ -24883,11 +24884,6 @@ msgstr "Serbian (Cyrillic)"
 msgid "Serbian (Latin)"
 msgstr "Serbiska (latinskt alfabet)"
 
-#. js-lingui-id: hjUUtd
-#: src/pages/settings/admin-panel/SettingsAdminUserDetail.tsx
-msgid "Server access"
-msgstr "Serveråtkomst"
-
 #. js-lingui-id: OtiC0G
 #: src/modules/log-console/constants/LogConsoleSecurityFilterFields.tsx
 #: src/modules/log-console/utils/getLogConsoleSecurityEvent.ts
@@ -24898,6 +24894,21 @@ msgstr "Serveradministratörsåtkomst uppdaterad"
 #: src/modules/settings/admin-panel/components/SettingsAdminServerAdminAccess.tsx
 msgid "Server administrator access updated."
 msgstr "Serveradministratörsåtkomst uppdaterad."
+
+#. js-lingui-id: brrpLO
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdmins.tsx
+msgid "Server administrators"
+msgstr "Serveradministratörer"
+
+#. js-lingui-id: ZR3jYY
+#: src/pages/settings/admin-panel/SettingsAdminUserDetail.tsx
+msgid "Server tools"
+msgstr "Serververktyg"
+
+#. js-lingui-id: Yh2+td
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdmins.tsx
+msgid "Server tools only: the admin panel and impersonation. They give no access to CRM records."
+msgstr "Endast serververktyg: administratörspanelen och impersonering. De ger ingen åtkomst till poster i CRM."
 
 #. js-lingui-id: WJSW19
 #: src/modules/settings/application-monitoring/constants/ApplicationLogSourceLabels.ts
@@ -27523,6 +27534,11 @@ msgstr "Detta databasvärde åsidosätter miljöinställningar."
 msgid "This device"
 msgstr "Den här enheten"
 
+#. js-lingui-id: fcvBIo
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdminAccess.tsx
+msgid "This does not give access to CRM records. CRM access is a role, chosen in Åtkomst."
+msgstr "Detta ger ingen åtkomst till poster i CRM. Åtkomst till CRM är en roll som väljs i Åtkomst."
+
 #. js-lingui-id: GyVWfy
 #: src/modules/ai/utils/getAgentChatThreadSnoozeOptions.ts
 msgid "This evening"
@@ -27987,6 +28003,12 @@ msgstr "till"
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowRunStepLogsEmailDetail.tsx
 msgid "To"
 msgstr "Till"
+
+#. js-lingui-id: JyBNIC
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdmins.tsx
+#: src/modules/settings/members/components/MemberPermissionsTab.tsx
+msgid "To give someone access to the CRM, choose their role in Åtkomst."
+msgstr "Ge någon åtkomst till CRM genom att välja personens roll i Åtkomst."
 
 #. js-lingui-id: ecUA8p
 #: src/modules/ai/utils/groupThreadsByDate.ts
@@ -29879,11 +29901,6 @@ msgstr "Användares arbetsytor"
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useSettingsRolePermissionFlagConfig.ts
 msgid "Users"
 msgstr "Användare"
-
-#. js-lingui-id: zCO0/Y
-#: src/modules/settings/admin-panel/components/SettingsAdminServerAdmins.tsx
-msgid "Users with server-level access. Open a user to grant or revoke access; use the search below to find anyone."
-msgstr "Användare med åtkomst på servernivå. Öppna en användare för att bevilja eller återkalla åtkomst; använd sökningen nedan för att hitta någon."
 
 #. js-lingui-id: UIOjSC
 #: src/modules/settings/admin-panel/signing-keys/components/SettingsAdminSigningKeysTable.tsx

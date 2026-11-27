@@ -201,7 +201,7 @@ export const SettingsAdminServerAdminAccess = ({
                 <Dropdown.ActionItem
                   onClick={() =>
                     requestChange({
-                      description: t`full server access`,
+                      description: t`all server tools`,
                       isRevoking: false,
                       update: {
                         canAccessFullAdminPanel: true,
@@ -209,7 +209,7 @@ export const SettingsAdminServerAdminAccess = ({
                       },
                     })
                   }
-                >{t`Grant full access`}</Dropdown.ActionItem>
+                >{t`Grant all server tools`}</Dropdown.ActionItem>
               )}
             </Dropdown.Section>
           </DropdownContent>
@@ -232,6 +232,9 @@ export const SettingsAdminServerAdminAccess = ({
                 ? t`This will revoke ${pendingChange?.description ?? ''} for ${userLabel}.`
                 : t`This will grant ${pendingChange?.description ?? ''} to ${userLabel}.`}
             </div>
+            {!pendingChange?.isRevoking && (
+              <div>{t`This does not give access to CRM records. CRM access is a role, chosen in Åtkomst.`}</div>
+            )}
             <div>{t`Enter your two-factor authentication code to confirm.`}</div>
             <OTPInput
               maxLength={6}
