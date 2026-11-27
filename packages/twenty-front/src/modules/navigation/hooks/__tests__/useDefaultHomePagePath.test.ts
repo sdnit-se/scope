@@ -389,6 +389,20 @@ describe('useDefaultHomePagePath', () => {
       expect(result.current.defaultHomePagePath).toEqual(AppPath.Home);
     });
   });
+  it('should open the hosted welcome page on mobile when there is no readable object', async () => {
+    mockIsMobile = true;
+
+    const { result } = renderHooks({
+      withCurrentUser: true,
+      withExistingView: false,
+      objectMetadataItems: [],
+      navigationMenuItems: [],
+    });
+
+    await waitFor(() => {
+      expect(result.current.defaultHomePagePath).toEqual('/shebang/welcome');
+    });
+  });
   it('should still return the sign in page on mobile when there is no currentUser', async () => {
     mockIsMobile = true;
     jotaiStore.set(currentUserState.atom, null);

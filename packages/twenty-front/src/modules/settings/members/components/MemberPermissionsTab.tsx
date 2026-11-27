@@ -26,8 +26,11 @@ const StyledNoRoleContainer = styled.div`
   align-items: center;
   color: ${themeCssVariables.font.color.tertiary};
   display: flex;
+  flex-direction: column;
+  gap: ${themeCssVariables.spacing[2]};
   justify-content: center;
   padding: ${themeCssVariables.spacing[8]};
+  text-align: center;
 `;
 
 const StyledRoleContainer = styled.div`
@@ -114,9 +117,22 @@ export const MemberPermissionsTab = ({
     }
   };
 
+  const crmAccessGuidance = (
+    <span>
+      {t`To give someone access to the CRM, choose their role in Åtkomst.`}{' '}
+      <SettingsTextLink
+        to={`${HOSTED_PAGE_ROUTE_PREFIX}access`}
+        variant="secondary"
+      >{t`Open Åtkomst`}</SettingsTextLink>
+    </span>
+  );
+
   if (!isDefined(primaryRole)) {
     return (
-      <StyledNoRoleContainer>{t`No role assigned to this member`}</StyledNoRoleContainer>
+      <StyledNoRoleContainer>
+        {t`No role assigned to this member`}
+        {crmAccessGuidance}
+      </StyledNoRoleContainer>
     );
   }
 
@@ -132,11 +148,7 @@ export const MemberPermissionsTab = ({
             <>
               {t`Customize what this user can view and perform`}
               <br />
-              {t`To give someone access to the CRM, choose their role in Åtkomst.`}{' '}
-              <SettingsTextLink
-                to={`${HOSTED_PAGE_ROUTE_PREFIX}access`}
-                variant="secondary"
-              >{t`Open Åtkomst`}</SettingsTextLink>
+              {crmAccessGuidance}
             </>
           }
         />
